@@ -53,7 +53,7 @@ async def main():
     parser.add_argument("-i", "--inputFile", required=True, help="CSV file with summary claims and source statements")
     parser.add_argument("-o", "--outputDir", default="evals/autorating/results", help="Where to save evaluation results to")
     parser.add_argument("-l", "--location", default="us-central1", help="In which location to run the model")
-    parser.add_argument("-m", "--model", default="gemini-2.5-pro-preview-03-25", help="Vertex AI model name")
+    parser.add_argument("-m", "--model", default="gemini-2.5-pro-preview-05-06", help="Vertex AI model name")
     parser.add_argument("-c", "--additionalContext", default="", help="Additional context to provide to the model")
     args = parser.parse_args()
 

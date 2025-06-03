@@ -49,7 +49,7 @@ export class VertexModel extends Model {
   constructor(
     project: string,
     location: string,
-    modelName: string = "gemini-2.5-pro-preview-03-25"
+    modelName: string = "gemini-2.5-pro-preview-05-06"
   ) {
     super();
     this.vertexAI = new VertexAI({
@@ -66,7 +66,7 @@ export class VertexModel extends Model {
    * Get generative model corresponding to structured data output specification as a JSON Schema specification.
    */
   getGenerativeModel(schema?: TSchema): GenerativeModel {
-    const requestOptions: RequestOptions = { timeout: 150000 }; // 2.5 min (overrides current default of 5 mins)
+    const requestOptions: RequestOptions = { timeout: 150000 * 4 }; // 10 min (overrides current default of 5 mins)
     return this.vertexAI.getGenerativeModel(getModelParams(this.modelName, schema), requestOptions);
   }
 
