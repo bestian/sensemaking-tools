@@ -133,7 +133,7 @@ export async function getTopicsAndSubtopics(
   comments: Comment[]
 ): Promise<Topic[]> {
   const sensemaker = new Sensemaker({
-    defaultModel: new VertexModel(project, "us-central1"),
+    defaultModel: new VertexModel(project, "global"),
   });
   return await sensemaker.learnTopics(comments, true);
 }
@@ -153,7 +153,7 @@ export async function getSummary(
   additionalContext?: string
 ): Promise<Summary> {
   const sensemaker = new Sensemaker({
-    defaultModel: new VertexModel(project, "us-central1"),
+    defaultModel: new VertexModel(project, "global"),
   });
   // TODO: Make the summariation type an argument and add it as a flag in runner.ts. The data
   // requirements (like requiring votes) would also need updated.

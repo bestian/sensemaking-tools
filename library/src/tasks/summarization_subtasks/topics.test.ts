@@ -110,7 +110,7 @@ describe("AllTopicsSummaryTest", () => {
     expect(
       await new AllTopicsSummary(
         new GroupedSummaryStats(TEST_COMMENTS),
-        new VertexModel("project123", "usa")
+        new VertexModel("project123", "global")
       ).getSummary()
     ).toEqual({
       title: "## Topics",

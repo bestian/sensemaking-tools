@@ -80,7 +80,7 @@ async function main(): Promise<void> {
 
   // Learn topics and categorize comments.
   const sensemaker = new Sensemaker({
-    defaultModel: new VertexModel(options.vertexProject, "us-central1"),
+    defaultModel: new VertexModel(options.vertexProject, "global"),
   });
   const topics = options.topics ? getTopics(options.topics) : undefined;
   const categorizedComments = await sensemaker.categorizeComments(
