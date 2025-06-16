@@ -7,10 +7,11 @@
   "workspaces": [
     "api-server",
     "library",
-    "web-ui"
+    "web-ui",
+    "napolitan"
   ],
   "scripts": {
-    "test": "npm run test --workspaces",
+    "test": "npm run test --workspaces && python3 -m pytest",
     "lint": "npm run lint --workspaces",
     "format": "npm run format --workspaces"
   },
