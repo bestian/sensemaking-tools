@@ -1,0 +1,1 @@
+import{U as o}from"./index-COZDKLvM.js";const e=o({base:"light",brandTitle:"My custom Storybook",brandUrl:"https://example.com",brandImage:"logo.svg",brandTarget:"_self"}),t={parameters:{controls:{matchers:{color:/(background|color)$/i,date:/Date$/i}},docs:{theme:e}}};export{t as default};
