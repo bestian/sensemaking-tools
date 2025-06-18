@@ -1,3 +1,4 @@
 /node_modules
 /.eslintcache
 /.venv
+.DS_Store
