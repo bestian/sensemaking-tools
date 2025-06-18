@@ -1,5 +1,5 @@
 {
-    "name": "sensemaker-viz-components",
+    "name": "@conversationai/sensemaker-visualizations",
     "version": "1.0.46",
     "description": "Interactive visualization components for sensemaker data",
     "type": "module",
@@ -22,7 +22,7 @@
     "peerDependencies": {
         "d3": "^7.0.0"
     },
-    "homepage": "https://github.com/polygraph-cool/sensemaker-viz#readme",
+    "homepage": "https://github.com/Jigsaw-Code/sensemaking-tools/tree/main/visualization-library#readme",
     "devDependencies": {
         "@storybook/addon-essentials": "^8.6.12",
         "@storybook/blocks": "^8.6.12",
@@ -43,12 +43,13 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/polygraph-cool/sensemaker-viz.git"
+        "url": "git+https://github.com/Jigsaw-Code/sensemaking-tools.git",
+        "directory": "visualization-library"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/polygraph-cool/sensemaker-viz/issues"
+        "url": "https://github.com/Jigsaw-Code/sensemaking-tools/issues"
     }
 }
