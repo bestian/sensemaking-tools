@@ -3,8 +3,8 @@ import { create } from '@storybook/theming';
 
 export default create({
   base: 'light',
-  brandTitle: 'My custom Storybook',
-  brandUrl: 'https://example.com',
+  brandTitle: 'Sensemaker Visualization Library',
+  brandUrl: 'https://jigsaw-code.github.io/sensemaking-tools/',
   brandImage: 'logo.svg',
   brandTarget: '_self',
 });

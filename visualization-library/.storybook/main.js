@@ -14,7 +14,7 @@ const config = {
     "staticDirs": ['../stories/data', '../stories/assets'],
     "viteFinal": async (config) => {
         // Set base URL for GitHub Pages
-        config.base = process.env.NODE_ENV === 'production' ? '/sensemaking-viz/' : '/';
+        config.base = process.env.NODE_ENV === 'production' ? '/sensemaking-tools/visualization-docs/' : '/';
         return config;
     }
 };
