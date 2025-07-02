@@ -8,6 +8,7 @@
     "api-server",
     "library",
     "web-ui",
+    "visualizations-library",
     "napolitan"
   ],
   "scripts": {
@@ -40,7 +41,7 @@
     "puppeteer": "^24.3.0",
     "ts-jest": "^29.2.5",
     "typedoc": "^0.26.10",
-    "typescript": "^5.6.3",
+    "typescript": "~5.6.3",
     "typescript-eslint": "^8.24.1"
   },
   "lint-staged": {

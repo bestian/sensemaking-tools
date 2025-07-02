@@ -1,8 +1,11 @@
-module.exports = {
+import type { JestConfigWithTsJest } from "ts-jest";
+
+const jestConfig: JestConfigWithTsJest = {
   preset: "ts-jest",
+  testEnvironment: "node",
   transform: {
-    "^.+\\.(ts|tsx)?$": "ts-jest",
-    "^.+\\.(js|jsx)$": "babel-jest",
+    "^.+\\.tsx?$": ["ts-jest", { tsconfig: "tsconfig.spec.json" }],
   },
-  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
 };
+
+export default jestConfig;
