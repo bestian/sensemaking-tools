@@ -38,7 +38,7 @@ import logging
 
 from hallucination_autorater import HallucinationAutorater
 from autorating_utils import read_csv
-from vertex_model import VertexModel
+from models.vertex_model import VertexModel
 
 
 async def main():

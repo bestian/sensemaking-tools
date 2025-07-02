@@ -19,7 +19,7 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from autorating_utils import EvalInput
 from hallucination_autorater import HallucinationAutorater
-from vertex_model import VertexModel
+from models.vertex_model import VertexModel
 
 
 @pytest.fixture

@@ -26,7 +26,7 @@ from autorating_utils import (
     format_comments,
     format_summary,
 )
-from vertex_model import VertexModel, run_tasks_in_parallel
+from models.vertex_model import VertexModel, run_tasks_in_parallel
 
 
 class HallucinationAutorater:
