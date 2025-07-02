@@ -1,0 +1,10 @@
+services:
+  napolitan:
+    build:
+      context: .
+      dockerfile: napolitan.Dockerfile
+    volumes:
+      - ./napolitan:/app/napolitan
+      - ./models:/app/models
+    environment:
+      PYTHONPATH: /app
