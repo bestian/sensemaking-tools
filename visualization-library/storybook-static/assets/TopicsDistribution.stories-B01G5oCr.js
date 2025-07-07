@@ -1,19 +1,19 @@
-import{s as k}from"./scriptWarning-DXObLxWB.js";const F="/sensemaking-viz",d=["#AFB42B","#129EAF","#F4511E","#3949AB","#5F8F35","#9334E6","#E52592","#00897B","#E8710A","#1A73E8"],c=t=>t.startsWith("http://")||t.startsWith("https://")?t:`${F}${t}`,E={title:"Charts/TopicsDistribution",tags:["autodocs"],argTypes:{dataSource:{name:"data-source",control:"text",description:"Local path or remote URL to the data source JSON.",table:{type:{summary:"string"},defaultValue:{summary:"none"},category:"Required"}},summarySource:{name:"summary-source",control:"text",description:"Local path or remote URL to the summary data JSON. Optional, but required for theme summaries.",table:{type:{summary:"string"},defaultValue:{summary:"none"},category:"Optional"}},view:{control:"select",options:["cluster","scatter"],description:'Display mode: "cluster" (circle packing) or "scatter" (distributed). Can be set statically or dynamically via DOM manipulation.',table:{type:{summary:"string"},defaultValue:{summary:"cluster"}}},id:{control:"text",description:"Unique identifier for the chart element. Primarily used to target the chart for DOM manipulation.",table:{type:{summary:"string"},defaultValue:{summary:"none"}}},topicFilter:{name:"topic-filter",control:"text",description:"Semicolon-separated list of topics to filter data. Can also prefix with '!' to exclude topics.",table:{type:{summary:"string"},defaultValue:{summary:"none"},category:"Required"}},colors:{name:"colors",control:"object",description:"Array of colors to use in the chart.",table:{type:{summary:"string[]"},defaultValue:{summary:JSON.stringify(d)},category:"Style"}},fontFamily:{name:"font-family",control:"text",description:"Font family to use in the chart.",table:{type:{summary:"string"},defaultValue:{summary:"Noto Sans"},category:"Style"}},altText:{name:"alt-text",control:"text",description:"Manually set alternative text description for accessibility purposes. This will overwrite the programmatically generated alt text.",table:{type:{summary:"string"},defaultValue:{summary:"undefined"},category:"Accessibility"}}},parameters:{docs:{description:{component:`
+import{s as k}from"./scriptWarning-DXObLxWB.js";const F="/sensemaking-tools/visualization-docs",d=["#AFB42B","#129EAF","#F4511E","#3949AB","#5F8F35","#9334E6","#E52592","#00897B","#E8710A","#1A73E8"],c=t=>t.startsWith("http://")||t.startsWith("https://")?t:`${F}${t}`,E={title:"Charts/TopicsDistribution",tags:["autodocs"],argTypes:{dataSource:{name:"data-source",control:"text",description:"Local path or remote URL to the data source JSON.",table:{type:{summary:"string"},defaultValue:{summary:"none"},category:"Required"}},summarySource:{name:"summary-source",control:"text",description:"Local path or remote URL to the summary data JSON. Optional, but required for theme summaries.",table:{type:{summary:"string"},defaultValue:{summary:"none"},category:"Optional"}},view:{control:"select",options:["cluster","scatter"],description:'Display mode: "cluster" (circle packing) or "scatter" (distributed). Can be set statically or dynamically via DOM manipulation.',table:{type:{summary:"string"},defaultValue:{summary:"cluster"}}},id:{control:"text",description:"Unique identifier for the chart element. Primarily used to target the chart for DOM manipulation.",table:{type:{summary:"string"},defaultValue:{summary:"none"}}},topicFilter:{name:"topic-filter",control:"text",description:"Semicolon-separated list of topics to filter data. Can also prefix with '!' to exclude topics.",table:{type:{summary:"string"},defaultValue:{summary:"none"},category:"Required"}},colors:{name:"colors",control:"object",description:"Array of colors to use in the chart.",table:{type:{summary:"string[]"},defaultValue:{summary:JSON.stringify(d)},category:"Style"}},fontFamily:{name:"font-family",control:"text",description:"Font family to use in the chart.",table:{type:{summary:"string"},defaultValue:{summary:"Noto Sans"},category:"Style"}},altText:{name:"alt-text",control:"text",description:"Manually set alternative text description for accessibility purposes. This will overwrite the programmatically generated alt text.",table:{type:{summary:"string"},defaultValue:{summary:"undefined"},category:"Accessibility"}}},parameters:{docs:{description:{component:`
 The topic alignment chart displays agreement/disagreement percentages with options for different view options (cluster or scatter). The view can be set statically or dynamically via DOM manipulation.
 
 The radius of each subtopic is determined by the number of statements in the subtopic using a square root scale.
                 
 ${k}
-                `}}}},x=({id:t,dataSource:l,summarySource:s,view:u,topicFilter:i,colors:o,fontFamily:n,altText:m})=>`
+                `}}}},x=({id:t,dataSource:l,summarySource:s,view:u,topicFilter:o,colors:i,fontFamily:n,altText:m})=>`
     <sensemaker-chart
       id="${t}"
       data-source="${c(l)}"
       summary-source="${c(s)}"
       chart-type="topics-distribution"
       view="${u}"
-      colors='${JSON.stringify(o||d)}'
+      colors='${JSON.stringify(i||d)}'
       font-family="${n||"Noto Sans"}"
-      ${i?`topic-filter="${i}"`:""}
+      ${o?`topic-filter="${o}"`:""}
       ${m?`alt-text="${m}"`:""}
     ></sensemaker-chart>
   `,e=x.bind({});e.args={dataSource:"/comments.json",summarySource:"/summary.json",view:"cluster",topicFilter:"!other"};e.parameters={docs:{description:{story:"The cluster view shows the subtopics as circles grouped by topic, with the size of the circle indicating the number of statements in the subtopic."},source:{code:`<sensemaker-chart
@@ -28,7 +28,7 @@ ${k}
   chart-type="topics-distribution"
   view="scatter"
   topic-filter="!other">
-</sensemaker-chart>`,language:"html",type:"code"}}};const V=({dataSource:t,summarySource:l,topicFilter:s,colors:u,fontFamily:i,altText:o})=>(setTimeout(()=>{const n=document.getElementById("topics-distribution-chart-with-toggle");document.querySelectorAll('input[name="view"]').forEach(T=>{T.addEventListener("change",p=>{p.target.checked&&(p.target.value==="scatter"?n.setAttribute("view","scatter"):n.setAttribute("view","cluster"))})})},100),`
+</sensemaker-chart>`,language:"html",type:"code"}}};const V=({dataSource:t,summarySource:l,topicFilter:s,colors:u,fontFamily:o,altText:i})=>(setTimeout(()=>{const n=document.getElementById("topics-distribution-chart-with-toggle");document.querySelectorAll('input[name="view"]').forEach(T=>{T.addEventListener("change",p=>{p.target.checked&&(p.target.value==="scatter"?n.setAttribute("view","scatter"):n.setAttribute("view","cluster"))})})},100),`
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
       <div class="view-controls" style="margin-bottom: 20px;">
         <label style="margin-right: 15px; cursor: pointer;">
@@ -46,9 +46,9 @@ ${k}
         chart-type="topics-distribution"
         view="cluster"
         colors='${JSON.stringify(u||d)}'
-        font-family="${i||"Noto Sans"}"
+        font-family="${o||"Noto Sans"}"
         ${s?`topic-filter="${s}"`:""}
-        ${o?`alt-text="${o}"`:""}
+        ${i?`alt-text="${i}"`:""}
       ></sensemaker-chart>
     </div>
   `),a=V.bind({});a.args={dataSource:"/comments.json",summarySource:"/summary.json",topicFilter:"!other"};a.parameters={docs:{description:{story:"The chart view updates via external controls, with animated transitions that preserve DOM state."},source:{code:`<!-- Toggle controls -->

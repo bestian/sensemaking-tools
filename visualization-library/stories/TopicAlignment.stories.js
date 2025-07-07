@@ -3,7 +3,7 @@ import { scriptWarning } from "./shared/scriptWarning.js";
 import comments from "./data/comments.json";
 
 const defaultColors = ["#3A708A", "#589AB7", "#8bc3da", "#757575"];
-const basePath = process.env.NODE_ENV === 'production' ? '/sensemaking-viz' : '';
+const basePath = process.env.NODE_ENV === 'production' ? '/sensemaking-tools/visualization-docs' : '';
 
 const getDataSource = (path) => {
     // If it's a remote URL (starts with http:// or https://), return as is
