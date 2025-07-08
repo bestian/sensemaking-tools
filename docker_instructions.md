@@ -16,8 +16,8 @@ Use the name from above.\
 `docker exec -it participation-project-napolitan-1 bash`
 
 ### Setup gcloud cli project and authenticate:
-`gcloud config set project <project_name> && \`\
-`gcloud auth application-default login`
+`gcloud auth application-default login && \`\
+`gcloud config set project <project_name>`
 
 # To delete docker container
 `docker compose down --rmi all --volumes`
