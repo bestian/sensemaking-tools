@@ -1,11 +1,11 @@
 /**
  * Returns CSS styles for the topics distribution visualization.
  * Includes styles for containers, nodes, text elements, and interactive elements.
- * 
+ *
  * @returns {string} CSS styles as a template literal
  */
 export function getStyles() {
-    return `
+  return `
 /* Container styles */
 .chart-container {
 		user-select: none;

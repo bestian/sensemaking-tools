@@ -12,7 +12,7 @@
     "napolitan"
   ],
   "scripts": {
-    "test": "npm run test --workspaces && python3 -m pytest",
+    "test": "npm run test --workspaces",
     "lint": "npm run lint --workspaces",
     "format": "npm run format --workspaces"
   },

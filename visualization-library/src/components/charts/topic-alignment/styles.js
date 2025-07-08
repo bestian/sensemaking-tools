@@ -4,7 +4,7 @@
  * @returns {string} CSS styles as a template literal
  */
 export function getStyles() {
-    return `
+  return `
 /* Container styles */
 .topic-alignment-container {
 	width: 100%;

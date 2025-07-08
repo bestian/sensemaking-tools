@@ -35,5 +35,3 @@ curl "${EXPORT_URL_BASE}/participant-votes.csv" > "${OUTPUT_DIR}/participants-vo
 curl "${EXPORT_URL_BASE}/votes.csv" > "${OUTPUT_DIR}/votes.csv"
 curl "${EXPORT_URL_BASE}/summary.csv" > "${OUTPUT_DIR}/summary.csv"
 curl "${EXPORT_URL_BASE}/comment-groups.csv" > "${OUTPUT_DIR}/comment-groups.csv"
-
-

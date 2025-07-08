@@ -18,60 +18,62 @@ import logging
 import os
 import time
 from typing import List
-import pandas as pd
 from autorating_utils import (
-    EvalResults,
     EvalInput,
-    generate_evaluation_report,
+    EvalResults,
     format_comments,
     format_summary,
+    generate_evaluation_report,
 )
 from models.vertex_model import VertexModel, run_tasks_in_parallel
+import pandas as pd
 
 
 class HallucinationAutorater:
-    def __init__(self, model: VertexModel, output_dir: str):
-        self.model = model
-        self.output_dir = output_dir
 
-    async def rate_hallucination(self, summaries: List[EvalInput], context: str = ""):
-        """
-        Evaluates the hallucination/fabrication tendency of generated summary statements.
+  def __init__(self, model: VertexModel, output_dir: str):
+    self.model = model
+    self.output_dir = output_dir
 
-        Args:
-            summaries: A list of `EvalInput` objects.
-            context: optional additional context to provide to the model
-        """
-        start_time_total = time.perf_counter()
+  async def rate_hallucination(
+      self, summaries: List[EvalInput], context: str = ""
+  ):
+    """Evaluates the hallucination/fabrication tendency of generated summary statements.
 
-        # Initialize DataFrame with the header row
-        autorating_results_df = pd.DataFrame(
-            columns=[
-                "Generated Statement",
-                "Source Comments",
-                "Has Hallucinations?",
-                "LLM Analysis",
-                "LLM Explanation",
-                "Runtime (seconds)",
-            ]
-        )
+    Args:
+        summaries: A list of `EvalInput` objects.
+        context: optional additional context to provide to the model
+    """
+    start_time_total = time.perf_counter()
 
-        aggregated_results: EvalResults = {
-            "totalSummaries": 0,
-            "metrics": {"Hallucinations": {"no": 0, "yes": 0, "maybe": 0}},
-        }
+    # Initialize DataFrame with the header row
+    autorating_results_df = pd.DataFrame(
+        columns=[
+            "Generated Statement",
+            "Source Comments",
+            "Has Hallucinations?",
+            "LLM Analysis",
+            "LLM Explanation",
+            "Runtime (seconds)",
+        ]
+    )
 
-        prompts = []
-        for summary_data in summaries:
-            statement = summary_data["summary"]
-            comments = summary_data["source"]
+    aggregated_results: EvalResults = {
+        "totalSummaries": 0,
+        "metrics": {"Hallucinations": {"no": 0, "yes": 0, "maybe": 0}},
+    }
 
-            formatted_summary = format_summary(statement)
+    prompts = []
+    for summary_data in summaries:
+      statement = summary_data["summary"]
+      comments = summary_data["source"]
 
-            # TODO: pass comments context so we don't need to ask model to ignore claims like 'broad support', 'common ground' and potentially miss some hallucinations
-            formatted_comments = format_comments(comments)
+      formatted_summary = format_summary(statement)
 
-            prompt = f"""
+      # TODO: pass comments context so we don't need to ask model to ignore claims like 'broad support', 'common ground' and potentially miss some hallucinations
+      formatted_comments = format_comments(comments)
+
+      prompt = f"""
 You are analyzing a statement that attempts to summarize a comment or a set of comments.
 
 STATEMENT:
@@ -104,103 +106,105 @@ Do not include markdown code blocks around the JSON response, such as ```json or
 For example:
 {{"analysis": "...", "answer": "NO", "explanation": "NO because..."}}
 """
-            prompts.append((prompt, statement, comments))
+      prompts.append((prompt, statement, comments))
 
-        # inner function to evaluate a single prompt
-        async def evaluate(prompt_data):
-            prompt, statement, comments = prompt_data
-            start_time_statement = time.perf_counter()
+    # inner function to evaluate a single prompt
+    async def evaluate(prompt_data):
+      prompt, statement, comments = prompt_data
+      start_time_statement = time.perf_counter()
 
-            try:
-                response = await self.model.generate_data(prompt)
+      try:
+        response = await self.model.generate_data(prompt)
 
-            except Exception as e:
-                logging.error(f"Error during LLM call or parsing: {e}")
-                return {
-                    "statement": statement,
-                    "comments": comments,
-                    "has_hallucinations": "NULL",
-                    "analysis": "NULL",
-                    "explanation": "NULL",
-                    "runtime": "NULL",
-                }
+      except Exception as e:
+        logging.error(f"Error during LLM call or parsing: {e}")
+        return {
+            "statement": statement,
+            "comments": comments,
+            "has_hallucinations": "NULL",
+            "analysis": "NULL",
+            "explanation": "NULL",
+            "runtime": "NULL",
+        }
 
-            if not response:
-                logging.warning("Skipping due to invalid response from LLM.")
-                return {
-                    "statement": statement,
-                    "comments": comments,
-                    "has_hallucinations": "NULL",
-                    "analysis": "NULL",
-                    "explanation": "NULL",
-                    "runtime": "NULL",
-                }
+      if not response:
+        logging.warning("Skipping due to invalid response from LLM.")
+        return {
+            "statement": statement,
+            "comments": comments,
+            "has_hallucinations": "NULL",
+            "analysis": "NULL",
+            "explanation": "NULL",
+            "runtime": "NULL",
+        }
 
-            statement_runtime_sec = time.perf_counter() - start_time_statement
-            logging.info(f"STATEMENT hallucination check took {statement_runtime_sec} seconds.")
+      statement_runtime_sec = time.perf_counter() - start_time_statement
+      logging.info(
+          f"STATEMENT hallucination check took {statement_runtime_sec} seconds."
+      )
 
-            return {
-                "statement": statement,
-                "comments": comments,
-                "has_hallucinations": response["answer"],
-                "analysis": response["analysis"],
-                "explanation": response["explanation"],
-                "runtime": f"{statement_runtime_sec:.2f}",
-            }
+      return {
+          "statement": statement,
+          "comments": comments,
+          "has_hallucinations": response["answer"],
+          "analysis": response["analysis"],
+          "explanation": response["explanation"],
+          "runtime": f"{statement_runtime_sec:.2f}",
+      }
 
-        results = await run_tasks_in_parallel(prompts, evaluate)
+    results = await run_tasks_in_parallel(prompts, evaluate)
 
-        for result in results:
-            # add to dataframe
-            new_row = pd.DataFrame(
-                [
-                    [
-                        result["statement"],
-                        result["comments"],
-                        result["has_hallucinations"],
-                        result["analysis"],
-                        result["explanation"],
-                        result["runtime"],
-                    ]
-                ],
-                columns=autorating_results_df.columns,
-            )
-            autorating_results_df = pd.concat(
-                [autorating_results_df, new_row], ignore_index=True
-            )
+    for result in results:
+      # add to dataframe
+      new_row = pd.DataFrame(
+          [[
+              result["statement"],
+              result["comments"],
+              result["has_hallucinations"],
+              result["analysis"],
+              result["explanation"],
+              result["runtime"],
+          ]],
+          columns=autorating_results_df.columns,
+      )
+      autorating_results_df = pd.concat(
+          [autorating_results_df, new_row], ignore_index=True
+      )
 
-            # Update aggregated results
-            has_hallucinations = result["has_hallucinations"]
-            if has_hallucinations == "YES":
-                aggregated_results["metrics"]["Hallucinations"]["yes"] += 1
-            elif has_hallucinations == "NO":
-                aggregated_results["metrics"]["Hallucinations"]["no"] += 1
-            elif has_hallucinations == "MAYBE":
-                aggregated_results["metrics"]["Hallucinations"]["maybe"] += 1
+      # Update aggregated results
+      has_hallucinations = result["has_hallucinations"]
+      if has_hallucinations == "YES":
+        aggregated_results["metrics"]["Hallucinations"]["yes"] += 1
+      elif has_hallucinations == "NO":
+        aggregated_results["metrics"]["Hallucinations"]["no"] += 1
+      elif has_hallucinations == "MAYBE":
+        aggregated_results["metrics"]["Hallucinations"]["maybe"] += 1
 
-            aggregated_results["totalSummaries"] += 1
+      aggregated_results["totalSummaries"] += 1
 
-        # Save autorating results to a CSV file
-        output_file_path = os.path.join(
-            self.output_dir, "hallucination_autoratings.csv"
-        )
-        os.makedirs(os.path.dirname(output_file_path), exist_ok=True)  # Create directory if needed
-        try:
-            autorating_results_df.to_csv(output_file_path, index=False)  # Save DataFrame to CSV
-            logging.info(f"CSV data saved to {output_file_path}")
-        except Exception as e:
-            logging.error(f"Error writing CSV data to file: {e}")
+    # Save autorating results to a CSV file
+    output_file_path = os.path.join(
+        self.output_dir, "hallucination_autoratings.csv"
+    )
+    os.makedirs(
+        os.path.dirname(output_file_path), exist_ok=True
+    )  # Create directory if needed
+    try:
+      autorating_results_df.to_csv(
+          output_file_path, index=False
+      )  # Save DataFrame to CSV
+      logging.info(f"CSV data saved to {output_file_path}")
+    except Exception as e:
+      logging.error(f"Error writing CSV data to file: {e}")
 
-        # Generate a report
-        total_runtime_min = (time.perf_counter() - start_time_total) / 60
-        report = generate_evaluation_report(aggregated_results, total_runtime_min)
-        logging.info(report)
-        report_file_path = os.path.join(
-            self.output_dir, "hallucination_report.txt"
-        )
-        try:
-            with open(report_file_path, "w", encoding="utf-8") as report_file:
-                report_file.write(report)
-            logging.info(f"Report saved to {report_file_path}")
-        except Exception as e:
-            logging.error(f"Error writing report to file: {e}")
+    # Generate a report
+    total_runtime_min = (time.perf_counter() - start_time_total) / 60
+    report = generate_evaluation_report(aggregated_results, total_runtime_min)
+    logging.info(report)
+    report_file_path = os.path.join(self.output_dir, "hallucination_report.txt")
+    try:
+      with open(report_file_path, "w", encoding="utf-8") as report_file:
+        report_file.write(report)
+      logging.info(f"Report saved to {report_file_path}")
+    except Exception as e:
+      logging.error(f"Error writing report to file: {e}")

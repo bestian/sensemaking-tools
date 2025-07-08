@@ -15,13 +15,14 @@
 """Tests for embeddings_lib."""
 
 import unittest
-from unittest.mock import patch, MagicMock
-import numpy as np
-
+from unittest.mock import MagicMock, patch
 # Module under test
 import embeddings_lib
+import numpy as np
+
 
 class TestEmbeddingsLib(unittest.TestCase):
+
   def test_cosine_similarity_calculation(self):
     # Arrange
     vec_a = np.array([1.0, 0.0])
@@ -29,14 +30,17 @@ class TestEmbeddingsLib(unittest.TestCase):
     vec_c = np.array([1.0, 1.0])
 
     # Act & Assert
-    self.assertAlmostEqual(embeddings_lib.get_cosine_similarity(vec_a, vec_a), 1.0)
-    self.assertAlmostEqual(embeddings_lib.get_cosine_similarity(vec_a, vec_b), 0.0)
+    self.assertAlmostEqual(
+        embeddings_lib.get_cosine_similarity(vec_a, vec_a), 1.0
+    )
+    self.assertAlmostEqual(
+        embeddings_lib.get_cosine_similarity(vec_a, vec_b), 0.0
+    )
     # Using cos(pi/4) here since pi/4 is the angle between these vectors, and is
     # therefore by definition what the "cosine similarity" should equal
     self.assertAlmostEqual(
         embeddings_lib.get_cosine_similarity(vec_a, vec_c), np.cos(np.pi / 4)
     )  # ~0.707
-
 
   def test_cosine_distance_calculation(self):
     # Arrange
@@ -45,9 +49,14 @@ class TestEmbeddingsLib(unittest.TestCase):
     vec_c = np.array([1.0, 1.0])
 
     # Act & Assert
-    self.assertAlmostEqual(embeddings_lib.get_cosine_distance(vec_a, vec_a), 0.0)
-    self.assertAlmostEqual(embeddings_lib.get_cosine_distance(vec_a, vec_b), 1.0)
+    self.assertAlmostEqual(
+        embeddings_lib.get_cosine_distance(vec_a, vec_a), 0.0
+    )
+    self.assertAlmostEqual(
+        embeddings_lib.get_cosine_distance(vec_a, vec_b), 1.0
+    )
     # As above, using pi/4 for the angle between these vectors
     self.assertAlmostEqual(
-        embeddings_lib.get_cosine_distance(vec_a, vec_c), 1.0 - np.cos(np.pi / 4)
+        embeddings_lib.get_cosine_distance(vec_a, vec_c),
+        1.0 - np.cos(np.pi / 4),
     )  # ~0.293

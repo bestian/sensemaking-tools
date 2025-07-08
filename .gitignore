@@ -8,3 +8,4 @@ private_*
 # Ignore Gemini CLI files.
 GEMINI.md
 todo.md
+*.env

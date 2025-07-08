@@ -25,4 +25,6 @@ RETRY_DELAY_SEC = 10
 
 # Set default vertex parallelism (number of concurrent LLM calls) based on similarly named env var, or use default value
 parallelism_env_var = os.environ.get("DEFAULT_VERTEX_PARALLELISM")
-DEFAULT_VERTEX_PARALLELISM = int(parallelism_env_var) if parallelism_env_var else 100
+DEFAULT_VERTEX_PARALLELISM = (
+    int(parallelism_env_var) if parallelism_env_var else 100
+)

@@ -1,12 +1,12 @@
 /**
  * Returns CSS custom properties (variables) for styling components.
  * Defines font families, sizes, weights, and colors used throughout the application.
- * 
+ *
  * @param {string} [fontFamily="Noto Sans"] - Primary font family to use
  * @returns {string} CSS custom properties as a template literal
  */
 export function styleVariables(fontFamily = "Noto Sans") {
-    return `
+  return `
 .sm-template-container {
 	/* Font settings */
 	--sm-font-family: ${fontFamily}, Arial, sans-serif;

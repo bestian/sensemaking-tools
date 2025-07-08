@@ -1,11 +1,11 @@
 /**
  * Returns global CSS styles for tooltips and related components.
  * Defines styles for tooltip positioning, appearance, and content formatting.
- * 
+ *
  * @returns {string} CSS styles as a template literal
  */
 export function globalStyle() {
-    return `
+  return `
 /* Base tooltip styles */
 .sm-tooltip {
     position: fixed;

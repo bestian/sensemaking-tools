@@ -8,7 +8,7 @@ import { extractTopicsSubContent } from "../../helpers/extractSubcontentSummary.
 /**
  * Renders a stacked bar chart visualization for topic overview.
  * Creates interactive bars with tooltips and handles data processing.
- * 
+ *
  * @param {HTMLElement} container - Container element for the visualization
  * @param {Array} data - Raw data array containing topic information
  * @param {Object} theme - Theme configuration object
@@ -17,68 +17,68 @@ import { extractTopicsSubContent } from "../../helpers/extractSubcontentSummary.
  * @returns {Function} Cleanup function
  */
 export function render(container, data, theme, title, summaryData) {
-    // Validate required inputs
-    if (!data || !data.length) {
-        console.error("No data provided to renderStackedBars");
-        return;
-    }
+  // Validate required inputs
+  if (!data || !data.length) {
+    console.error("No data provided to renderStackedBars");
+    return;
+  }
 
-    if (!theme) {
-        console.error("No theme provided to renderStackedBars");
-        return;
-    }
+  if (!theme) {
+    console.error("No theme provided to renderStackedBars");
+    return;
+  }
 
-    // Extract relevant sub-content from summary data
-    const subcontentSummaryData = extractTopicsSubContent(summaryData);
-  
-    // Initialize chart dimensions and styling
-    const margin = { top: 0, right: 0, bottom: 0, left: 0 };
-    const width = 1000; // Fixed width that will be scaled by viewBox
-    const barHeight = (theme.bars && theme.bars.barHeight) || 30;
-    const barPadding = (theme.bars && theme.bars.barPadding) || 20;
-    const segmentPadding = 2; // Space between segments
-    const cornerRadius = 4; // Rounded corners radius
-    const colorArray = theme.colors || ["#FFE0B2", "#FFCDD2", "#B3E5FC"];
+  // Extract relevant sub-content from summary data
+  const subcontentSummaryData = extractTopicsSubContent(summaryData);
 
-    // Add chart styles
-    const style = document.createElement("style");
-    style.textContent = getStyles(theme, barHeight, barPadding);
-    container.appendChild(style);
+  // Initialize chart dimensions and styling
+  const margin = { top: 0, right: 0, bottom: 0, left: 0 };
+  const width = 1000; // Fixed width that will be scaled by viewBox
+  const barHeight = (theme.bars && theme.bars.barHeight) || 30;
+  const barPadding = (theme.bars && theme.bars.barPadding) || 20;
+  const segmentPadding = 2; // Space between segments
+  const cornerRadius = 4; // Rounded corners radius
+  const colorArray = theme.colors || ["#FFE0B2", "#FFCDD2", "#B3E5FC"];
 
-    // Initialize tooltip
-    const tooltip = createTooltip();
+  // Add chart styles
+  const style = document.createElement("style");
+  style.textContent = getStyles(theme, barHeight, barPadding);
+  container.appendChild(style);
 
-    // Create chart container
-    const chartContainer = document.createElement("div");
-    chartContainer.className = "stacked-bar-container";
+  // Initialize tooltip
+  const tooltip = createTooltip();
 
-    // Process and prepare data
-    const processedData = processData(data);
-    const maxValue = d3.max(processedData, (d) => d.totalStatements);
+  // Create chart container
+  const chartContainer = document.createElement("div");
+  chartContainer.className = "stacked-bar-container";
 
-    // Render topic rows
-    processedData.forEach((topicData, index) => {
-        const row = renderTopicRow({
-            container,
-            topicData,
-            index,
-            colorArray,
-            tooltip,
-            width,
-            barHeight,
-            cornerRadius,
-            segmentPadding,
-            maxValue,
-            summaries: subcontentSummaryData
-        });
+  // Process and prepare data
+  const processedData = processData(data);
+  const maxValue = d3.max(processedData, (d) => d.totalStatements);
 
-        container.appendChild(row);
+  // Render topic rows
+  processedData.forEach((topicData, index) => {
+    const row = renderTopicRow({
+      container,
+      topicData,
+      index,
+      colorArray,
+      tooltip,
+      width,
+      barHeight,
+      cornerRadius,
+      segmentPadding,
+      maxValue,
+      summaries: subcontentSummaryData,
     });
 
-    container.appendChild(chartContainer);
+    container.appendChild(row);
+  });
 
-    // Return cleanup function
-    return function cleanup() {
-        // tooltip.cleanup();
-    };
+  container.appendChild(chartContainer);
+
+  // Return cleanup function
+  return function cleanup() {
+    // tooltip.cleanup();
+  };
 }

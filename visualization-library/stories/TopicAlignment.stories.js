@@ -3,112 +3,118 @@ import { scriptWarning } from "./shared/scriptWarning.js";
 import comments from "./data/comments.json";
 
 const defaultColors = ["#3A708A", "#589AB7", "#8bc3da", "#757575"];
-const basePath = process.env.NODE_ENV === 'production' ? '/sensemaking-tools/visualization-docs' : '';
+const basePath =
+  process.env.NODE_ENV === "production" ? "/sensemaking-tools/visualization-docs" : "";
 
 const getDataSource = (path) => {
-    // If it's a remote URL (starts with http:// or https://), return as is
-    if (path.startsWith('http://') || path.startsWith('https://')) {
-        return path;
-    }
-    // Otherwise, prepend the base path for local files
-    return `${basePath}${path}`;
+  // If it's a remote URL (starts with http:// or https://), return as is
+  if (path.startsWith("http://") || path.startsWith("https://")) {
+    return path;
+  }
+  // Otherwise, prepend the base path for local files
+  return `${basePath}${path}`;
 };
 
 export default {
-    title: "Charts/TopicAlignment",
-    tags: ["autodocs"],
-    argTypes: {
-        dataSource: {
-            name: "data-source",
-            control: "text",
-            description: "Local path or remote URL to the main data source. Not used if data is provided directly via property.",
-            table: {
-                type: { summary: "string" },
-                defaultValue: { summary: "none" },
-                category: "Data Attributes",
-            },
-        },
-        view: {
-            control: "select",
-            options: ["solid", "waffle"],
-            description: 'Display mode: "solid" (bar) or "waffle" (squares). Can be set statically or dynamically via DOM manipulation.',
-            table: {
-                type: { summary: "string" },
-                defaultValue: { summary: "solid" },
-            },
-        },
-        id: {
-            control: "text",
-            description: "Unique identifier for the chart element. Primarily used to target the chart for DOM manipulation.",
-            table: {
-                type: { summary: "string" },
-                defaultValue: { summary: "none" },
-            },
-        },
-        topicFilter: {
-            name: "topic-filter",
-            control: "text",
-            description: "Topic to filter data .",
-            table: {
-                type: { summary: "string" },
-                defaultValue: { summary: "none" },
-                category: "Required",
-            },
-        },
-        colors: {
-            name: "colors",
-            control: "object",
-            description: "Array of colors to use in the chart rendered in order of high, medium, low, and uncertain.",
-            table: {
-                type: { summary: "string[]" },
-                defaultValue: { summary: JSON.stringify(defaultColors) },
-                category: "Style",
-            },
-        },
-        fontFamily: {
-            name: "font-family",
-            control: "text",
-            description: "Font family to use in the chart.",
-            table: {
-                type: { summary: "string" },
-                defaultValue: { summary: "Noto Sans" },
-                category: "Style",
-            },
-        },
-        altText: {
-            name: "alt-text",
-            control: "text",
-            description: "Manually set alternative text description for accessibility purposes. This will overwrite the programmatically generated alt text.",
-            table: {
-                type: { summary: "string" },
-                defaultValue: { summary: "undefined" },
-                category: "Accessibility",
-            },
-        },
+  title: "Charts/TopicAlignment",
+  tags: ["autodocs"],
+  argTypes: {
+    dataSource: {
+      name: "data-source",
+      control: "text",
+      description:
+        "Local path or remote URL to the main data source. Not used if data is provided directly via property.",
+      table: {
+        type: { summary: "string" },
+        defaultValue: { summary: "none" },
+        category: "Data Attributes",
+      },
     },
-    parameters: {
-        docs: {
-            description: {
-                component: `
+    view: {
+      control: "select",
+      options: ["solid", "waffle"],
+      description:
+        'Display mode: "solid" (bar) or "waffle" (squares). Can be set statically or dynamically via DOM manipulation.',
+      table: {
+        type: { summary: "string" },
+        defaultValue: { summary: "solid" },
+      },
+    },
+    id: {
+      control: "text",
+      description:
+        "Unique identifier for the chart element. Primarily used to target the chart for DOM manipulation.",
+      table: {
+        type: { summary: "string" },
+        defaultValue: { summary: "none" },
+      },
+    },
+    topicFilter: {
+      name: "topic-filter",
+      control: "text",
+      description: "Topic to filter data .",
+      table: {
+        type: { summary: "string" },
+        defaultValue: { summary: "none" },
+        category: "Required",
+      },
+    },
+    colors: {
+      name: "colors",
+      control: "object",
+      description:
+        "Array of colors to use in the chart rendered in order of high, medium, low, and uncertain.",
+      table: {
+        type: { summary: "string[]" },
+        defaultValue: { summary: JSON.stringify(defaultColors) },
+        category: "Style",
+      },
+    },
+    fontFamily: {
+      name: "font-family",
+      control: "text",
+      description: "Font family to use in the chart.",
+      table: {
+        type: { summary: "string" },
+        defaultValue: { summary: "Noto Sans" },
+        category: "Style",
+      },
+    },
+    altText: {
+      name: "alt-text",
+      control: "text",
+      description:
+        "Manually set alternative text description for accessibility purposes. This will overwrite the programmatically generated alt text.",
+      table: {
+        type: { summary: "string" },
+        defaultValue: { summary: "undefined" },
+        category: "Accessibility",
+      },
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        component: `
 The topic alignment chart displays agreement/disagreement percentages with options for different view options (solid or waffle). The view can be set statically or dynamically via DOM manipulation.
                 
 ${scriptWarning}
                 `,
-            },
-        },
+      },
     },
+  },
 };
 
 // Basic template
 const Template = ({ id, dataSource, view, topicFilter, colors, fontFamily, altText }) => {
-        return `
+  return `
     <sensemaker-chart
       id="${id}"
       data-source="${getDataSource(dataSource)}"
       chart-type="topic-alignment"
       view="${view}"
       colors='${JSON.stringify(colors || defaultColors)}'
-      font-family="${fontFamily || 'Noto Sans'}"
+      font-family="${fontFamily || "Noto Sans"}"
       ${topicFilter ? `topic-filter="${topicFilter}"` : ""}
       ${altText ? `alt-text="${altText}"` : ""}
     ></sensemaker-chart>
@@ -176,7 +182,9 @@ const ViewToggleTemplate = ({ dataSource, topicFilter, colors, fontFamily, altTe
   // This will run after the component is added to the DOM
   setTimeout(() => {
     const chart = document.getElementById("topic-alignment-chart-with-toggle");
-    const viewInputs = document.querySelectorAll('#topic-alignment-chart-with-toggle-controls input[name="view"]');
+    const viewInputs = document.querySelectorAll(
+      '#topic-alignment-chart-with-toggle-controls input[name="view"]'
+    );
 
     // Add event listeners to view controls
     viewInputs.forEach((input) => {
@@ -205,7 +213,7 @@ const ViewToggleTemplate = ({ dataSource, topicFilter, colors, fontFamily, altTe
         chart-type="topic-alignment"
         view="solid"
         colors='${JSON.stringify(colors || defaultColors)}'
-        font-family="${fontFamily || 'Noto Sans'}"
+        font-family="${fontFamily || "Noto Sans"}"
         ${topicFilter ? `topic-filter="${topicFilter}"` : ""}
         ${altText ? `alt-text="${altText}"` : ""}>
       </sensemaker-chart>
@@ -268,31 +276,33 @@ WithViewToggle.parameters = {
 
 // Template for direct data injection with view toggle
 const DirectDataTemplate = ({ topicFilter, colors, fontFamily, altText }) => {
-    const chartId = "topic-alignment-direct-data";
-    
-    // This script will run after the component is added to the DOM
-    setTimeout(() => {
-        const chart = document.getElementById(chartId);
-        const viewInputs = document.querySelectorAll('#topic-alignment-direct-data-controls input[name="view"]');
+  const chartId = "topic-alignment-direct-data";
 
-        if (chart) {
-            // Provide the imported data directly to the component properties
-            chart.data = comments;
-            
-            // Add event listeners to view controls
-            viewInputs.forEach((input) => {
-                input.addEventListener("change", (e) => {
-                    if (e.target.checked) {
-                        chart.setAttribute("view", e.target.value);
-                    }
-                });
-            });
-        } else {
-            console.error(`Element with id '${chartId}' not found for direct data assignment.`);
-        }
-    }, 0);
+  // This script will run after the component is added to the DOM
+  setTimeout(() => {
+    const chart = document.getElementById(chartId);
+    const viewInputs = document.querySelectorAll(
+      '#topic-alignment-direct-data-controls input[name="view"]'
+    );
 
-    return `
+    if (chart) {
+      // Provide the imported data directly to the component properties
+      chart.data = comments;
+
+      // Add event listeners to view controls
+      viewInputs.forEach((input) => {
+        input.addEventListener("change", (e) => {
+          if (e.target.checked) {
+            chart.setAttribute("view", e.target.value);
+          }
+        });
+      });
+    } else {
+      console.error(`Element with id '${chartId}' not found for direct data assignment.`);
+    }
+  }, 0);
+
+  return `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
       <div id="topic-alignment-direct-data-controls" class="view-controls" style="margin-bottom: 20px;">
         <label style="margin-right: 15px; cursor: pointer;">
@@ -308,7 +318,7 @@ const DirectDataTemplate = ({ topicFilter, colors, fontFamily, altText }) => {
         chart-type="topic-alignment"
         view="solid"
         colors='${JSON.stringify(colors || defaultColors)}'
-        font-family="${fontFamily || 'Noto Sans'}"
+        font-family="${fontFamily || "Noto Sans"}"
         ${topicFilter ? `topic-filter="${topicFilter}"` : ""}
         ${altText ? `alt-text="${altText}"` : ""}>
       </sensemaker-chart>

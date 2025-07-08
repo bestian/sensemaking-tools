@@ -36,33 +36,62 @@ import argparse
 import asyncio
 import logging
 
-from hallucination_autorater import HallucinationAutorater
 from autorating_utils import read_csv
+from hallucination_autorater import HallucinationAutorater
 from models.vertex_model import VertexModel
 
 
 async def main():
 
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(message)s", # print log messages only without any extra info
-    )
+  logging.basicConfig(
+      level=logging.INFO,
+      format="%(message)s",  # print log messages only without any extra info
+  )
 
-    parser = argparse.ArgumentParser(description="Run automated evaluation of summarization results.")
-    parser.add_argument("-p", "--gcpProject", required=True, help="GCP project name for Vertex AI")
-    parser.add_argument("-i", "--inputFile", required=True, help="CSV file with summary claims and source statements")
-    parser.add_argument("-o", "--outputDir", default="evals/autorating/results", help="Where to save evaluation results to")
-    parser.add_argument("-l", "--location", default="global", help="In which location to run the model")
-    parser.add_argument("-m", "--model", default="gemini-2.5-pro-preview-06-05", help="Vertex AI model name")
-    parser.add_argument("-c", "--additionalContext", default="", help="Additional context to provide to the model")
-    args = parser.parse_args()
+  parser = argparse.ArgumentParser(
+      description="Run automated evaluation of summarization results."
+  )
+  parser.add_argument(
+      "-p", "--gcpProject", required=True, help="GCP project name for Vertex AI"
+  )
+  parser.add_argument(
+      "-i",
+      "--inputFile",
+      required=True,
+      help="CSV file with summary claims and source statements",
+  )
+  parser.add_argument(
+      "-o",
+      "--outputDir",
+      default="evals/autorating/results",
+      help="Where to save evaluation results to",
+  )
+  parser.add_argument(
+      "-l",
+      "--location",
+      default="global",
+      help="In which location to run the model",
+  )
+  parser.add_argument(
+      "-m",
+      "--model",
+      default="gemini-2.5-pro-preview-06-05",
+      help="Vertex AI model name",
+  )
+  parser.add_argument(
+      "-c",
+      "--additionalContext",
+      default="",
+      help="Additional context to provide to the model",
+  )
+  args = parser.parse_args()
 
-    model = VertexModel(args.gcpProject, args.location, args.model)
-    autorater = HallucinationAutorater(model, args.outputDir)
-    summaries = read_csv(args.inputFile)
+  model = VertexModel(args.gcpProject, args.location, args.model)
+  autorater = HallucinationAutorater(model, args.outputDir)
+  summaries = read_csv(args.inputFile)
 
-    await autorater.rate_hallucination(summaries, args.additionalContext)
+  await autorater.rate_hallucination(summaries, args.additionalContext)
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+  asyncio.run(main())

@@ -1,0 +1,32 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: end-of-file-fixer
+        types: [python]
+  - repo: https://github.com/google/pyink
+    rev: 24.10.1
+    hooks:
+      - id: pyink
+        types: [python]
+        language_version: python3.12
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: bash -c 'python -m ensurepip && pip install -r requirements-dev.txt && python -m pytest'
+        language: python
+        types: [python]
+        pass_filenames: false
+      - id: npm-test
+        name: Run npm tests
+        entry: npm test
+        language: system
+        types: [file]
+        pass_filenames: false
+      - id: lint-staged
+        name: Run lint-staged
+        entry: npx lint-staged
+        language: system
+        types: [file]
+        pass_filenames: false
