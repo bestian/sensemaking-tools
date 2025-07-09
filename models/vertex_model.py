@@ -15,32 +15,35 @@
 import asyncio
 import logging
 import json
-from typing import Any, List, Callable
+from typing import Any, List, Callable, Type
 import vertexai
 from vertexai.generative_models import (
     GenerativeModel,
     HarmBlockThreshold,
     HarmCategory,
+    GenerationResponse,
 )
 import google.auth
 from google.auth.transport.requests import Request as AuthRequest
 from requests.adapters import HTTPAdapter
 import requests
+from pydantic import ValidationError, TypeAdapter
+
+from .model import Model as BaseModelClass, SchemaType, ListSchemaType
+from .model_util import MAX_LLM_RETRIES, DEFAULT_VERTEX_PARALLELISM, RETRY_DELAY_SEC, MAX_RETRIES
 
 
-DEFAULT_VERTEX_PARALLELISM = 100  # number of concurrent LLM calls.
-MAX_LLM_RETRIES = 3
-RETRY_DELAY_SEC = 10
+class VertexModel(BaseModelClass):
 
-class VertexModel:
     def __init__(
             self,
             project: str,
             location: str,
             model_name: str,
     ):
-        creds = custom_pool_creds()
 
+        # Initialize Vertex AI SDK
+        creds = custom_pool_creds() # Enables high concurrency
         vertexai.init(project=project, location=location, credentials=creds)
 
         self.llm = GenerativeModel(
@@ -60,11 +63,14 @@ class VertexModel:
             },
         )
 
-    async def generate_text(self, prompt: str) -> str:
-        return await self.call_llm(prompt, self.llm)
 
-    async def generate_data(self, prompt: str) -> Any:
-        response_text = await self.call_llm(prompt, self.llm)
+    async def generate_text(self, prompt: str) -> str:
+        return await self._call_llm_with_retry(prompt)
+
+    async def generate_data(
+            self, prompt: str, schema: Type[SchemaType] | Type[ListSchemaType]
+    ) -> SchemaType | ListSchemaType:
+        response_text = await self._call_llm_with_retry(prompt)
 
         # Drop markdown code block delimiters if present
         if response_text.startswith("```json"):
@@ -73,18 +79,28 @@ class VertexModel:
             response_text = response_text[:-3]  # Remove ```
 
         try:
-            response = json.loads(response_text)
-        except json.JSONDecodeError as e:
-            raise ValueError(f"Model returned invalid JSON: {response_text}") from e
+            # Use TypeAdapter for robust parsing of schema
+            # The schema argument itself is the type hint, e.g. Topic or List[Topic]
+            adapter = TypeAdapter(schema)
+            return adapter.validate_json(response_text)
 
-        return response
+        except ValidationError as e: # Catches Pydantic validation errors
+            logging.error(f"Model response failed Pydantic validation for schema {schema}: {response_text}.\nError: {e}")
+            raise ValueError(f"Model response failed Pydantic validation: {response_text}.") from e
+        except json.JSONDecodeError as e: # Catches errors if response_text is not valid JSON
+            logging.error(f"Model returned invalid JSON: {response_text}.")
+            raise ValueError(f"Model returned invalid JSON: {response_text}.") from e
+        except Exception as e: # Catches any other unexpected errors during parsing
+            logging.error(f"Failed to parse or validate model response against schema {schema}: {response_text}.\nError: {e}")
+            raise ValueError(f"Failed to parse or validate model response: {response_text}.") from e
 
-    async def call_llm(self, prompt: str, model: GenerativeModel) -> str:
 
-        async def call_llm_inner():
-            return await model.generate_content_async(prompt)
+    async def _call_llm_with_retry(self, prompt: str) -> str:
 
-        def validate_response(response) -> bool:
+        async def call_llm_inner() -> GenerationResponse:
+            return await self.llm.generate_content_async(prompt) # TODO: pass schema for constraint decoding
+
+        def validate_response(response: GenerationResponse | None) -> bool:
             if not response:
                 logging.error("Failed to get a model response.")
                 return False
@@ -94,11 +110,12 @@ class VertexModel:
                 return False
 
             logging.info(
-                f"✓ Completed LLM call (input: {response.usage_metadata.prompt_token_count} tokens, output: {response.usage_metadata.candidates_token_count} tokens)"
+                f"✓ Completed LLM call (input: {response.usage_metadata.prompt_token_count} tokens, "
+                f"output: {response.usage_metadata.candidates_token_count} tokens)"
             )
             return True
 
-        result = await retry_call(
+        result = await _retry_call(
             call_llm_inner,
             validate_response,
             MAX_LLM_RETRIES,
@@ -107,14 +124,15 @@ class VertexModel:
         )
         return result.text
 
-async def retry_call(
-        func,
-        validator,
-        max_retries,
-        error_message,
-        retry_delay_sec,
-        func_args=None,
-        validator_args=None,
+
+async def _retry_call(
+        func: Callable[..., Any], # The async function to call
+        validator: Callable[[Any], bool], # A function to validate the response
+        max_retries: int,
+        error_message: str,
+        retry_delay_sec: float,
+        func_args: List[Any] | None = None,
+        validator_args: List[Any] | None = None,
 ):
     func_args = func_args or []
     validator_args = validator_args or []
@@ -140,20 +158,22 @@ async def retry_call(
 
 async def run_tasks_in_parallel(
         items: List[Any],
-        func: Callable,
+        func: Callable, # func should be an async function: async def func(item, *args, **kwargs)
         limit: int = DEFAULT_VERTEX_PARALLELISM,
-        *args,
-        **kwargs,
+        *args: Any,
+        **kwargs: Any,
 ) -> List[Any]:
     semaphore = asyncio.Semaphore(limit) # Controls concurrency
 
-    async def limited_task(item):
+    async def limited_task(item: Any) -> Any:
         async with semaphore:
             return await func(item, *args, **kwargs)
 
-    logging.info(f"Running {limit} evaluation tasks in parallel...")
+    if items:
+        logging.info(f"Running up to {limit} tasks in parallel for a total of {len(items)} tasks...")
+
     tasks = [limited_task(item) for item in items]
-    results = await asyncio.gather(*tasks)
+    results = await asyncio.gather(*tasks, return_exceptions=False) # Set return_exceptions=True to debug individual task failures
     return results
 
 def custom_pool_creds():
@@ -163,7 +183,7 @@ def custom_pool_creds():
     adapter = HTTPAdapter(
         pool_connections=DEFAULT_VERTEX_PARALLELISM,  # number of connection pools to cache
         pool_maxsize=DEFAULT_VERTEX_PARALLELISM,  # max connections per pool
-        max_retries=MAX_LLM_RETRIES,
+        max_retries=MAX_RETRIES,
         pool_block=True  # block when no free connections
     )
     session.mount("https://", adapter)
