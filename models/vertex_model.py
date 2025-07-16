@@ -76,7 +76,7 @@ class VertexModel(BaseModelClass):
     )
 
   async def generate_text(self, prompt: str) -> str:
-    return await self.call_llm(prompt, self.llm)
+    return await self._call_llm_with_retry(prompt)
 
   async def generate_data(
       self, prompt: str, schema: Type[SchemaType] | Type[ListSchemaType]
