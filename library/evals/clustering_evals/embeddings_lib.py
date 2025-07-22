@@ -36,9 +36,9 @@ def get_embedding(comment_text: str) -> np.ndarray:
     return embeddings[comment_text]
   else:
     response = vertex_client.models.embed_content(
-        model="text-embedding-large-exp-03-07",
+        model="gemini-embedding-001",
         contents=[comment_text],
-        config=EmbedContentConfig(),
+        config=EmbedContentConfig(task_type="CLUSTERING"),
     )
     result = np.array(response.embeddings[0].values)
     # Cache the result for later calls

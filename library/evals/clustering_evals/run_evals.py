@@ -48,6 +48,13 @@ def parse_arguments() -> argparse.Namespace:
   return parser.parse_args()
 
 
+class ResultsData:
+
+  def __init__(self, name: str, results: evals_lib.AnalysisResults):
+    self.name = name
+    self.results = results
+
+
 def main(args: argparse.Namespace) -> None:
   input_files = args.input_data
   output_path = args.output_csv_path
@@ -58,34 +65,43 @@ def main(args: argparse.Namespace) -> None:
     new_df = evals_lib.convert_topics_col_to_list(new_df)
     data.append(new_df)
 
-  categorization_diff_results = evals_lib.analyze_categorization_diffs(data)
-  topic_set_similarity_results = evals_lib.analyze_topic_set_similarity(data)
-  topic_centered_silhouette_results = (
-      evals_lib.analyze_topic_centered_silhouette_scores(data)
-  )
-  centroid_silhouette_results = evals_lib.analyze_centroid_silhouette_scores(
-      data
-  )
+  results = []
+  # These evals require comparing different runs, so they should be skipped if
+  # there's only one input dataset.
+  if len(data) > 1:
+    results.append(
+        ResultsData(
+            name="Topic Categorization Diff Rate",
+            results=evals_lib.analyze_categorization_diffs(data),
+        )
+    )
+    results.append(
+        ResultsData(
+            name="Topic Set Similarity",
+            results=evals_lib.analyze_topic_set_similarity(data),
+        )
+    )
 
-  results = [
-      categorization_diff_results,
-      topic_set_similarity_results,
-      topic_centered_silhouette_results,
-      centroid_silhouette_results,
-  ]
+  results.append(
+      ResultsData(
+          name="Topic Centered Silhouette",
+          results=evals_lib.analyze_topic_centered_silhouette_scores(data),
+      )
+  )
+  results.append(
+      ResultsData(
+          name="Centroid Centered Silhouette",
+          results=evals_lib.analyze_centroid_silhouette_scores(data),
+      )
+  )
 
   # Create a dictionary to store the results
   results_data = {
-      "Evaluation Name": [
-          "Topic Categorization Diff Rate",
-          "Topic Set Similarity",
-          "Topic Centered Silhouette",
-          "Centroid Silhouette",
-      ],
-      "Mean": [result.mean for result in results],
-      "Stdev": [result.stdev for result in results],
-      "Min": [result.min for result in results],
-      "Max": [result.max for result in results],
+      "Evaluation Name": [result.name for result in results],
+      "Mean": [result.results.mean for result in results],
+      "Stdev": [result.results.stdev for result in results],
+      "Min": [result.results.min for result in results],
+      "Max": [result.results.max for result in results],
   }
   with open(output_path, "w") as f:
     pd.DataFrame(data=results_data).to_csv(f, index=False)
