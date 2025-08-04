@@ -5,3 +5,4 @@ pytest-asyncio==1.0.0
 pandas==2.3.0
 google-genai==1.23.0
 google-api-python-client
+more_itertools
