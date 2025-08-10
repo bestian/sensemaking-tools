@@ -1,16 +1,102 @@
-# **Sensemaker by Jigsaw \- A Google AI Proof of Concept**
+# **[Sensemaker](https://github.com/Jigsaw-Code/sensemaking-tools) by Jigsaw - A Google AI Proof of Concept**
 
 This repository shares tools developed by [Jigsaw](http://jigsaw.google.com) as a proof of concept to help make sense of large-scale online conversations. It demonstrates how Large Language Models (LLMs) like Gemini can be leveraged for such tasks. This library offers a transparent look into Jigsaw's methods for categorization, summarization, and identifying agreement/disagreement in complex text. Our goal in sharing this is to inspire others and provide a potential starting point or useful elements for those tackling similar challenges.
 
-# **Overview**
+## **NPM Package Usage for Cloudflare Workers**
+
+This library is now available as an npm package optimized for Cloudflare Workers environment. You can use it directly in your Cloudflare Workers projects.
+
+### **Installation**
+
+Currently, the package is available from GitHub releases. Install from the release tarball:
+
+```bash
+# Download and install from GitHub release
+npm install https://github.com/bestian/sensemaking-tools/releases/download/v1.0.2/sensemaking-tools-1.0.2.tgz
+```
+
+Or download the `.tgz` file and install locally:
+
+```bash
+# Download the tarball
+wget https://github.com/bestian/sensemaking-tools/releases/download/v1.0.2/sensemaking-tools-1.0.2.tgz
+
+# Install from local file
+npm install ./sensemaking-tools-1.0.2.tgz
+```
+
+**Note**: This is a temporary installation method. The package will be published to npm in the future.
+
+### **Quick Start in Cloudflare Workers**
+
+```typescript
+import { Sensemaker, OpenRouterModel } from 'sensemaking-tools';
+
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    // Configure your models - OpenRouter for easy setup
+    const modelSettings = {
+      defaultModel: new OpenRouterModel({
+        apiKey: env.OPENROUTER_API_KEY,
+        baseUrl: env.OPENROUTER_BASE_URL,
+        model: env.OPENROUTER_MODEL
+      })
+    };
+
+    // Create sensemaker instance
+    const sensemaker = new Sensemaker(modelSettings);
+
+    // Example: Analyze comments from request body
+    const { comments } = await request.json();
+    
+    // Categorize comments by topics
+    const categorizedComments = await sensemaker.categorizeComments(comments);
+    
+    // Generate summary
+    const summary = await sensemaker.summarize(
+      categorizedComments,
+      'AGGREGATE_VOTE'
+    );
+
+    return new Response(JSON.stringify(summary), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+};
+```
+
+### **Available Exports**
+
+```typescript
+// Core classes
+import { Sensemaker } from 'sensemaking-tools';
+
+// Model implementations
+import { VertexModel, OpenRouterModel } from 'sensemaking-tools';
+
+// Types and utilities
+import { Comment, Topic, Summary, SummarizationType } from 'sensemaking-tools';
+```
+
+### **Building for Production**
+
+```bash
+npm run build:worker
+```
+
+This generates optimized JavaScript files in the `dist/` directory.
+
+---
+
+## **Overview**
 
 Effectively understanding large-scale public input is a significant challenge, as traditional methods struggle to translate thousands of diverse opinions into actionable insights. 'Sensemaker' showcases how Google's Gemini models can be used to transform massive volumes of raw community feedback into clear, digestible insights, aiding the analysis of these complex discussions.
 
 The tools demonstrated here illustrate methods for:
 
-* Topic Identification \- identifies the main points of discussion. The level of detail is configurable, allowing the tool to discover: just the top level topics; topics and subtopics; or the deepest level - topics, subtopics, and themes (sub-subtopics).  
-* Statement Categorization \- sorts statements into topics defined by a user or from the Topic Identification function. Statements can belong to more than one topic.  
-* Summarization \- analyzes statements and vote data to output a summary of the conversation, including an overview, themes discussed, and areas of agreement and disagreement.
+* Topic Identification - identifies the main points of discussion. The level of detail is configurable, allowing the tool to discover: just the top level topics; topics and subtopics; or the deepest level — topics, subtopics, and themes (sub-subtopics).  
+* Statement Categorization - sorts statements into topics defined by a user or from the Topic Identification function. Statements can belong to more than one topic.  
+* Summarization - analyzes statements and vote data to output a summary of the conversation, including an overview, themes discussed, and areas of agreement and disagreement.
 
 These methods were applied in a [Jigsaw case study in Bowling Green, Kentucky](https://medium.com/jigsaw/how-one-of-the-fastest-growing-cities-in-kentucky-used-ai-to-plan-for-the-next-25-years-3b70c4fd1412), analyzing a major U.S. digital civic conversation.
 
@@ -44,7 +130,7 @@ Statement categorization code can be found in [library/src/tasks/categorization.
 
 The summarization is output as a narrative report, but users are encouraged to pick and choose which elements are right for their data (see example from the runner [here](https://github.com/Jigsaw-Code/sensemaking-tools/blob/521dd0c4c2039f0ceb7c728653a9ea495eb2c8e9/runner-cli/runner.ts#L54)) and consider showing the summarizations alongside visualizations (more tools for this coming soon).
 
-Summarization code can be found in [library/rc/tasks/summarization.ts](https://github.com/Jigsaw-Code/sensemaking-tools/blob/main/library/src/tasks/summarization.ts).
+Summarization code can be found in [library/src/tasks/summarization.ts](https://github.com/Jigsaw-Code/sensemaking-tools/blob/main/library/src/tasks/summarization.ts).
 
 ### **Introduction Section**
 
@@ -91,6 +177,58 @@ For this section, Sensemaker provides grounding citations to show which statemen
 
 Each subtopic is labeled as "high", "moderately high", "moderately low" or "low" agreement. This is determined by, for each subtopic, getting *all* the comments that qualify as common ground comments and normalizing it based on how many comments were in that subtopic. Then these numbers are compared subtopic to subtopic.
 
+### **Multi-language Support**
+
+Sensemaker supports generating summaries in multiple languages through the `output_lang` parameter. The library provides localized prompts and labels for all supported languages, ensuring consistent output quality across different locales.
+
+#### **Supported Languages**
+
+1. **English (en)** - Default language
+2. **Traditional Chinese (zh-TW)** - Taiwan Traditional Chinese
+3. **Simplified Chinese (zh-CN)** - Mainland Simplified Chinese
+4. **French (fr)** - French
+5. **Spanish (es)** - Spanish
+6. **Japanese (ja)** - Japanese
+
+#### **Implementation**
+
+The multi-language support is implemented through:
+
+- **Localized Prompts**: All prompts used in summarization are translated and stored in `library/templates/l10n/prompts.ts`
+- **Label Translation**: Relative agreement and engagement labels (e.g., "low alignment", "moderately low alignment") are automatically translated based on the selected language
+- **Content Translation**: The "Other" keyword in reports is automatically replaced with the localized equivalent when `output_lang` is not "en"
+
+#### **Usage**
+
+Specify the output language when calling the summarization function:
+
+```typescript
+const summary = await sensemaker.summarize(
+  comments,
+  SummarizationType.AGGREGATE_VOTE,
+  topics,
+  additionalContext,
+  "zh-TW" // Output language
+);
+```
+
+Or use the `--output_lang` parameter in CLI tools:
+
+```bash
+npx ts-node ./library/runner-cli/runner_openrouter.ts \
+  --outputBasename out \
+  --inputFile "./files/comments.csv" \
+  --additionalContext "Description of the conversation" \
+  --output_lang zh-TW
+```
+
+#### **Technical Features**
+
+- **Type Safety**: Uses `SupportedLanguage` type to ensure language parameter correctness
+- **Automatic Fallback**: If a specified language is not available, the system automatically falls back to English
+- **Consistent Structure**: All language versions maintain the same prompt structure and format
+- **Extensible**: New languages can be added by extending the language definitions in `library/templates/l10n/`
+
 ### **LLMs Used and Custom Models**
 
 This library is implemented using Google Cloud's [VertexAI](https://cloud.google.com/vertex-ai), and works with the latest Gemini models. The access and quota requirements are controlled by a user's Google Cloud account.
@@ -101,7 +239,7 @@ Please note that performance results for existing functionality may vary dependi
 
 ### **Costs of Running**
 
-LLM pricing is based on token count and constantly changing. Here we list the token counts for a conversation with ~1000 statements. Please see [Vertex AI pricing](https://cloud.google.com/vertex-ai/generative-ai/pricing) for an up-to-date cost per input token. As of April 10, 2025 the cost for running topic identification, statement categorization, and summarization was in total under $1 on Gemini 1.5 Pro.  
+LLM pricing is based on token count and constantly changing. Here we list the token counts for a conversation with \~1000 statements. Please see [Vertex AI pricing](https://cloud.google.com/vertex-ai/generative-ai/pricing) for an up-to-date cost per input token. As of April 10, 2025 the cost for running topic identification, statement categorization, and summarization was in total under $1 on Gemini 1.5 Pro.  
 Token Counts for a 1000 statement conversation
 
 |  | Topic Identification | Statement Categorization | Summarization |
@@ -113,15 +251,15 @@ Token Counts for a 1000 statement conversation
 
 Our text summary consists of outputs from multiple LLM calls, each focused on summarizing a subset of comments. We have evaluated these LLM outputs for hallucinations both manually and using autoraters. Autorating code can be found in [library/evals/autorating](https://github.com/Jigsaw-Code/sensemaking-tools/tree/main/library/evals/autorating).
 
-We have evaluated topic identification and categorization using methods based on the silhouette coefficient. This evaluation code will be published in the near future. We have also considered how stable the outputs are run to run and comments are categorized into the same topic(s) ~90% of the time, and the identified topics also show high stability.
+We have evaluated topic identification and categorization using methods based on the silhouette coefficient. This evaluation code will be published in the near future. We have also considered how stable the outputs are run to run and comments are categorized into the same topic(s) \~90% of the time, and the identified topics also show high stability.
 
-## **Running the tools \- Setup**
+## **Running the tools - Setup**
 
 First make sure you have `npm` installed (`apt-get install npm` on Ubuntu-esque systems).  
 Next install the project modules by running:  
 `npm install`
 
-### **Using the Default Models \- GCloud Authentication**
+### **Using the Default Models - GCloud Authentication**
 
 A Google Cloud project is required to control quota and access when using the default models that connect to Model Garden. Installation instructions for all machines are [here](https://cloud.google.com/sdk/docs/install-sdk#deb).  
 For Linux the GCloud CLI can be installed like:  
@@ -130,7 +268,155 @@ Then to log in locally run:
 `gcloud config set project <your project name here>`  
 `gcloud auth application-default login`
 
-## **Example Usage \- Javascript**
+## **OpenRouter Integration**
+
+### **Environment Configuration**
+
+#### **Method 1: System Environment Variables (Recommended for Production)**
+
+Set system environment variables:
+
+```bash
+export OPENROUTER_API_KEY="your-api-key"
+export OPENROUTER_MODEL="openai/gpt-oss-120b"
+export OPENROUTER_BASE_URL="https://openrouter.ai/api/v1"
+export DEFAULT_OPENROUTER_PARALLELISM="5"
+```
+
+You can also set:
+
+```bash
+export OPENROUTER_MODEL="minimax/minimax-m2.5"
+```
+
+#### **Method 2: .env File (Development Only)**
+
+Create a `.env` file in the `library` directory:
+
+```bash
+OPENROUTER_API_KEY=your-api-key
+OPENROUTER_MODEL=openai/gpt-oss-120b
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+DEFAULT_OPENROUTER_PARALLELISM=5
+```
+
+Example with MiniMax M2.5:
+
+```bash
+OPENROUTER_MODEL=minimax/minimax-m2.5
+```
+
+**Note**: The `.env` file is only loaded when `NODE_ENV !== 'production'` to ensure production security.
+
+#### **Environment Variable Priority**
+
+1. **System environment variables** (highest priority)
+2. **.env file** (development only)
+3. **Default values** (lowest priority)
+
+### **Usage**
+
+#### **Basic Usage**
+
+```typescript
+import { createOpenRouterModelFromEnv } from './src/models/openrouter_model';
+
+// Automatically create model from environment variables
+const model = createOpenRouterModelFromEnv();
+```
+
+#### **Direct Instantiation**
+
+```typescript
+import { OpenRouterModel } from './src/models/openrouter_model';
+
+const model = new OpenRouterModel(
+  'your-api-key',
+  'openai/gpt-oss-120b',
+  'https://openrouter.ai/api/v1'
+);
+```
+
+### **Deployment**
+
+#### **Docker Environment**
+
+```dockerfile
+ENV OPENROUTER_API_KEY=your-api-key
+ENV OPENROUTER_MODEL=openai/gpt-oss-120b
+ENV OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+ENV DEFAULT_OPENROUTER_PARALLELISM=5
+```
+
+#### **Kubernetes Environment**
+
+```yaml
+env:
+- name: OPENROUTER_API_KEY
+  valueFrom:
+    secretKeyRef:
+      name: openrouter-secret
+      key: api-key
+- name: OPENROUTER_MODEL
+  value: "openai/gpt-oss-120b"
+- name: OPENROUTER_BASE_URL
+  value: "https://openrouter.ai/api/v1"
+```
+
+#### **Serverless Environment**
+
+```javascript
+// AWS Lambda, Vercel, Netlify, etc.
+process.env.OPENROUTER_API_KEY = 'your-api-key';
+process.env.OPENROUTER_MODEL = 'openai/gpt-oss-120b';
+```
+
+### **Browser Environment Support**
+
+This package is designed to be browser-friendly:
+
+- Prioritizes reading system environment variables
+- Does not rely on Node.js-specific file system operations
+- Supports Web Workers and Serverless environments
+
+### **Troubleshooting**
+
+#### **Common Issues**
+
+1. **API Key Not Set**
+   - Check the `OPENROUTER_API_KEY` environment variable
+   - Verify the `.env` file format is correct
+
+2. **Incorrect Model Name**
+   - Use the correct OpenRouter model name format
+   - Examples: `openai/gpt-oss-120b`, `anthropic/claude-3-sonnet`, `minimax/minimax-m2.5`
+
+3. **Concurrency Limit Issues**
+   - Adjust the `DEFAULT_OPENROUTER_PARALLELISM` value
+   - Adjust according to your OpenRouter plan
+
+#### **Debug Mode**
+
+Set `DEBUG_MODE=true` to enable detailed logging:
+
+```bash
+export DEBUG_MODE=true
+```
+
+## **Example Usage (OpenRouter) - Javascript**
+
+1. Register an OpenRouter account, obtain an API key, and set it in the `.env` file.
+2. Copy `polist_report.csv` into the `/files` directory and rename it to `comments.csv`.
+
+3. Run:
+
+```bash
+npx ts-node ./library/examples/tutorial.ts
+```
+
+You can get the output in Markdown format from console.
+
+## **Example Usage - Javascript**
 
 Summarize Seattle's $15 Minimum Wage Conversation.
 
@@ -172,79 +458,57 @@ const summary = mySensemaker.summarize(
 console.log(summary.getText("MARKDOWN"));
 ```
 
-CLI Usage  
-There is also a simple CLI set up for testing. There are three tools:
+## **CLI Usage**
+
+There is also a simple CLI set up for testing. There are several tools:
 
 * [./library/runner-cli/runner.ts](https://github.com/Jigsaw-Code/sensemaking-tools/blob/main/library/runner-cli/runner.ts): takes in a CSV representing a conversation and outputs an HTML file containing the summary. The summary is best viewed as an HTML file so that the included citations can be hovered over to see the original comment and votes.  
-* [./library/runner-cli/categorization\_runner.ts](https://github.com/Jigsaw-Code/sensemaking-tools/blob/main/library/runner-cli/categorization_runner.ts): takes in a CSV representing a conversation and outputs another CSV with the comments categorized into topics and subtopics.  
-* [./library/runner-cli/advanced\_runner.ts](https://github.com/Jigsaw-Code/sensemaking-tools/blob/main/library/runner-cli/advanced_runner.ts): takes in a CSV representing a conversation and outputs three files for an advanced user more interested in the statistics. The first is a JSON of topics, their sizes, and their subtopics. The second is a JSON with all of the comments and their alignment scores and values. Third is the summary object as a JSON which can be used for additional processing.
 
-**CSV Format Conversion:**
+* [./library/runner-cli/runner_openrouter.ts](https://github.com/bestian/sensemaking-tools/blob/new-feature-open-router/library/runner-cli/runner_openrouter.ts): Same usage as above, but uses OpenRouter model. 
 
-If your CSV file is exported from pol.is or polis.tw, you need to convert it to the required format before using the CLI tools.
-
-* For CSV files from **pol.is**, use [./polis_csv_fixer/csv_converter.py](https://github.com/bestian/sensemaking-tools/blob/new-feature-open-router/polis_csv_fixer/csv_converter.py):
+To use OpenRouter model, set up environment variables as below:
 
 ```bash
-python polis_csv_fixer/csv_converter.py input.csv output.csv
+# OpenRouter API Configuration
+OPENROUTER_API_KEY=your_openrouter_api_key_here
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+OPENROUTER_MODEL=openai/gpt-oss-120b
+
+# Optional: Custom headers for OpenRouter
+OPENROUTER_X_TITLE=Sensemaking Tools
 ```
 
-* For CSV files from **polis.tw**, use [./polis_csv_fixer/csv_converter_for_polis_tw.py](https://github.com/bestian/sensemaking-tools/blob/new-feature-open-router/polis_csv_fixer/csv_converter_for_polis_tw.py):
-
-```bash
-python polis_csv_fixer/csv_converter_for_polis_tw.py input.csv [output.csv]
-```
-
-**OpenRouter CLI Tools:**
-
-* [./library/runner-cli/runner\_openrouter.ts](https://github.com/bestian/sensemaking-tools/blob/new-feature-open-router/library/runner-cli/runner_openrouter.ts): Same usage as `runner.ts`, but uses OpenRouter models. Supports multi-language output via the `--output_lang` parameter.
+then run
 
 ```bash
 npx ts-node ./library/runner-cli/runner_openrouter.ts \
   --outputBasename out \
   --inputFile "./files/comments.csv" \
   --additionalContext "Description of the conversation" \
+  --model minimax/minimax-m2.5 \
   --output_lang zh-TW
 ```
 
-The `--output_lang` parameter supports: `en` (default), `zh-TW`, `zh-CN`, `fr`, `es`, `ja`.
+The `--output_lang` parameter supports:
+- `en` (default): English output
+- `zh-TW`: Traditional Chinese output
 
-* [./library/runner-cli/categorization\_runner\_openrouter.ts](https://github.com/bestian/sensemaking-tools/blob/new-feature-open-router/library/runner-cli/categorization_runner_openrouter.ts): Uses OpenRouter models for topic categorization. Supports custom model selection and topic depth configuration.
+* [./library/runner-cli/categorization\_runner.ts](https://github.com/Jigsaw-Code/sensemaking-tools/blob/main/library/runner-cli/categorization_runner.ts): takes in a CSV representing a conversation and outputs another CSV with the comments categorized into topics and subtopics.  
+
+* [./library/runner-cli/categorization\_runner\_openrouter.ts](https://github.com/bestian/sensemaking-tools/blob/new-feature-open-router/library/runner-cli/categorization_runner_openrouter.ts): Uses OpenRouter model for topic categorization.
 
 ```bash
+# Basic usage
 npx ts-node ./library/runner-cli/categorization_runner_openrouter.ts \
   --inputFile "./files/comments.csv" \
-  --outputFile "./files/categorized_comments.csv" \
-  --topicDepth 2 \
-  --additionalContext "Description of the conversation"
+  --outputFile "./files/categorized_comments.csv"
 ```
 
-Set the `OPENROUTER_API_KEY` environment variable before running these tools. The model can be specified via `OPENROUTER_MODEL` environment variable.
+* [./library/runner-cli/advanced\_runner.ts](https://github.com/Jigsaw-Code/sensemaking-tools/blob/main/library/runner-cli/advanced_runner.ts): takes in a CSV representing a conversation and outputs three files for an advanced user more interested in the statistics. The first is a JSON of topics, their sizes, and their subtopics. The second is a JSON with all of the comments and their alignment scores and values. Third is the summary object as a JSON which can be used for additional processing.
 
 These tools process CSV input files.  These must contain the columns `comment_text` and `comment-id`.  For deliberations without group information, vote counts should be set in columns titled `agrees`, `disagrees` and `passes`.  If you do not have vote information, these can be set to 0. For deliberations with group breakdowns, you can set the columns `{group_name}-agree-count`, `{group_name}-disagree-count`, `{group_name}-pass-count`.
 
-## **Generating a Report \- Get a webpage presentation of the report**
-
-![Example of webpage presenting the generated report](./assets/report-page.png)
-
-To build a webpage presenting the results of the report, follow these steps:
-
-* Generate the 3 JSON files produced by running the advanced runner CLI tool (mentioned previously).
-* From the command line, access the web app directory by running `cd web-ui` from the root directory.
-* Then, get the website build (in a folder) by running the following command, being sure to include the paths to each of the 3 JSON files as well as the title of the report. The build will be placed at `web-ui > dist > web-ui`.
-```sh
-npx ts-node site-build.ts --topics <path-to-topics-file> --summary <path-to-summary-file> --comments <path-to-comments-file> --reportTitle "Title of Report"
-```
-* Access the build (using `cd`) and start the web server by running `npm run dev`. Then access the site in a browser at `localhost:4200`.
-
-Alternatively, a single HTML file for the report can be produced, which can be easily shared.
-* After generating the build, run the following command (from `root > web-ui`):
-```sh
-npx ts-node single-html-build.js
-```
-The tool will output the location of the produced HTML file. Access this file in a browser to view the report.
-
-## **Making Changes to the tools \- Development**
+## **Making Changes to the tools - Development**
 
 ### **Testing**
 
