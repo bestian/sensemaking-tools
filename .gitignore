@@ -9,3 +9,4 @@ private_*
 GEMINI.md
 todo.md
 *.env
+/files
