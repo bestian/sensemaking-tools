@@ -61,10 +61,30 @@ async function main() {
     });
 
     // 輸出結果
-    const response = completion.choices[0]?.message?.content;
-    if (response) {
+
+    // console.log(completion);
+    
+    console.log(completion.choices[0]?.message);
+
+    const response_msg = completion.choices[0]?.message;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //console.log((response_msg as any).reasoning);
+
+    let response_text;
+    if (model.includes('gpt-oss')) {
+      response_text = response_msg?.content;
+    } else if (model === 'google/gemini-2.5-pro') {
+      // 使用類型斷言來存取 reasoning 屬性
+      response_text = (response_msg as OpenAI.Chat.Completions.ChatCompletionMessage & { reasoning?: string })?.reasoning || response_msg?.content;
+      console.log(response_text);
+    } else {
+      response_text = response_msg?.content;
+    }
+
+    if (response_text) {
       console.log('AI 回應:');
-      console.log(response);
+      console.log(response_text);
     } else {
       console.log('未收到回應');
     }

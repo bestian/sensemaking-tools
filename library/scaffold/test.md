@@ -1,6 +1,24 @@
 # 路徑
-
 要先進入library目錄
+
+
+# 切換模型
+
+修改.env檔中的OPENROUTER_MODEL
+
+可用的模型如
+
+google/gemini-2.5-pro
+openai/gpt-5-chat
+anthropic/claude-sonnet-4
+
+openai/gpt-oss-120b
+openai/gpt-oss-20b
+openai/gpt-oss-20b:free
+
+
+
+
 
 ## Hello World 測試
 
