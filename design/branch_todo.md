@@ -1,5 +1,11 @@
 # Sensemaker 專案：從 Vertex AI 遷移到 OpenRouter 待辦清單
 
+## 工程基本方向
+
+1. 我想做的改良，是以open router來代替Vertex AI
+2. .env檔在library目錄下，使用者變更.env中想用的模型參數，即可控制本程式使用的模型
+3. 創建新的檔案而非直接變更舊的檔案，以便舊檔案和原專案同步。
+
 ## 第一階段：基礎架構建立
 
 ### 1.1 建立 OpenRouter 模型類別
