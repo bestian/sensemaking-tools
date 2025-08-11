@@ -1,4 +1,8 @@
-# Hello World 測試
+# 路徑
+
+要先進入library目錄
+
+## Hello World 測試
 
 這是一個簡單的 Hello World 程式。
 
@@ -11,4 +15,40 @@ npx ts-node scaffold/hello_world.ts
 ```
 Hello world
 ```
+
+---
+
+## AI Prompt 測試程式
+
+這是一個可以串接 OpenRouter API 的測試程式。
+
+### 使用方法
+
+```bash
+npx ts-node scaffold/simple_ai_prompt.ts "你的問題"
+```
+
+### 範例
+
+```bash
+# 簡單測試
+npx ts-node scaffold/simple_ai_prompt.ts "測試"
+
+# 中文問題
+npx ts-node scaffold/simple_ai_prompt.ts "請用繁體中文回答：什麼是人工智慧？"
+```
+
+### 預期輸出
+
+程式會顯示：
+- 使用的模型名稱
+- API 端點
+- 你的問題
+- AI 的回應
+
+### 注意事項
+
+- 需要先在 `library/.env` 檔案中設定 `OPENROUTER_API_KEY` 和 `OPENROUTER_MODEL`
+- 確保網路連線正常
+- 免費模型可能有使用限制
 
