@@ -72,7 +72,9 @@ async function main() {
     //console.log((response_msg as any).reasoning);
 
     let response_text;
-    if (model.includes('gpt-oss')) {
+    if (model.includes('gpt-oss') || 
+    model === 'openai/gpt-5-chat' || 
+    model === 'anthropic/claude-sonnet-4') {
       response_text = response_msg?.content;
     } else if (model === 'google/gemini-2.5-pro') {
       // 使用類型斷言來存取 reasoning 屬性
@@ -86,7 +88,7 @@ async function main() {
       console.log('AI 回應:');
       console.log(response_text);
     } else {
-      console.log('未收到回應');
+      console.log('未收到回應，或回應解析失敗');
     }
 
   } catch (error) {
