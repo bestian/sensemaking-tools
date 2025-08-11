@@ -3,6 +3,7 @@
 import OpenAI from 'openai';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import { align_response_text } from '../src/utils/align_response';
 
 // 載入環境變數
 dotenv.config({ path: path.join(__dirname, '../.env') });
@@ -67,22 +68,10 @@ async function main() {
     console.log(completion.choices[0]?.message);
 
     const response_msg = completion.choices[0]?.message;
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     //console.log((response_msg as any).reasoning);
 
-    let response_text;
-    if (model.includes('gpt-oss') || 
-    model === 'openai/gpt-5-chat' || 
-    model === 'anthropic/claude-sonnet-4') {
-      response_text = response_msg?.content;
-    } else if (model === 'google/gemini-2.5-pro') {
-      // 使用類型斷言來存取 reasoning 屬性
-      response_text = (response_msg as OpenAI.Chat.Completions.ChatCompletionMessage & { reasoning?: string })?.reasoning || response_msg?.content;
-      console.log(response_text);
-    } else {
-      response_text = response_msg?.content;
-    }
+    const response_text = align_response_text(model, response_msg);
 
     if (response_text) {
       console.log('AI 回應:');
