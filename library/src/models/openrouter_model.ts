@@ -185,7 +185,7 @@ export class OpenRouterModel extends Model {
                 type: "json_schema",
                 json_schema: {
                   name: "response",
-                  strict: false, // 改為 false 以允許更寬鬆的格式
+                  strict: true, // 若改為 false 會允許更寬鬆的格式
                   schema: schema
                 }
               };
