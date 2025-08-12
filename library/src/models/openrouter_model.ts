@@ -1,0 +1,252 @@
+// Copyright 2024 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// Module to interact with models available through OpenRouter, including various
+// AI models from different providers like OpenAI, Anthropic, Google, etc.
+
+import pLimit from "p-limit";
+import OpenAI from "openai";
+import { Model } from "./model";
+import { checkDataSchema } from "../types";
+import { Static, TSchema } from "@sinclair/typebox";
+import { retryCall } from "../sensemaker_utils";
+import { RETRY_DELAY_MS, MAX_LLM_RETRIES } from "./model_util";
+
+// 環境變數常數
+const DEFAULT_OPENROUTER_PARALLELISM = 2;
+const DEFAULT_OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
+
+/**
+ * Class to interact with models available through OpenRouter.
+ */
+export class OpenRouterModel extends Model {
+  private openai: OpenAI;
+  private modelName: string;
+  private limit: pLimit.Limit; // controls model calls concurrency on model's instance level
+  
+  // Override the default categorization batch size if needed
+  public readonly categorizationBatchSize: number = 100;
+
+  /**
+   * Create a model object.
+   * @param apiKey - the OpenRouter API key
+   * @param modelName - the name of the model from OpenRouter to connect with
+   * @param baseURL - optional custom base URL for OpenRouter API
+   */
+  constructor(
+    apiKey: string,
+    modelName: string = "openai/gpt-oss-120b",
+    baseURL?: string
+  ) {
+    super();
+    
+    if (!apiKey) {
+      throw Error("OpenRouter API key is required");
+    }
+
+    this.openai = new OpenAI({
+      apiKey,
+      baseURL: baseURL || DEFAULT_OPENROUTER_BASE_URL,
+    });
+    
+    this.modelName = modelName;
+
+    // 從環境變數讀取並發限制，或使用預設值
+    const parallelismEnvVar = process.env["DEFAULT_OPENROUTER_PARALLELISM"];
+    const parallelism = parallelismEnvVar ? parseInt(parallelismEnvVar) : DEFAULT_OPENROUTER_PARALLELISM;
+    
+    console.log("Creating OpenRouterModel with ", parallelism, " parallel workers...");
+    this.limit = pLimit(parallelism);
+  }
+
+  /**
+   * Get the current model name being used.
+   * @returns the model name
+   */
+  getModelName(): string {
+    return this.modelName;
+  }
+
+  /**
+   * Get the current parallelism limit.
+   * @returns the current parallelism limit
+   */
+  getParallelismLimit(): number {
+    // p-limit doesn't expose the limit value directly, so we'll return the configured value
+    const parallelismEnvVar = process.env["DEFAULT_OPENROUTER_PARALLELISM"];
+    return parallelismEnvVar ? parseInt(parallelismEnvVar) : DEFAULT_OPENROUTER_PARALLELISM;
+  }
+
+  /**
+   * Check if the model supports structured output (JSON Schema).
+   * @returns true if the model supports structured output
+   */
+  supportsStructuredOutput(): boolean {
+    // Most OpenRouter models support structured output via response_format
+    return true;
+  }
+
+  /**
+   * Generate text based on the given prompt.
+   * @param prompt the text including instructions and/or data to give the model
+   * @returns the model response as a string
+   */
+  async generateText(prompt: string): Promise<string> {
+    return await this.callLLM(prompt);
+  }
+
+  /**
+   * Generate structured data based on the given prompt.
+   * @param prompt the text including instructions and/or data to give the model
+   * @param schema a JSON Schema specification (generated from TypeBox)
+   * @returns the model response as data structured according to the JSON Schema specification
+   */
+  async generateData(prompt: string, schema: TSchema): Promise<Static<typeof schema>> {
+    const validateResponse = (response: string): boolean => {
+      let parsedResponse;
+      try {
+        parsedResponse = JSON.parse(response);
+      } catch (e) {
+        console.error(`Model returned a non-JSON response:\n${response}\n${e}`);
+        return false;
+      }
+      if (!checkDataSchema(schema, parsedResponse)) {
+        console.error("Model response does not match schema: " + response);
+        return false;
+      }
+
+      return true;
+    };
+    
+    return JSON.parse(
+      await this.callLLM(prompt, validateResponse, schema)
+    );
+  }
+
+  /**
+   * Calls an LLM to generate text based on a given prompt and handles rate limiting, response validation and retries.
+   *
+   * Concurrency: To take advantage of concurrent execution, invoke this function as a batch of callbacks,
+   * and pass it to the `executeConcurrently` function. It will run multiple `callLLM` functions concurrently,
+   * up to the limit set by `p-limit` in `OpenRouterModel`'s constructor.
+   *
+   * @param prompt - The text prompt to send to the language model.
+   * @param validator - optional check for the model response.
+   * @param schema - optional JSON schema for structured output.
+   * @returns A Promise that resolves with the text generated by the language model.
+   */
+  async callLLM(
+    prompt: string,
+    validator: (response: string) => boolean = () => true,
+    schema?: TSchema
+  ): Promise<string> {
+    // Wrap the entire retryCall sequence with the `p-limit` limiter,
+    // so we don't let other calls to start until we're done with the current one
+    // (in case it's failing with rate limits error and needs to be waited on and retried first)
+    const rateLimitedCall = () =>
+      this.limit(async () => {
+        return await retryCall(
+          // call LLM
+          async () => {
+            const requestOptions: {
+              model: string;
+              messages: Array<{ role: "user"; content: string }>;
+              max_tokens: number;
+              temperature: number;
+              response_format?: {
+                type: "json_schema";
+                json_schema: {
+                  name: string;
+                  strict: boolean;
+                  schema: TSchema;
+                };
+              };
+            } = {
+              model: this.modelName,
+              messages: [{ role: "user", content: prompt }],
+              max_tokens: 4000,
+              temperature: 0,
+            };
+
+            // 如果有 schema，設定結構化輸出
+            if (schema) {
+              requestOptions.response_format = {
+                type: "json_schema",
+                json_schema: {
+                  name: "response",
+                  strict: true,
+                  schema: schema
+                }
+              };
+            }
+
+            const completion = await this.openai.chat.completions.create(requestOptions);
+            
+            // 檢查回應是否有效
+            if (!completion.choices || completion.choices.length === 0) {
+              throw new Error("No choices returned from OpenRouter API");
+            }
+            
+            const content = completion.choices[0]?.message?.content;
+            if (!content) {
+              throw new Error("Empty content returned from OpenRouter API");
+            }
+            
+            return content;
+          },
+          // Check if the response exists and contains text.
+          function (response): boolean {
+            if (!response || typeof response !== "string") {
+              console.error("Failed to get a model response.");
+              return false;
+            }
+            if (response.trim() === "") {
+              console.error("Model returned an empty response.");
+              return false;
+            }
+            if (!validator(response)) {
+              return false;
+            }
+            console.log("✓ Completed LLM call");
+            return true;
+          },
+          MAX_LLM_RETRIES,
+          "Failed to get a valid model response.",
+          RETRY_DELAY_MS,
+          [], // Arguments for the LLM call
+          [] // Arguments for the validator function
+        );
+      });
+
+    return await rateLimitedCall();
+  }
+}
+
+/**
+ * Factory function to create an OpenRouterModel from environment variables.
+ * @returns OpenRouterModel instance configured from environment variables
+ */
+export function createOpenRouterModelFromEnv(): OpenRouterModel {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  const model = process.env.OPENROUTER_MODEL || "google/gemini-2.5-pro";
+  const baseURL = process.env.OPENROUTER_BASE_URL || DEFAULT_OPENROUTER_BASE_URL;
+
+
+
+  if (!apiKey) {
+    throw Error("OPENROUTER_API_KEY environment variable is required");
+  }
+
+  return new OpenRouterModel(apiKey, model, baseURL);
+}

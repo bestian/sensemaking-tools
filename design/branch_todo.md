@@ -9,48 +9,48 @@
 ## 第零階段：標記並複製核心檔案
 
 ### 0.1 複製核心類型定義
-- [ ] 分析 `library/src/types.ts` → 分析並理解所有 TypeBox Schema 定義 (無 Vertex AI 依賴)
-- [ ] 分析 `library/src/models/model.ts` → 理解抽象 Model 類別介面 (無 Vertex AI 依賴)
-- [ ] 複製 `library/src/models/vertex_model.ts` 至 `library/src/models/openrouter_model.ts` → 分析 Vertex AI 實作細節 (有 Vertex AI 依賴)
+- [x] 分析 `library/src/types.ts` → 分析並理解所有 TypeBox Schema 定義 (無 Vertex AI 依賴)
+- [x] 分析 `library/src/models/model.ts` → 理解抽象 Model 類別介面 (無 Vertex AI 依賴)
+- [x] 複製 `library/src/models/vertex_model.ts` 至 `library/src/models/openrouter_model.ts` → 分析 Vertex AI 實作細節 (有 Vertex AI 依賴)
 
-### 0.2 複製 Prompt 處理函數
-- [ ] 分析 `library/src/sensemaker_utils.ts` → 分析 `getPrompt` 和 `getAbstractPrompt` 函數 (無 Vertex AI 依賴，只有 model_util 依賴)
-- [ ] 分析 `library/src/tasks/summarization_subtasks/` 目錄 → 分析所有 prompt 指令範例 (無 Vertex AI 依賴)
+### 0.2 分析 Prompt 處理函數
+- [x] 分析 `library/src/sensemaker_utils.ts` → 分析 `getPrompt` 和 `getAbstractPrompt` 函數 (無 Vertex AI 依賴，只有 model_util 依賴)
+- [x] 分析 `library/src/tasks/summarization_subtasks/` 目錄 → 分析所有 prompt 指令範例 (無 Vertex AI 依賴)
 
 ### 0.3 複製測試檔案作為參考
-- [ ] 複製 `library/src/models/vertex_model.test.ts` 至 `library/src/models/openrouter_model.test.ts`  → 理解測試模式和驗證邏輯 (有 Vertex AI 依賴)
-- [ ] 分析 `library/src/types.test.ts` → 理解類型驗證測試 (無 Vertex AI 依賴)
+- [x] 複製 `library/src/models/vertex_model.test.ts` 至 `library/src/models/openrouter_model.test.ts`  → 理解測試模式和驗證邏輯 (有 Vertex AI 依賴)
+- [x] 分析 `library/src/types.test.ts` → 理解類型驗證測試 (無 Vertex AI 依賴)
 
 ### 0.4 複製工具和配置檔案
-- [ ] 分析 `library/src/models/model_util.ts` → 分析常數和工具函數 (無 Vertex AI 依賴，只是常數定義)
-- [ ] 分析 `library/package.json` → 分析依賴關係和腳本 (無 Vertex AI 依賴)
+- [x] 分析 `library/src/models/model_util.ts` → 分析常數和工具函數 (無 Vertex AI 依賴，只是常數定義)
+- [x] 分析 `library/package.json` → 分析依賴關係和腳本 (無 Vertex AI 依賴)
 
 ### 0.5 分析現有 Schema 結構
-- [ ] 分析 `FlatTopic`, `NestedTopic`, `Topic` 等核心類型
-- [ ] 分析 `Comment`, `VoteTally`, `Summary` 等資料結構
-- [ ] 分析 `checkDataSchema` 函數的實作邏輯
-- [ ] 分析所有 prompt 指令的格式和內容
+- [x] 分析 `FlatTopic`, `NestedTopic`, `Topic` 等核心類型
+- [x] 分析 `Comment`, `VoteTally`, `Summary` 等資料結構
+- [x] 分析 `checkDataSchema` 函數的實作邏輯
+- [x] 分析所有 prompt 指令的格式和內容
 
 ## 第一階段：基礎架構建立
 
 ### 1.1 建立 OpenRouter 模型類別
-- [ ] 建立 `library/src/models/openrouter_model.ts` 檔案
-- [ ] 實作 `Model` 抽象類別的具體實作
-- [ ] 整合 OpenRouter API 呼叫
-- [ ] 實作速率限制和重試機制
-- [ ] 支援結構化輸出 (JSON Schema)
+- [x] 建立 `library/src/models/openrouter_model.ts` 檔案
+- [x] 實作 `Model` 抽象類別的具體實作
+- [x] 整合 OpenRouter API 呼叫
+- [x] 實作速率限制和重試機制
+- [x] 支援結構化輸出 (JSON Schema)
 
 ### 1.2 建立 OpenRouter 工具類別
 - [ ] 建立 `library/src/models/openrouter_util.ts` 檔案
-- [ ] 定義 OpenRouter 相關常數
-- [ ] 實作 API 金鑰管理
-- [ ] 定義預設模型設定
+- [x] 定義 OpenRouter 相關常數
+- [x] 實作 API 金鑰管理
+- [x] 定義預設模型設定
 - [ ] 實作請求格式轉換
 
 ### 1.3 更新環境變數設定
-- [ ] 建立 `.env.example` 檔案
-- [ ] 新增 `dotenv` 依賴管理環境變數
-- [ ] 定義 OpenRouter API 金鑰
+- [x] 建立 `.env.example` 檔案
+- [x] 新增 `dotenv` 依賴管理環境變數
+- [x] 定義 OpenRouter API 金鑰
 - [ ] 設定預設模型選擇
 - [ ] 設定速率限制參數
 
