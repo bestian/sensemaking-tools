@@ -130,6 +130,26 @@ Then to log in locally run:
 `gcloud config set project <your project name here>`  
 `gcloud auth application-default login`
 
+
+## **Example Usage(Open Router) \- Javascript**
+
+1. Register an OpenRouter account, obtain an API key, and set it in the `.env` file.
+2. Copy `polist_report.csv` into the `/files` directory and rename it to `comments.csv`.
+3. Run:
+
+```bash
+cd library
+```
+
+4. Run:
+
+```bash
+npx ts-node examples/tutorial.ts
+```
+
+You can get the output in Markdown format from console.
+
+
 ## **Example Usage \- Javascript**
 
 Summarize Seattle’s $15 Minimum Wage Conversation.
