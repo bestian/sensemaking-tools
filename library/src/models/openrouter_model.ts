@@ -274,7 +274,7 @@ export class OpenRouterModel extends Model {
  */
 export function createOpenRouterModelFromEnv(): OpenRouterModel {
   const apiKey = process.env.OPENROUTER_API_KEY;
-  const model = process.env.OPENROUTER_MODEL || "google/gemini-2.5-pro";
+  const model = process.env.OPENROUTER_MODEL || "openai/gpt-oss-120b";
   const baseURL = process.env.OPENROUTER_BASE_URL || DEFAULT_OPENROUTER_BASE_URL;
 
 
