@@ -6,6 +6,31 @@
 2. .env檔在library目錄下，使用者變更.env中想用的模型參數，即可控制本程式使用的模型
 3. 創建新的檔案而非直接變更舊的檔案，以便舊檔案和原專案同步。
 
+## 第零階段：標記並複製核心檔案
+
+### 0.1 複製核心類型定義
+- [ ] 分析 `library/src/types.ts` → 分析並理解所有 TypeBox Schema 定義 (無 Vertex AI 依賴)
+- [ ] 分析 `library/src/models/model.ts` → 理解抽象 Model 類別介面 (無 Vertex AI 依賴)
+- [ ] 複製 `library/src/models/vertex_model.ts` 至 `library/src/models/openrouter_model.ts` → 分析 Vertex AI 實作細節 (有 Vertex AI 依賴)
+
+### 0.2 複製 Prompt 處理函數
+- [ ] 分析 `library/src/sensemaker_utils.ts` → 分析 `getPrompt` 和 `getAbstractPrompt` 函數 (無 Vertex AI 依賴，只有 model_util 依賴)
+- [ ] 分析 `library/src/tasks/summarization_subtasks/` 目錄 → 分析所有 prompt 指令範例 (無 Vertex AI 依賴)
+
+### 0.3 複製測試檔案作為參考
+- [ ] 複製 `library/src/models/vertex_model.test.ts` 至 `library/src/models/openrouter_model.test.ts`  → 理解測試模式和驗證邏輯 (有 Vertex AI 依賴)
+- [ ] 分析 `library/src/types.test.ts` → 理解類型驗證測試 (無 Vertex AI 依賴)
+
+### 0.4 複製工具和配置檔案
+- [ ] 分析 `library/src/models/model_util.ts` → 分析常數和工具函數 (無 Vertex AI 依賴，只是常數定義)
+- [ ] 分析 `library/package.json` → 分析依賴關係和腳本 (無 Vertex AI 依賴)
+
+### 0.5 分析現有 Schema 結構
+- [ ] 分析 `FlatTopic`, `NestedTopic`, `Topic` 等核心類型
+- [ ] 分析 `Comment`, `VoteTally`, `Summary` 等資料結構
+- [ ] 分析 `checkDataSchema` 函數的實作邏輯
+- [ ] 分析所有 prompt 指令的格式和內容
+
 ## 第一階段：基礎架構建立
 
 ### 1.1 建立 OpenRouter 模型類別
