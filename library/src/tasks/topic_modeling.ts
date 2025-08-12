@@ -135,14 +135,23 @@ export function learnedTopicsValid(response: Topic[], parentTopic?: Topic): bool
     const allowedTopicNames = [parentTopic]
       .map((topic: Topic) => topic.name.toLowerCase())
       .concat("other");
-    if (!topicNames.every((name) => allowedTopicNames.includes(name.toLowerCase()))) {
-      topicNames.forEach((topicName: string) => {
-        if (!allowedTopicNames.includes(topicName.toLowerCase())) {
+    
+    // 更寬鬆的主題名稱匹配，允許大小寫和格式差異
+    const normalizedTopicNames = topicNames.map(name => 
+      name.toLowerCase().replace(/[‑\-\s]+/g, ' ').trim()
+    );
+    const normalizedAllowedNames = allowedTopicNames.map(name => 
+      name.toLowerCase().replace(/[‑\-\s]+/g, ' ').trim()
+    );
+    
+    if (!normalizedTopicNames.every((name) => normalizedAllowedNames.includes(name))) {
+      normalizedTopicNames.forEach((topicName: string, index: number) => {
+        if (!normalizedAllowedNames.includes(topicName)) {
           console.warn(
             "Invalid response: Found top-level topic not present in the provided topics. Provided topics: ",
-            allowedTopicNames,
+            normalizedAllowedNames,
             " Found topic: ",
-            topicName
+            topicNames[index]
           );
         }
       });
@@ -155,7 +164,13 @@ export function learnedTopicsValid(response: Topic[], parentTopic?: Topic): bool
     const subtopicNames =
       "subtopics" in topic ? topic.subtopics.map((subtopic) => subtopic.name) : [];
     for (const subtopicName of subtopicNames) {
-      if (topicNames.includes(subtopicName) && subtopicName !== "Other") {
+      // 更寬鬆的名稱匹配，允許大小寫和格式差異
+      const normalizedSubtopicName = subtopicName.toLowerCase().replace(/[‑\-\s]+/g, ' ').trim();
+      const normalizedTopicNames = topicNames.map(name => 
+        name.toLowerCase().replace(/[‑\-\s]+/g, ' ').trim()
+      );
+      
+      if (normalizedTopicNames.includes(normalizedSubtopicName) && subtopicName !== "Other") {
         console.warn(
           `Invalid response: Subtopic "${subtopicName}" has the same name as a main topic.`
         );

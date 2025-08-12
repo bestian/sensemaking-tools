@@ -17,6 +17,13 @@ openai/gpt-oss-20b
 openai/gpt-oss-20b:free
 
 
+## sensemaker_scaffold001.ts測試
+
+```
+npx ts-node scaffold/sensemaker_scaffold001.ts
+```
+
+
 ## JSON 結構化輸出測試
 
 ```

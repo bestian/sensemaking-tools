@@ -185,7 +185,7 @@ export class OpenRouterModel extends Model {
                 type: "json_schema",
                 json_schema: {
                   name: "response",
-                  strict: true,
+                  strict: false, // 改為 false 以允許更寬鬆的格式
                   schema: schema
                 }
               };
@@ -199,8 +199,43 @@ export class OpenRouterModel extends Model {
             }
             
             const content = completion.choices[0]?.message?.content;
-            if (!content) {
+            if (!content || content.trim() === "") {
               throw new Error("Empty content returned from OpenRouter API");
+            }
+            
+            // 檢查是否為有效的 JSON 回應（當使用 schema 時）
+            if (schema && content.trim().startsWith('{')) {
+              try {
+                JSON.parse(content);
+              } catch {
+                console.warn("OpenRouter returned malformed JSON, attempting to fix...");
+                // 嘗試修復常見的 JSON 格式問題
+                const fixedContent = content
+                  .replace(/[\u2013\u2014]/g, '-') // 修復破折號
+                  .replace(/\s+/g, ' ') // 修復多餘空格
+                  .replace(/[‑\-\s]+/g, ' ') // 修復各種破折號和空格
+                  .replace(/[^\x00-\x7F]/g, '') // 移除非 ASCII 字符
+                  .trim();
+                try {
+                  JSON.parse(fixedContent);
+                  return fixedContent;
+                } catch (e2) {
+                  console.error("Failed to fix JSON:", e2);
+                  // 最後嘗試：移除所有可能的問題字符
+                  const lastResortContent = content
+                    .replace(/[^\w\s\{\}\[\]":,.-]/g, '')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+                  try {
+                    JSON.parse(lastResortContent);
+                    console.warn("JSON fixed with last resort method");
+                    return lastResortContent;
+                  } catch (e3) {
+                    console.error("All JSON fixing attempts failed:", e3);
+                    throw new Error("Invalid JSON response from OpenRouter API");
+                  }
+                }
+              }
             }
             
             return content;
