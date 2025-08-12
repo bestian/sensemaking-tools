@@ -17,6 +17,11 @@ openai/gpt-oss-20b
 openai/gpt-oss-20b:free
 
 
+## JSON 結構化輸出測試
+
+```
+npx ts-node scaffold/JSON_ai_prompt.ts "創建一個虛構人物的資料"
+```
 
 
 
