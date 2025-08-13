@@ -91,7 +91,7 @@ async function main() {
     
     // 暫時使用示例數據，等待 CSV 檔案準備好
     // 當 CSV 檔案準備好後，可以替換這個部分
-    const comments: Comment[] = getCommentsFromCsv("../files/comments.csv")
+    const comments: Comment[] = getCommentsFromCsv("./files/comments.csv")
 
     console.log(`✅ 載入 ${comments.length} 條評論\n`);
 

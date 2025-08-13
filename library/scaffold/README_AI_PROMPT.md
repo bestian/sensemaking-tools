@@ -4,10 +4,10 @@
 
 ## 前置需求
 
-1. 在 `library/.env` 檔案中設定以下環境變數：
+1. 在 `.env` 檔案中設定以下環境變數：
    ```bash
    OPENROUTER_API_KEY=your_openrouter_api_key_here
-   OPENROUTER_MODEL=openai/gpt-4o-mini
+   OPENROUTER_MODEL=openai/gpt-oss-120b
    OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
    ```
 

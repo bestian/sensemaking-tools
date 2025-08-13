@@ -7,7 +7,7 @@ console.log('=== 環境變數測試 ===\n');
 
 // 載入環境變數
 console.log('1. 載入 .env 檔案...');
-const result = dotenv.config({ path: path.join(__dirname, '../.env') });
+const result = dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 if (result.error) {
   console.error('❌ 載入 .env 檔案失敗:', result.error.message);

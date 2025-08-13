@@ -6,7 +6,7 @@ import { OpenRouterModel } from '../src/models/openrouter_model';
 import { Type } from '@sinclair/typebox';
 
 // 載入環境變數
-dotenv.config({ path: path.join(__dirname, '../.env') });
+dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 // 定義測試用的 JSON Schema
 const TEST_SCHEMA = Type.Object({

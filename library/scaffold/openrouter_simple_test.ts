@@ -5,7 +5,7 @@ import * as path from 'path';
 import { OpenRouterModel } from '../src/models/openrouter_model';
 
 // 載入環境變數
-dotenv.config({ path: path.join(__dirname, '../.env') });
+dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 async function testOpenRouterModel() {
   console.log('=== OpenRouter 模型簡單測試 ===\n');

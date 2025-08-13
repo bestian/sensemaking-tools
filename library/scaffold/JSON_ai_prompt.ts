@@ -7,7 +7,7 @@ import { Type, TSchema } from '@sinclair/typebox';
 import { TypeCompiler } from '@sinclair/typebox/compiler';
 
 // 載入環境變數
-dotenv.config({ path: path.join(__dirname, '../.env') });
+dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 // 定義 JSON Schema 類型
 interface OpenRouterRequest {

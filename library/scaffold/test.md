@@ -22,18 +22,27 @@ openai/gpt-oss-20b:free
 
 ### 先準備好/files/comments.csv
 
-### 在/Library目錄，執行
 
+### 在根目錄，執行
 
 ```
-npx ts-node scaffold/sensemaker_scaffold001.ts
+npx ts-node ./library/runner-cli/runner_openrouter.ts \
+  --outputBasename out \
+  --inputFile "./files/comments.csv" \
+  --additionalContext "Description of the conversation"
+  ```
+
+### 在根目錄，執行
+
+```bash
+npx ts-node ./library/scaffold/sensemaker_scaffold001.ts
 ```
 
 
 ## JSON 結構化輸出測試
 
-```
-npx ts-node scaffold/JSON_ai_prompt.ts "創建一個虛構人物的資料"
+```bash
+npx ts-node ./library/scaffold/JSON_ai_prompt.ts "創建一個虛構人物的資料"
 ```
 
 
@@ -43,7 +52,7 @@ npx ts-node scaffold/JSON_ai_prompt.ts "創建一個虛構人物的資料"
 這是一個簡單的 Hello World 程式。
 
 ```bash
-npx ts-node scaffold/hello_world.ts
+npx ts-node ./library/scaffold/hello_world.ts
 ```
 
 預期輸出
@@ -61,17 +70,17 @@ Hello world
 ### 使用方法
 
 ```bash
-npx ts-node scaffold/simple_ai_prompt.ts "你的問題"
+npx ts-node ./library/scaffold/simple_ai_prompt.ts "你的問題"
 ```
 
 ### 範例
 
 ```bash
 # 簡單測試
-npx ts-node scaffold/simple_ai_prompt.ts "測試"
+npx ts-node ./library/scaffold/simple_ai_prompt.ts "測試"
 
 # 中文問題
-npx ts-node scaffold/simple_ai_prompt.ts "請用繁體中文回答：什麼是人工智慧？"
+npx ts-node ./library/scaffold/simple_ai_prompt.ts "請用繁體中文回答：什麼是人工智慧？"
 ```
 
 ### 預期輸出

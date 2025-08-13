@@ -6,7 +6,7 @@ import * as path from 'path';
 import { align_response_text } from '../src/utils/align_response';
 
 // 載入環境變數
-dotenv.config({ path: path.join(__dirname, '../.env') });
+dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 async function main() {
   // 檢查命令列參數
@@ -26,13 +26,13 @@ async function main() {
 
   if (!apiKey) {
     console.error('錯誤: 未設定 OPENROUTER_API_KEY 環境變數');
-    console.error('請在 library/.env 檔案中設定你的 OpenRouter API 金鑰');
+    console.error('請在 .env 檔案中設定你的 OpenRouter API 金鑰');
     process.exit(1);
   }
 
   if (!model) {
     console.error('錯誤: 未設定 OPENROUTER_MODEL 環境變數');
-    console.error('請在 library/.env 檔案中設定要使用的模型');
+    console.error('請在 .env 檔案中設定要使用的模型');
     process.exit(1);
   }
 
@@ -68,7 +68,7 @@ async function main() {
     console.log(completion.choices[0]?.message);
 
     const response_msg = completion.choices[0]?.message;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     //console.log((response_msg as any).reasoning);
 
     const response_text = align_response_text(model, response_msg);
