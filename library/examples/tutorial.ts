@@ -17,14 +17,11 @@
 // Sensemaker scaffold example using OpenRouterModel instead of VertexModel
 // This demonstrates how to use the new OpenRouter integration
 
-import * as dotenv from 'dotenv';
 import { Sensemaker } from '../src/sensemaker';
 import { createOpenRouterModelFromEnv } from '../src/models/openrouter_model';
 import { SummarizationType, Comment, VoteTally } from '../src/types';
+import { getEnvVar } from '../src/utils/env_loader';
 import * as fs from 'fs';
-
-// 載入環境變數
-dotenv.config();
 
 // CSV 讀取函數
 function getCommentsFromCsv(csvPath: string): Comment[] {
@@ -63,15 +60,15 @@ async function main() {
     console.log('🚀 啟動 Sensemaker 腳本...\n');
 
     // 檢查環境變數
-    if (!process.env.OPENROUTER_API_KEY) {
+    if (!getEnvVar('OPENROUTER_API_KEY')) {
       throw new Error('❌ 缺少 OPENROUTER_API_KEY 環境變數');
     }
 
     console.log('✅ 環境變數載入成功');
-    console.log(`🔑 API 金鑰: ${process.env.OPENROUTER_API_KEY ? '已設定' : '未設定'}`);
-    console.log(`🤖 模型: ${process.env.OPENROUTER_MODEL || '使用預設值'}`);
-    console.log(`🌐 API 端點: ${process.env.OPENROUTER_BASE_URL || '使用預設值'}`);
-    console.log(`⚡ 並發限制: ${process.env.DEFAULT_OPENROUTER_PARALLELISM || '使用預設值'}\n`);
+    console.log(`🔑 API 金鑰: ${getEnvVar('OPENROUTER_API_KEY') ? '已設定' : '未設定'}`);
+    console.log(`🤖 模型: ${getEnvVar('OPENROUTER_MODEL', '使用預設值')}`);
+    console.log(`🌐 API 端點: ${getEnvVar('OPENROUTER_BASE_URL', '使用預設值')}`);
+    console.log(`⚡ 並發限制: ${getEnvVar('DEFAULT_OPENROUTER_PARALLELISM', '使用預設值')}\n`);
 
     // 使用 OpenRouter 模型建立 Sensemaker 實例
     const openRouterModel = createOpenRouterModelFromEnv();

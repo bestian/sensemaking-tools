@@ -15,12 +15,13 @@
 // Module to interact with models available through OpenRouter, including various
 // AI models from different providers like OpenAI, Anthropic, Google, etc.
 
-import pLimit from "p-limit";
 import OpenAI from "openai";
 import { Model } from "./model";
+import { retryCall } from "../sensemaker_utils";
+import pLimit from "p-limit";
+import { getEnvVar, getRequiredEnvVar } from "../utils/env_loader";
 import { checkDataSchema } from "../types";
 import { Static, TSchema } from "@sinclair/typebox";
-import { retryCall } from "../sensemaker_utils";
 import { RETRY_DELAY_MS, MAX_LLM_RETRIES } from "./model_util";
 
 // 環境變數常數
@@ -273,15 +274,9 @@ export class OpenRouterModel extends Model {
  * @returns OpenRouterModel instance configured from environment variables
  */
 export function createOpenRouterModelFromEnv(): OpenRouterModel {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-  const model = process.env.OPENROUTER_MODEL || "openai/gpt-oss-120b";
-  const baseURL = process.env.OPENROUTER_BASE_URL || DEFAULT_OPENROUTER_BASE_URL;
-
-
-
-  if (!apiKey) {
-    throw Error("OPENROUTER_API_KEY environment variable is required");
-  }
+  const apiKey = getRequiredEnvVar("OPENROUTER_API_KEY");
+  const model = getEnvVar("OPENROUTER_MODEL", "openai/gpt-oss-120b");
+  const baseURL = getEnvVar("OPENROUTER_BASE_URL", DEFAULT_OPENROUTER_BASE_URL);
 
   return new OpenRouterModel(apiKey, model, baseURL);
 }

@@ -1,134 +1,124 @@
-# OpenRouter 模型使用說明
+# OpenRouter 整合指南
 
-## 概述
+本指南說明如何在 Sensemaker 專案中使用 OpenRouter 模型。
 
-OpenRouter 模型是 Vertex AI 模型的替代方案，使用 OpenRouter API 來存取各種 AI 模型。
+## 環境設定
 
-## 檔案結構
+### 方式 1：系統環境變數（推薦用於生產環境）
 
+設定系統環境變數：
+
+```bash
+export OPENROUTER_API_KEY="your-api-key"
+export OPENROUTER_MODEL="openai/gpt-4"
+export OPENROUTER_BASE_URL="https://openrouter.ai/api/v1"
+export DEFAULT_OPENROUTER_PARALLELISM="5"
 ```
-library/src/models/
-├── openrouter_model.ts          # OpenRouter 模型實作
-├── openrouter_model.test.ts     # 測試檔案 (目前有 Mock 問題)
-└── model.ts                     # 抽象 Model 介面
 
-library/scaffold/
-└── openrouter_simple_test.ts    # 簡單測試腳本
-```
-
-## 快速開始
-
-### 1. 設定環境變數
+### 方式 2：.env 檔案（僅用於開發環境）
 
 在 `library` 目錄下創建 `.env` 檔案：
 
 ```bash
-# OpenRouter 設定
-OPENROUTER_API_KEY=your_openrouter_api_key_here
-OPENROUTER_MODEL=openai/gpt-5-chat
+OPENROUTER_API_KEY=your-api-key
+OPENROUTER_MODEL=openai/gpt-4
 OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
-DEFAULT_OPENROUTER_PARALLELISM=2
+DEFAULT_OPENROUTER_PARALLELISM=5
 ```
 
-### 2. 安裝依賴
+**注意**：`.env` 檔案只在 `NODE_ENV !== 'production'` 時才會被載入，確保生產環境的安全性。
 
-```bash
-cd library
-npm install
-```
+### 環境變數優先順序
 
-### 3. 運行簡單測試
+1. **系統環境變數**（最高優先級）
+2. **.env 檔案**（僅開發環境）
+3. **預設值**（最低優先級）
 
-```bash
-npx ts-node scaffold/openrouter_simple_test.ts
-```
-
-## 使用方法
+## 使用方式
 
 ### 基本使用
 
 ```typescript
-import { OpenRouterModel } from './src/models/openrouter_model';
-
-// 直接創建實例
-const model = new OpenRouterModel(
-  'your_api_key',
-  'openai/gpt-oss-120b'
-);
-
-// 文字生成
-const response = await model.generateText("請總結以下內容...");
-```
-
-### 從環境變數創建
-
-```typescript
 import { createOpenRouterModelFromEnv } from './src/models/openrouter_model';
 
+// 自動從環境變數建立模型
 const model = createOpenRouterModelFromEnv();
-const response = await model.generateText("測試問題");
 ```
 
-### 結構化資料生成
+### 直接建立
 
 ```typescript
-import { Type } from '@sinclair/typebox';
+import { OpenRouterModel } from './src/models/openrouter_model';
 
-const schema = Type.Object({
-  summary: Type.String(),
-  topics: Type.Array(Type.String())
-});
-
-const data = await model.generateData("請分析以下評論...", schema);
+const model = new OpenRouterModel(
+  'your-api-key',
+  'openai/gpt-4',
+  'https://openrouter.ai/api/v1'
+);
 ```
 
-## 支援的模型
+## 部署說明
 
-以下模型支援 JSON Schema 結構化輸出：
+### Docker 環境
 
-- `openai/gpt-4o` (推薦)
-- `openai/gpt-4o-mini`
-- `anthropic/claude-3.5-sonnet` (推薦)
-- `google/gemini-pro`
+```dockerfile
+ENV OPENROUTER_API_KEY=your-api-key
+ENV OPENROUTER_MODEL=openai/gpt-4
+ENV OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+ENV DEFAULT_OPENROUTER_PARALLELISM=5
+```
 
-## 與 Vertex AI 的差異
+### Kubernetes 環境
 
-| 特性 | Vertex AI | OpenRouter |
-|------|-----------|------------|
-| 模型選擇 | 僅限 Google 模型 | 多廠商模型 |
-| 結構化輸出 | 原生支援 | 部分模型支援 |
-| 成本 | 按 Google 定價 | 按各廠商定價 |
-| 設定複雜度 | 需要 GCP 專案 | 僅需 API 金鑰 |
+```yaml
+env:
+- name: OPENROUTER_API_KEY
+  valueFrom:
+    secretKeyRef:
+      name: openrouter-secret
+      key: api-key
+- name: OPENROUTER_MODEL
+  value: "openai/gpt-4"
+- name: OPENROUTER_BASE_URL
+  value: "https://openrouter.ai/api/v1"
+```
+
+### Serverless 環境
+
+```javascript
+// AWS Lambda, Vercel, Netlify 等
+process.env.OPENROUTER_API_KEY = 'your-api-key';
+process.env.OPENROUTER_MODEL = 'openai/gpt-4';
+```
+
+## 瀏覽器環境支援
+
+本套件已設計為瀏覽器友好：
+
+- 優先讀取系統環境變數
+- 不依賴 Node.js 特定的檔案系統操作
+- 支援 Web Workers 和 Serverless 環境
 
 ## 故障排除
 
-### 1. API 金鑰錯誤
-- 確保 `OPENROUTER_API_KEY` 已正確設定
-- 從 https://openrouter.ai/ 獲取有效的 API 金鑰
+### 常見問題
 
-### 2. 模型不支援結構化輸出
-- 使用支援的模型 (如 gpt-4o, claude-3.5-sonnet)
-- 或改用 `generateText` 方法
+1. **API 金鑰未設定**
+   - 檢查 `OPENROUTER_API_KEY` 環境變數
+   - 確認 `.env` 檔案格式正確
 
-### 3. 網路問題
-- 檢查網路連線
-- 確認 API 端點是否可達
-- 檢查是否達到 API 使用限制
+2. **模型名稱錯誤**
+   - 使用正確的 OpenRouter 模型名稱格式
+   - 例如：`openai/gpt-4`, `anthropic/claude-3-sonnet`
 
-## 開發注意事項
+3. **並發限制問題**
+   - 調整 `DEFAULT_OPENROUTER_PARALLELISM` 值
+   - 根據你的 OpenRouter 計劃調整
 
-### 測試問題
-目前的 Jest 測試有 Mock 設定問題，建議使用 `openrouter_simple_test.ts` 進行手動測試。
+### 除錯模式
 
-### 類型安全
-模型完全支援 TypeScript 類型檢查，使用 TypeBox 進行 Schema 驗證。
+設定 `DEBUG_MODE=true` 來啟用詳細日誌：
 
-### 錯誤處理
-包含完整的錯誤處理和重試機制，與原有的 Vertex AI 模型行為一致。
-
-## 下一步
-
-1. 設定環境變數
-2. 運行簡單測試腳本
-3. 整合到現有專案中
-4. 根據需要調整並發設定
+```bash
+export DEBUG_MODE=true
+```

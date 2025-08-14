@@ -135,16 +135,11 @@ Then to log in locally run:
 
 1. Register an OpenRouter account, obtain an API key, and set it in the `.env` file.
 2. Copy `polist_report.csv` into the `/files` directory and rename it to `comments.csv`.
+
 3. Run:
 
 ```bash
-cd library
-```
-
-4. Run:
-
-```bash
-npx ts-node examples/tutorial.ts
+npx ts-node ./library/examples/tutorial.ts
 ```
 
 You can get the output in Markdown format from console.
@@ -196,6 +191,31 @@ CLI Usage
 There is also a simple CLI set up for testing. There are three  tools:
 
 * [./library/runner-cli/runner.ts](https://github.com/Jigsaw-Code/sensemaking-tools/blob/main/library/runner-cli/runner.ts): takes in a CSV representing a conversation and outputs an HTML file containing the summary. The summary is best viewed as an HTML file so that the included citations can be hovered over to see the original comment and votes.  
+
+* [.library/runner-cli/runner_openrouter.ts](https://github.com/bestian/sensemaking-tools/blob/new-feature-open-router/library/runner-cli/runner_openrouter.ts)
+
+Same usage as above, but use open router model. 
+To use open router model, you have to set up envivronment varibles as bellow:
+
+```bash
+# OpenRouter API Configuration
+OPENROUTER_API_KEY=your_openrouter_api_key_here
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+OPENROUTER_MODEL=openai/gpt-oss-120b
+
+# Optional: Custom headers for OpenRouter
+OPENROUTER_X_TITLE=Sensemaking Tools
+```
+
+then run
+
+```bash
+npx ts-node ./library/runner-cli/runner_openrouter.ts \
+  --outputBasename out \
+  --inputFile "./files/comments.csv" \
+  --additionalContext "Description of the conversation"
+```
+
 * [./library/runner-cli/categorization\_runner.ts](https://github.com/Jigsaw-Code/sensemaking-tools/blob/main/library/runner-cli/categorization_runner.ts): takes in a CSV representing a conversation and outputs another CSV with the comments categorized into topics and subtopics.  
 * [./library/runner-cli/advanced\_runner.ts](https://github.com/Jigsaw-Code/sensemaking-tools/blob/main/library/runner-cli/advanced_runner.ts): takes in a CSV representing a conversation and outputs three files for an advanced user more interested in the statistics. The first is a JSON of topics, their sizes, and their subtopics. The second is a JSON with all of the comments and their alignment scores and values. Third is the summary object as a JSON which can be used for additional processing.
 

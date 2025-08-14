@@ -1,12 +1,8 @@
 #!/usr/bin/env node
 
 import OpenAI from 'openai';
-import * as dotenv from 'dotenv';
-import * as path from 'path';
+import { getEnvVar, getRequiredEnvVar } from '../src/utils/env_loader';
 import { align_response_text } from '../src/utils/align_response';
-
-// 載入環境變數
-dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 async function main() {
   // 檢查命令列參數
@@ -20,9 +16,9 @@ async function main() {
   const prompt = args[0];
 
   // 檢查必要的環境變數
-  const apiKey = process.env.OPENROUTER_API_KEY;
-  const model = process.env.OPENROUTER_MODEL;
-  const baseURL = process.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1';
+  const apiKey = getRequiredEnvVar('OPENROUTER_API_KEY');
+  const model = getRequiredEnvVar('OPENROUTER_MODEL');
+  const baseURL = getEnvVar('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1');
 
   if (!apiKey) {
     console.error('錯誤: 未設定 OPENROUTER_API_KEY 環境變數');

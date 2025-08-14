@@ -17,7 +17,6 @@
 // columns of the form <Group Name>-agree-count, <Group Name>-disagree-count, and
 // <Group Name>-pass-count.
 
-import * as dotenv from 'dotenv';
 import { Sensemaker } from "../src/sensemaker";
 import { OpenRouterModel } from "../src/models/openrouter_model";
 import {
@@ -29,14 +28,11 @@ import {
   SummaryContent,
   VoteInfo,
 } from "../src/types";
-import * as path from "path";
 import * as fs from "fs";
 import { parse } from "csv-parse";
 import { marked } from "marked";
 import { createObjectCsvWriter } from "csv-writer";
-
-// 載入環境變數，指定 .env 檔案路徑
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+import { getEnvVar, getRequiredEnvVar } from '../src/utils/env_loader';
 
 /**
  * Core comment columns, sans any vote tally rows
@@ -134,12 +130,9 @@ export function writeSummaryToGroundedCSV(summary: Summary, outputFilePath: stri
 export async function getTopicsAndSubtopics(
   comments: Comment[]
 ): Promise<Topic[]> {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-  if (!apiKey) {
-    throw new Error("OPENROUTER_API_KEY environment variable is required");
-  }
+  const apiKey = getRequiredEnvVar("OPENROUTER_API_KEY");
+  const modelName = getEnvVar("OPENROUTER_MODEL", "openai/gpt-oss-120b");
   
-  const modelName = process.env.OPENROUTER_MODEL || "openai/gpt-oss-120b";
   const sensemaker = new Sensemaker({
     defaultModel: new OpenRouterModel(apiKey, modelName),
   });
@@ -158,12 +151,9 @@ export async function getSummary(
   topics?: Topic[],
   additionalContext?: string
 ): Promise<Summary> {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-  if (!apiKey) {
-    throw new Error("OPENROUTER_API_KEY environment variable is required");
-  }
+  const apiKey = getRequiredEnvVar("OPENROUTER_API_KEY");
+  const modelName = getEnvVar("OPENROUTER_MODEL", "openai/gpt-oss-120b");
   
-  const modelName = process.env.OPENROUTER_MODEL || "openai/gpt-oss-120b";
   const sensemaker = new Sensemaker({
     defaultModel: new OpenRouterModel(apiKey, modelName),
   });
@@ -319,7 +309,7 @@ export async function getCommentsFromCsv(inputFilePath: string): Promise<Comment
   if (!inputFilePath) {
     throw new Error("Input file path is missing!");
   }
-  const filePath = path.resolve(inputFilePath);
+  const filePath = fs.realpathSync(inputFilePath);
   const fileContent = fs.readFileSync(filePath, { encoding: "utf-8" });
 
   const parser = parse(fileContent, {

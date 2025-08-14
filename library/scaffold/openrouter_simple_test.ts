@@ -1,25 +1,17 @@
 #!/usr/bin/env node
 
-import * as dotenv from 'dotenv';
-import * as path from 'path';
 import { OpenRouterModel } from '../src/models/openrouter_model';
-
-// 載入環境變數
-dotenv.config({ path: path.join(__dirname, '../../.env') });
+import { getRequiredEnvVar } from '../src/utils/env_loader';
 
 async function testOpenRouterModel() {
-  console.log('=== OpenRouter 模型簡單測試 ===\n');
-
   try {
-    // 檢查環境變數
-    const apiKey = process.env.OPENROUTER_API_KEY;
-    if (!apiKey) {
-      console.error('❌ 錯誤: 未設定 OPENROUTER_API_KEY 環境變數');
-      console.error('請在 library/.env 檔案中設定你的 OpenRouter API 金鑰');
-      return;
-    }
+    console.log('🚀 開始測試 OpenRouter 模型...\n');
 
-    const model = process.env.OPENROUTER_MODEL || 'openai/gpt-4o';
+    // 檢查環境變數
+    const apiKey = getRequiredEnvVar('OPENROUTER_API_KEY');
+    console.log('✅ API 金鑰已設定');
+
+    const model = getRequiredEnvVar('OPENROUTER_MODEL');
     console.log(`✅ 使用模型: ${model}`);
     console.log(`✅ API 金鑰: ${apiKey.substring(0, 8)}...\n`);
 

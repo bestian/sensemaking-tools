@@ -1,39 +1,26 @@
 #!/usr/bin/env node
 
-import * as dotenv from 'dotenv';
-import * as path from 'path';
 import { OpenRouterModel } from '../src/models/openrouter_model';
+import { getEnvVar, getRequiredEnvVar } from '../src/utils/env_loader';
 import { Type } from '@sinclair/typebox';
 
-// 載入環境變數
-dotenv.config({ path: path.join(__dirname, '../../.env') });
-
 // 定義測試用的 JSON Schema
-const TEST_SCHEMA = Type.Object({
-  summary: Type.String({ description: "總結內容" }),
-  topics: Type.Array(Type.String(), { description: "主題列表" }),
-  sentiment: Type.Union([
-    Type.Literal("positive"),
-    Type.Literal("negative"),
-    Type.Literal("neutral")
-  ], { description: "情感傾向" })
+const testSchema = Type.Object({
+  summary: Type.String(),
+  topics: Type.Array(Type.String()),
+  confidence: Type.Number()
 });
 
-async function debugOpenRouterModel() {
-  console.log('=== OpenRouter 模型調試測試 ===\n');
-
+async function testOpenRouterModel() {
   try {
-    // 檢查環境變數
-    const apiKey = process.env.OPENROUTER_API_KEY;
-    if (!apiKey) {
-      console.error('❌ 錯誤: 未設定 OPENROUTER_API_KEY 環境變數');
-      console.error('請在 library/.env 檔案中設定你的 OpenRouter API 金鑰');
-      return;
-    }
+    console.log('🚀 開始測試 OpenRouter 模型...\n');
 
-    const model = process.env.OPENROUTER_MODEL || 'openai/gpt-4o';
-    console.log(`✅ 使用模型: ${model}`);
-    console.log(`✅ API 金鑰: ${apiKey.substring(0, 8)}...\n`);
+    // 檢查環境變數
+    const apiKey = getRequiredEnvVar('OPENROUTER_API_KEY');
+    console.log('✅ API 金鑰已設定');
+
+    const model = getEnvVar('OPENROUTER_MODEL', 'openai/gpt-4o');
+    console.log(`🤖 使用模型: ${model}`);
 
     // 創建模型實例
     console.log('1. 創建 OpenRouter 模型實例...');
@@ -68,10 +55,10 @@ async function debugOpenRouterModel() {
     
     console.log(`問題: ${dataPrompt.trim()}`);
     console.log('   正在發送結構化輸出請求...');
-    console.log('   使用 Schema:', JSON.stringify(TEST_SCHEMA, null, 2));
+    console.log('   使用 Schema:', JSON.stringify(testSchema, null, 2));
     
     const dataStartTime = Date.now();
-    const structuredData = await openRouterModel.generateData(dataPrompt, TEST_SCHEMA);
+    const structuredData = await openRouterModel.generateData(dataPrompt, testSchema);
     const dataEndTime = Date.now();
     
     console.log('結構化回答:');
@@ -139,7 +126,7 @@ async function debugOpenRouterModel() {
 
 // 執行調試測試
 if (require.main === module) {
-  debugOpenRouterModel().catch((error) => {
+  testOpenRouterModel().catch((error) => {
     console.error('程式執行失敗:', error);
     process.exit(1);
   });
