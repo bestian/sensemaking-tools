@@ -17,14 +17,14 @@
 import os
 
 # The maximum number of times a task should be retried.
-MAX_RETRIES = 3
+MAX_RETRIES = 4
 # The maximum number of times an LLM call should be retried.
-MAX_LLM_RETRIES = 3
+MAX_LLM_RETRIES = 4
 # How long in seconds to wait between LLM calls.
 RETRY_DELAY_SEC = 10
 
 # Set default vertex parallelism (number of concurrent LLM calls) based on similarly named env var, or use default value
 parallelism_env_var = os.environ.get("DEFAULT_VERTEX_PARALLELISM")
 DEFAULT_VERTEX_PARALLELISM = (
-    int(parallelism_env_var) if parallelism_env_var else 100
+    int(parallelism_env_var) if parallelism_env_var else 1000
 )

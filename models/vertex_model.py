@@ -33,6 +33,12 @@ from .model import Model as BaseModelClass, SchemaType, ListSchemaType
 from .model_util import MAX_LLM_RETRIES, DEFAULT_VERTEX_PARALLELISM, RETRY_DELAY_SEC, MAX_RETRIES
 
 
+class TokenLimitExceededError(Exception):
+  """Custom exception for when the token limit is exceeded."""
+
+  pass
+
+
 class VertexModel(BaseModelClass):
 
   def __init__(
@@ -176,6 +182,9 @@ async def _retry_call(
 
       logging.error(f"Attempt {attempt} failed. Invalid response: {response}")
     except Exception as error:
+      if "exceeds the maximum number of tokens allowed" in str(error):
+        logging.warning("Input token limit exceeded. Not retrying.")
+        raise TokenLimitExceededError(error) from error
       logging.error(f"Attempt {attempt} failed: {error}")
 
     # Exponential backoff calculation
