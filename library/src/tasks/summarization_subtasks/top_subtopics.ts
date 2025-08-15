@@ -21,6 +21,7 @@ import { getPrompt } from "../../sensemaker_utils";
 
 // Import localization system
 import { 
+  getLanguageName,
   getReportSectionTitle, 
   getReportContent, 
   getSubsectionTitle,
@@ -30,8 +31,15 @@ import {
 
 export class TopSubtopicsSummary extends RecursiveSummary<SummaryStats> {
   async getSummary(): Promise<SummaryContent> {
+    // Debug: 檢查 output_lang 值
+    console.log(`[DEBUG] TopSubtopicsSummary.getSummary() output_lang: ${this.output_lang}`);
+    
     const allSubtopics = getFlattenedSubtopics(this.input.getStatsByTopic());
     const topSubtopics = getTopSubtopics(allSubtopics, 5, this.output_lang);
+    
+    // Debug: 檢查 getTopSubtopics 的調用參數
+    console.log(`[DEBUG] TopSubtopicsSummary.getSummary() calling getTopSubtopics with: max=5, output_lang="${this.output_lang}"`);
+    console.log(`[DEBUG] TopSubtopicsSummary.getSummary() allSubtopics count: ${allSubtopics.length}, topSubtopics count: ${topSubtopics.length}`);
 
     const subtopicSummaryContents: SummaryContent[] = [];
     for (let i = 0; i < topSubtopics.length; ++i) {
@@ -45,6 +53,12 @@ export class TopSubtopicsSummary extends RecursiveSummary<SummaryStats> {
       topCount: topSubtopics.length
     });
     
+    // Debug: 檢查本地化函式的調用參數和結果
+    console.log(`[DEBUG] TopSubtopicsSummary.getSummary() calling getReportSectionTitle with: section="topSubtopics", output_lang="${this.output_lang}", count=${topSubtopics.length}`);
+    console.log(`[DEBUG] TopSubtopicsSummary.getSummary() calling getReportContent with: section="topSubtopics", content="text", output_lang="${this.output_lang}"`);
+    console.log(`[DEBUG] TopSubtopicsSummary.getSummary() title result: "${title}"`);
+    console.log(`[DEBUG] TopSubtopicsSummary.getSummary() text result: "${text}"`);
+    
     return Promise.resolve({
       title: title,
       text: text,
@@ -53,11 +67,16 @@ export class TopSubtopicsSummary extends RecursiveSummary<SummaryStats> {
   }
 
   async getSubtopicSummary(st: TopicStats, index: number): Promise<SummaryContent> {
+    // Debug: 檢查 getSubtopicSummary 中的 output_lang 值
+    console.log(`[DEBUG] TopSubtopicsSummary.getSubtopicSummary() output_lang: ${this.output_lang}`);
+    
     const subtopicComments = st.summaryStats.comments;
     console.log(`Generating PROMINENT THEMES for top 5 subtopics: "${st.name}"`);
+    console.log(`[DEBUG] Calling model.generateText with output_lang: ${this.output_lang}`);
+    
     const text = await this.model.generateText(
       getPrompt(
-        `Please generate a concise bulleted list identifying up to 5 prominent themes across all statements. Each theme should be less than 10 words long.  Do not use bold text. Do not preface the bulleted list with any text. These statements are all about ${st.name}`,
+        `Please use ${getLanguageName(this.output_lang)} language to generate a concise bulleted list identifying up to 5 prominent themes across all statements. Each theme should be less than 10 words long.  Do not use bold text. Do not preface the bulleted list with any text. These statements are all about ${st.name}`,
         subtopicComments.map((comment: Comment): string => comment.text),
         this.additionalContext,
         this.output_lang
@@ -67,6 +86,10 @@ export class TopSubtopicsSummary extends RecursiveSummary<SummaryStats> {
     
     // Get localized themes title from localization system
     const themesTitle = getSubsectionTitle("prominentThemes", this.output_lang);
+    
+    // Debug: 檢查本地化函式的調用參數和結果
+    console.log(`[DEBUG] TopSubtopicsSummary.getSubtopicSummary() calling getSubsectionTitle with: section="prominentThemes", output_lang="${this.output_lang}"`);
+    console.log(`[DEBUG] TopSubtopicsSummary.getSubtopicSummary() themesTitle result: "${themesTitle}"`);
     
     const themesSummary = { title: themesTitle, text: text };
     return Promise.resolve({
@@ -78,6 +101,9 @@ export class TopSubtopicsSummary extends RecursiveSummary<SummaryStats> {
 }
 
 function getTopSubtopics(allSubtopics: TopicStats[], max = 5, output_lang: SupportedLanguage = "en") {
+  // Debug: 檢查 getTopSubtopics 函數接收到的 output_lang 參數
+  console.log(`[DEBUG] getTopSubtopics() received output_lang: ${output_lang}`);
+  
   // Sort all subtopics by comment count, desc
   allSubtopics.sort((a, b) => b.commentCount - a.commentCount);
 
@@ -85,6 +111,10 @@ function getTopSubtopics(allSubtopics: TopicStats[], max = 5, output_lang: Suppo
   const topSubtopics = [];
   for (const st of allSubtopics) {
     if (st.name == getTopicName("other", output_lang)) {
+      // Debug: 檢查 getTopicName 的調用
+      console.log(`[DEBUG] getTopSubtopics() calling getTopicName with: topic="other", output_lang="${output_lang}"`);
+      console.log(`[DEBUG] getTopSubtopics() getTopicName result: "${getTopicName("other", output_lang)}"`);
+      console.log(`[DEBUG] getTopSubtopics() skipping subtopic: "${st.name}"`);
       continue;
     }
     topSubtopics.push(st);
@@ -92,6 +122,10 @@ function getTopSubtopics(allSubtopics: TopicStats[], max = 5, output_lang: Suppo
       break;
     }
   }
+  
+  // Debug: 檢查最終結果
+  console.log(`[DEBUG] getTopSubtopics() returning ${topSubtopics.length} subtopics`);
+  
   return topSubtopics;
 }
 

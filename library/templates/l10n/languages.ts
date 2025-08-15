@@ -11,8 +11,8 @@ export const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
 
 export const LANGUAGE_PREFIXES: Record<SupportedLanguage, string> = {
   "en": "",
-  "zh-TW": "使用的語言非常非常重要，以下問題請用繁體中文回答。",
-  "fr": "Il est très important d'utiliser la bonne langue. Veuillez répondre en français."
+  "zh-TW": "以下問題請一定要全文使用繁體中文回答，不要用其他語言回答！",
+  "fr": "Veuillez répondre en français. ne répondez pas en anglais."
 };
 
 export function getLanguageName(lang: SupportedLanguage): string {
@@ -20,6 +20,7 @@ export function getLanguageName(lang: SupportedLanguage): string {
 }
 
 export function getLanguagePrefix(lang: SupportedLanguage): string {
+  console.log(`[DEBUG] getLanguagePrefix() lang: ${lang}`);
   return LANGUAGE_PREFIXES[lang] || "";
 }
 

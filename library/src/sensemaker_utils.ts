@@ -86,7 +86,9 @@ export function getAbstractPrompt<T>(
   additionalContext?: string,
   output_lang: SupportedLanguage = "en"
 ) {
+  console.log(`[DEBUG] getAbstractPrompt() output_lang: ${output_lang}`);
   const languagePrefix = getLanguagePrefix(output_lang);
+  console.log(`[DEBUG] getAbstractPrompt() languagePrefix: ${languagePrefix}`);
   return languagePrefix + `
 <instructions>
   ${instructions}
@@ -110,6 +112,7 @@ export function getPrompt(
   additionalContext?: string,
   output_lang: SupportedLanguage = "en"
 ): string {
+  console.log(`[DEBUG] getPrompt() output_lang: ${output_lang}`);
   return getAbstractPrompt(
     instructions,
     data,
