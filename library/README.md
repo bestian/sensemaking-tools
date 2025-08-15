@@ -213,8 +213,13 @@ then run
 npx ts-node ./library/runner-cli/runner_openrouter.ts \
   --outputBasename out \
   --inputFile "./files/comments.csv" \
-  --additionalContext "Description of the conversation"
+  --additionalContext "Description of the conversation" \
+  --output_lang zh-TW
 ```
+
+The `--output_lang` parameter supports:
+- `en` (default): English output
+- `zh-TW`: Traditional Chinese output
 
 * [./library/runner-cli/categorization\_runner.ts](https://github.com/Jigsaw-Code/sensemaking-tools/blob/main/library/runner-cli/categorization_runner.ts): takes in a CSV representing a conversation and outputs another CSV with the comments categorized into topics and subtopics.  
 * [./library/runner-cli/advanced\_runner.ts](https://github.com/Jigsaw-Code/sensemaking-tools/blob/main/library/runner-cli/advanced_runner.ts): takes in a CSV representing a conversation and outputs three files for an advanced user more interested in the statistics. The first is a JSON of topics, their sizes, and their subtopics. The second is a JSON with all of the comments and their alignment scores and values. Third is the summary object as a JSON which can be used for additional processing.

@@ -17,6 +17,7 @@ import { Model } from "../models/model";
 import { MAX_RETRIES } from "../models/model_util";
 import { getPrompt, retryCall } from "../sensemaker_utils";
 import { Comment, FlatTopic, NestedTopic, Topic } from "../types";
+import { SupportedLanguage } from "../../templates/l10n";
 
 /**
  * @fileoverview Helper functions for performing topic modeling on sets of comments.
@@ -92,7 +93,8 @@ export function learnOneLevelOfTopics(
   model: Model,
   topic?: Topic,
   otherTopics?: Topic[],
-  additionalContext?: string
+  additionalContext?: string,
+  output_lang: SupportedLanguage = "en"
 ): Promise<Topic[]> {
   const instructions = generateTopicModelingPrompt(topic, otherTopics);
   const schema = topic ? Type.Array(NestedTopic) : Type.Array(FlatTopic);
@@ -104,9 +106,11 @@ export function learnOneLevelOfTopics(
         getPrompt(
           instructions,
           comments.map((comment) => comment.text),
-          additionalContext
+          additionalContext,
+          output_lang
         ),
-        schema
+        schema,
+        output_lang
       )) as Topic[];
     },
     function (response: Topic[]): boolean {

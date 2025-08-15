@@ -52,6 +52,11 @@ async function main(): Promise<void> {
     .option(
       "-a, --additionalContext <context>",
       "A short description of the conversation to add context."
+    )
+    .option(
+      "--output_lang <language>",
+      "Output language for the report (default: en, supported: en, zh-TW)",
+      "en"
     );
   program.parse(process.argv);
   const options = program.opts();
@@ -61,7 +66,8 @@ async function main(): Promise<void> {
   const summary = await getSummary(
     comments,
     undefined,
-    options.additionalContext
+    options.additionalContext,
+    options.output_lang
   );
 
   const markdownContent = summary.getText("MARKDOWN");

@@ -19,6 +19,7 @@ import { categorizeCommentsRecursive } from "./tasks/categorization";
 import { summarizeByType } from "./tasks/summarization";
 import { ModelSettings, Model } from "./models/model";
 import { getUniqueTopics } from "./sensemaker_utils";
+import { SupportedLanguage } from "../templates/l10n";
 
 // Class to make sense of conversation data. Uses LLMs to learn what topics were discussed and
 // categorize comments. Then these categorized comments can be used with optional Vote data to
@@ -81,18 +82,20 @@ export class Sensemaker {
     comments: Comment[],
     summarizationType: SummarizationType = SummarizationType.AGGREGATE_VOTE,
     topics?: Topic[],
-    additionalContext?: string
+    additionalContext?: string,
+    output_lang: SupportedLanguage = "en"
   ): Promise<Summary> {
     const startTime = performance.now();
 
     // Categories are required for summarization, this is a no-op if they already have categories.
-    comments = await this.categorizeComments(comments, true, topics, additionalContext, 2);
+    comments = await this.categorizeComments(comments, true, topics, additionalContext, 2, output_lang);
 
     const summary = await summarizeByType(
       this.getModel("summarizationModel"),
       comments,
       summarizationType,
-      additionalContext
+      additionalContext,
+      output_lang
     );
 
     console.log(`Summarization took ${(performance.now() - startTime) / (1000 * 60)} minutes.`);
@@ -117,7 +120,8 @@ export class Sensemaker {
     includeSubtopics: boolean,
     topics?: Topic[],
     additionalContext?: string,
-    topicDepth?: 1 | 2 | 3
+    topicDepth?: 1 | 2 | 3,
+    output_lang: SupportedLanguage = "en"
   ): Promise<Topic[]> {
     const startTime = performance.now();
 
@@ -129,7 +133,8 @@ export class Sensemaker {
       includeSubtopics,
       topics,
       additionalContext,
-      topicDepth
+      topicDepth,
+      output_lang
     );
     const learnedTopics = getUniqueTopics(categorizedComments);
 
@@ -154,7 +159,8 @@ export class Sensemaker {
     includeSubtopics: boolean,
     topics?: Topic[],
     additionalContext?: string,
-    topicDepth?: 1 | 2 | 3
+    topicDepth?: 1 | 2 | 3,
+    output_lang: SupportedLanguage = "en"
   ): Promise<Comment[]> {
     const startTime = performance.now();
     if (!includeSubtopics && topicDepth && topicDepth > 1) {
@@ -168,7 +174,8 @@ export class Sensemaker {
       includeSubtopics ? topicDepth || 2 : 1,
       this.getModel("categorizationModel"),
       topics,
-      additionalContext
+      additionalContext,
+      output_lang
     );
 
     console.log(`Categorization took ${(performance.now() - startTime) / (1000 * 60)} minutes.`);

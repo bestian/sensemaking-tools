@@ -25,6 +25,9 @@ import {
   retryCall,
 } from "../../sensemaker_utils";
 
+// Import localization system
+import { getReportSectionTitle, getReportContent } from "../../../templates/l10n";
+
 function oneShotInstructions(topicNames: string[]) {
   return (
     `Your job is to compose a summary of the key findings from a public discussion, based on already composed summaries corresponding to topics and subtopics identified in said discussion. ` +
@@ -83,10 +86,11 @@ export class OverviewSummary extends RecursiveSummary<OverviewInput> {
     const method = this.input.method || "one-shot";
     const result = await (method == "one-shot" ? this.oneShotSummary() : this.perTopicSummary());
 
-    const preamble =
-      `Below is a high level overview of the topics discussed in the conversation, as well as the percentage of statements categorized under each topic. ` +
-      `Note that the percentages may add up to greater than 100% when statements fall under more than one topic.\n\n`;
-    return { title: "## Overview", text: preamble + result };
+    // Get localized title and preamble from localization system
+    const title = getReportSectionTitle("overview", this.output_lang);
+    const preamble = getReportContent("overview", "preamble", this.output_lang);
+    
+    return { title, text: preamble + result };
   }
 
   /**
@@ -96,6 +100,7 @@ export class OverviewSummary extends RecursiveSummary<OverviewInput> {
    */
   async oneShotSummary(): Promise<string> {
     const topicNames = this.topicNames();
+    const output_lang = this.output_lang;
     const prompt = getAbstractPrompt(
       oneShotInstructions(topicNames),
       [filterSectionsForOverview(this.input.topicsSummary)],
@@ -108,7 +113,7 @@ export class OverviewSummary extends RecursiveSummary<OverviewInput> {
     return await retryCall(
       async function (model, prompt) {
         console.log(`Generating OVERVIEW SUMMARY in one shot`);
-        let result = await model.generateText(prompt);
+        let result = await model.generateText(prompt, output_lang);
         result = removeEmptyLines(result);
         if (!result) {
           throw new Error(`Overview summary failed to conform to markdown list format.`);
@@ -143,7 +148,7 @@ export class OverviewSummary extends RecursiveSummary<OverviewInput> {
         this.additionalContext
       );
       console.log(`Generating OVERVIEW SUMMARY for topic: "${topicStats.name}"`);
-      text += (await this.model.generateText(prompt)).trim() + "\n";
+      text += (await this.model.generateText(prompt, this.output_lang)).trim() + "\n";
     }
     return text;
   }

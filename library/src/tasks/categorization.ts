@@ -18,6 +18,7 @@ import { executeConcurrently, getPrompt, hydrateCommentRecord } from "../sensema
 import { TSchema, Type } from "@sinclair/typebox";
 import { learnOneLevelOfTopics } from "./topic_modeling";
 import { MAX_RETRIES, RETRY_DELAY_MS } from "../models/model_util";
+import { SupportedLanguage } from "../../templates/l10n";
 
 /**
  * @fileoverview Helper functions for performing comments categorization.
@@ -36,7 +37,8 @@ export async function categorizeWithRetry(
   instructions: string,
   inputComments: Comment[],
   topics: Topic[],
-  additionalContext?: string
+  additionalContext?: string,
+  output_lang: SupportedLanguage = "en"
 ): Promise<CommentRecord[]> {
   // a holder for uncategorized comments: first - input comments, later - any failed ones that need to be retried
   let uncategorized: Comment[] = [...inputComments];
@@ -49,8 +51,9 @@ export async function categorizeWithRetry(
     );
     const outputSchema: TSchema = Type.Array(TopicCategorizedComment);
     const newCategorized: CommentRecord[] = (await model.generateData(
-      getPrompt(instructions, uncategorizedCommentsForModel, additionalContext),
-      outputSchema
+      getPrompt(instructions, uncategorizedCommentsForModel, additionalContext, output_lang),
+      outputSchema,
+      output_lang
     )) as CommentRecord[];
 
     const newProcessedComments = processCategorizedComments(
@@ -556,7 +559,8 @@ export async function categorizeCommentsRecursive(
   topicDepth: 1 | 2 | 3,
   model: Model,
   topics?: Topic[],
-  additionalContext?: string
+  additionalContext?: string,
+  output_lang: SupportedLanguage = "en"
 ): Promise<Comment[]> {
   // The exit condition - if the requested topic depth matches the current depth of topics on the
   // comments then exit.
@@ -567,20 +571,20 @@ export async function categorizeCommentsRecursive(
   }
 
   if (!topics) {
-    topics = await learnOneLevelOfTopics(comments, model, undefined, undefined, additionalContext);
-    comments = await oneLevelCategorization(comments, model, topics, additionalContext);
+    topics = await learnOneLevelOfTopics(comments, model, undefined, undefined, additionalContext, output_lang);
+    comments = await oneLevelCategorization(comments, model, topics, additionalContext, output_lang);
     // Sometimes comments are categorized into an "Other" topic if no given topics are a good fit.
     // This needs included in the list of topics so these are processed downstream.
     topics.push({ name: "Other" });
-    return categorizeCommentsRecursive(comments, topicDepth, model, topics, additionalContext);
+    return categorizeCommentsRecursive(comments, topicDepth, model, topics, additionalContext, output_lang);
   }
 
   if (topics && currentTopicDepth === 0) {
-    comments = await oneLevelCategorization(comments, model, topics, additionalContext);
+    comments = await oneLevelCategorization(comments, model, topics, additionalContext, output_lang);
     // Sometimes comments are categorized into an "Other" topic if no given topics are a good fit.
     // This needs included in the list of topics so these are processed downstream.
     topics.push({ name: "Other" });
-    return categorizeCommentsRecursive(comments, topicDepth, model, topics, additionalContext);
+    return categorizeCommentsRecursive(comments, topicDepth, model, topics, additionalContext, output_lang);
   }
 
   let index = 0;
@@ -600,7 +604,7 @@ export async function categorizeCommentsRecursive(
     if (!("subtopics" in topic)) {
       // The subtopics are added to the existing topic, so a list of length one is returned.
       const newTopicAndSubtopics = (
-        await learnOneLevelOfTopics(commentsInTopic, model, topic, parentTopics, additionalContext)
+        await learnOneLevelOfTopics(commentsInTopic, model, topic, parentTopics, additionalContext, output_lang)
       )[0];
       if (!("subtopics" in newTopicAndSubtopics)) {
         throw Error("Badly formed LLM response - expected 'subtopics' to be in topics ");
@@ -613,7 +617,8 @@ export async function categorizeCommentsRecursive(
       commentsInTopic,
       model,
       topic.subtopics,
-      additionalContext
+      additionalContext,
+      output_lang
     );
     comments = mergeCommentTopics(comments, categorizedComments, topic, currentTopicDepth);
     // Sometimes comments are categorized into an "Other" subtopic if no given subtopics are a good fit.
@@ -622,14 +627,15 @@ export async function categorizeCommentsRecursive(
     topicWithNewSubtopics.subtopics.push({ name: "Other" });
     topics = mergeTopics(topics, topicWithNewSubtopics);
   }
-  return categorizeCommentsRecursive(comments, topicDepth, model, topics, additionalContext);
+  return categorizeCommentsRecursive(comments, topicDepth, model, topics, additionalContext, output_lang);
 }
 
 export async function oneLevelCategorization(
   comments: Comment[],
   model: Model,
   topics: Topic[],
-  additionalContext?: string
+  additionalContext?: string,
+  output_lang: SupportedLanguage = "en"
 ): Promise<Comment[]> {
   const instructions = topicCategorizationPrompt(topics);
   // TODO: Consider the effects of smaller batch sizes. 1 comment per batch was much faster, but
@@ -641,7 +647,7 @@ export async function oneLevelCategorization(
 
     // Create a callback function for each batch and add it to the list, preparing them for parallel execution.
     batchesToCategorize.push(() =>
-      categorizeWithRetry(model, instructions, uncategorizedBatch, topics, additionalContext)
+      categorizeWithRetry(model, instructions, uncategorizedBatch, topics, additionalContext, output_lang)
     );
   }
 

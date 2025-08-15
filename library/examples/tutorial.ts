@@ -18,7 +18,7 @@
 // This demonstrates how to use the new OpenRouter integration
 
 import { Sensemaker } from '../src/sensemaker';
-import { createOpenRouterModelFromEnv } from '../src/models/openrouter_model';
+import { OpenRouterModel } from '../src/models/openrouter_model';
 import { SummarizationType, Comment, VoteTally } from '../src/types';
 import { getEnvVar } from '../src/utils/env_loader';
 import * as fs from 'fs';
@@ -71,10 +71,13 @@ async function main() {
     console.log(`⚡ 並發限制: ${getEnvVar('DEFAULT_OPENROUTER_PARALLELISM', '使用預設值')}\n`);
 
     // 使用 OpenRouter 模型建立 Sensemaker 實例
-    const openRouterModel = createOpenRouterModelFromEnv();
-    console.log(`✅ OpenRouter 模型建立成功: ${openRouterModel.getModelName()}`);
-    console.log(`⚡ 並發限制: ${openRouterModel.getParallelismLimit()}`);
-    console.log(`🔧 支援結構化輸出: ${openRouterModel.supportsStructuredOutput()}\n`);
+    const openRouterModel = new OpenRouterModel(
+      getEnvVar('OPENROUTER_API_KEY') || '',
+      getEnvVar('OPENROUTER_MODEL', 'anthropic/claude-3.5-sonnet')
+    );
+    console.log(`✅ OpenRouter 模型建立成功`);
+    console.log(`🔑 API 金鑰: ${getEnvVar('OPENROUTER_API_KEY') ? '已設定' : '未設定'}`);
+    console.log(`🤖 模型: ${getEnvVar('OPENROUTER_MODEL', '使用預設值')}\n`);
 
     const mySensemaker = new Sensemaker({
       defaultModel: openRouterModel,
@@ -106,7 +109,11 @@ async function main() {
       // 沒有現有主題:
       undefined,
       // 額外上下文:
-      "This is from a conversation about Taiwan's homeschooling system and community development"
+      "This is from a conversation about Taiwan's homeschooling system and community development",
+      // 主題深度:
+      2,
+      // 輸出語言:
+      "zh-TW"
     );
     
     console.log('✅ 主題學習完成');
@@ -121,7 +128,9 @@ async function main() {
       SummarizationType.AGGREGATE_VOTE,
       topics,
       // 額外上下文:
-      "This is from a conversation about Taiwan's homeschooling system and community development"
+      "This is from a conversation about Taiwan's homeschooling system and community development",
+      // 輸出語言:
+      "zh-TW"
     );
     
     console.log('✅ 對話總結完成');

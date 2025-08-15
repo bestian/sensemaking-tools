@@ -27,10 +27,20 @@ import { Comment, SummaryContent, isCommentType } from "../../types";
 import { Model } from "../../models/model";
 import { SummaryStats, TopicStats } from "../../stats/summary_stats";
 import { RelativeContext } from "./relative_context";
+// Import localization system
+import { 
+  type SupportedLanguage,
+  getReportSectionTitle, 
+  getReportContent, 
+  getSubsectionTitle,
+  getTopicSummaryText,
+  getPluralForm
+} from "../../../templates/l10n";
 
 const COMMON_INSTRUCTIONS =
   "Do not use the passive voice. Do not use ambiguous pronouns. Be clear. " +
   "Do not generate bullet points or special formatting. Do not yap.";
+
 const GROUP_SPECIFIC_INSTRUCTIONS =
   `Participants in this conversation have been clustered into opinion groups. ` +
   `These opinion groups mostly approve of these comments. `;
@@ -145,14 +155,17 @@ export class AllTopicsSummary extends RecursiveSummary<SummaryStats> {
       .map((t) => t.subtopicStats?.length || 0)
       .reduce((n, m) => n + m, 0);
     const hasSubtopics: boolean = nSubtopics > 0;
-    const subtopicsCountText: string = hasSubtopics ? `, as well as ${nSubtopics} subtopics` : "";
+    const subtopicsCountText: string = hasSubtopics ? getReportContent("subtopics", "text", this.output_lang, { count: nSubtopics }) : "";
     const usesGroups = topicStats.some((t) => t.summaryStats.groupBasedSummarization);
-    const overviewText: string =
-      `From the statements submitted, ${nTopics} high level topics were identified` +
-      `${subtopicsCountText}. Based on voting patterns` +
-      `${usesGroups ? " between the opinion groups described above," : ""} both points of common ` +
-      `ground as well as differences of opinion ${usesGroups ? "between the groups " : ""}` +
-      `have been identified and are described below.\n`;
+    
+    // Get localized title and overview text from localization system
+    const title = getReportSectionTitle("topics", this.output_lang);
+    const overviewText = getReportContent("topics", "overview", this.output_lang, {
+      topicCount: nTopics,
+      subtopicsText: subtopicsCountText,
+      groupsText: usesGroups ? " between the opinion groups described above," : "",
+      groupsBetweenText: usesGroups ? "between the groups " : ""
+    });
 
     // Now construct the individual Topic summaries
     const relativeContext = new RelativeContext(topicStats);
@@ -164,11 +177,12 @@ export class AllTopicsSummary extends RecursiveSummary<SummaryStats> {
             topicStat,
             this.model,
             relativeContext,
-            this.additionalContext
+            this.additionalContext,
+            this.output_lang
           ).getSummary()
     );
     return {
-      title: "## Topics",
+      title: title,
       text: overviewText,
       subContents: await executeConcurrently(topicSummaries),
     };
@@ -188,9 +202,10 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
     topicStat: TopicStats,
     model: Model,
     relativeContext: RelativeContext,
-    additionalContext?: string
+    additionalContext?: string,
+    output_lang: SupportedLanguage = "en"
   ) {
-    super(topicStat.summaryStats, model, additionalContext);
+    super(topicStat.summaryStats, model, additionalContext, output_lang);
     this.topicStat = topicStat;
     this.relativeContext = relativeContext;
   }
@@ -228,7 +243,8 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
             subtopicStat,
             this.model,
             this.relativeContext,
-            this.additionalContext
+            this.additionalContext,
+            this.output_lang
           ).getSummary()
       );
 
@@ -237,9 +253,14 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
     const nSubtopics: number = subtopicSummaries.length;
     let topicSummary = "";
     if (nSubtopics > 0) {
-      topicSummary =
-        `This topic included ${nSubtopics} subtopic${nSubtopics === 1 ? "" : "s"}, comprising a ` +
-        `total of ${this.topicStat.commentCount} statement${this.topicStat.commentCount === 1 ? "" : "s"}.`;
+      // Get localized topic summary text from localization system
+      topicSummary = getTopicSummaryText("topicSummary", this.output_lang, {
+        subtopicCount: nSubtopics,
+        subtopicPlural: getPluralForm(nSubtopics, this.output_lang),
+        statementCount: this.topicStat.commentCount,
+        statementPlural: getPluralForm(this.topicStat.commentCount, this.output_lang)
+      });
+      
       const subtopicSummaryPrompt = getAbstractPrompt(
         getRecursiveTopicSummaryInstructions(this.topicStat),
         subtopicSummaryContents,
@@ -253,7 +274,7 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
       console.log(`Generating TOPIC SUMMARY for: "${this.topicStat.name}"`);
       subtopicSummaryContents.unshift({
         type: "TopicSummary",
-        text: await this.model.generateText(subtopicSummaryPrompt),
+        text: await this.model.generateText(subtopicSummaryPrompt, this.output_lang),
       });
     }
 
@@ -272,7 +293,12 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
     const relativeAgreement = this.relativeContext.getRelativeAgreement(
       this.topicStat.summaryStats
     );
-    const agreementDescription = `This subtopic had ${relativeAgreement} compared to the other subtopics.`;
+    
+    // Get localized agreement description from localization system
+    const agreementDescription = getTopicSummaryText("relativeAgreement", this.output_lang, {
+      level: relativeAgreement
+    });
+    
     const subContents = [await this.getThemesSummary()];
     // check env variable to decide whether to compute common ground and difference of opinion summaries
     if (process.env["SKIP_COMMON_GROUND_AND_DIFFERENCES_OF_OPINION"] !== "true") {
@@ -309,7 +335,7 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
       ]);
 
       const otherCommentsSummary = {
-        title: `**Other statements** (${otherComments.length} statements`,
+        title: getSubsectionTitle("otherStatements", this.output_lang, otherComments.length),
         text: otherCommentsTable,
       };
       subContents.push(otherCommentsSummary);
@@ -350,13 +376,16 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
       
       `,
         allComments.map((comment: Comment): string => comment.text),
-        this.additionalContext
-      )
+        this.additionalContext,
+        this.output_lang
+      ),
+      this.output_lang
     );
-    return {
-      title: "Prominent themes were: ",
-      text: text,
-    };
+    
+    // Get localized themes title from localization system
+    const title = getSubsectionTitle("prominentThemes", this.output_lang);
+    
+    return { title, text };
   }
 
   /**
@@ -379,15 +408,21 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
             ? getCommonGroundSingleCommentInstructions(this.input.groupBasedSummarization)
             : getCommonGroundInstructions(this.input.groupBasedSummarization),
           commonGroundComments.map((comment: Comment): string => comment.text),
-          this.additionalContext
-        )
+          this.additionalContext,
+          this.output_lang
+        ),
+        this.output_lang
       );
       text = await summary;
     }
+    
+    // Get localized common ground title from localization system
+    const title = this.input.groupBasedSummarization
+      ? getSubsectionTitle("commonGroundBetweenGroups", this.output_lang)
+      : getSubsectionTitle("commonGround", this.output_lang);
+    
     return {
-      title: this.input.groupBasedSummarization
-        ? "Common ground between groups: "
-        : "Common ground: ",
+      title,
       text: text,
       citations: commonGroundComments.map((comment) => comment.id),
     };
@@ -419,8 +454,12 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
       const summary = this.model.generateText(prompt);
       text = await summary;
     }
+    
+    // Get localized differences of opinion title from localization system
+    const title = getSubsectionTitle("differencesOfOpinion", this.output_lang);
+    
     const resp = {
-      title: "Differences of opinion: ",
+      title,
       text: text,
       citations: topDisagreeCommentsAcrossGroups.map((comment) => comment.id),
     };

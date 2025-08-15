@@ -19,6 +19,13 @@ import { Comment, SummaryContent } from "../../types";
 import { RecursiveSummary } from "./recursive_summarization";
 import { getPrompt } from "../../sensemaker_utils";
 
+// Import localization system
+import { 
+  getReportSectionTitle, 
+  getReportContent, 
+  getSubsectionTitle 
+} from "../../../templates/l10n";
+
 export class TopSubtopicsSummary extends RecursiveSummary<SummaryStats> {
   async getSummary(): Promise<SummaryContent> {
     const allSubtopics = getFlattenedSubtopics(this.input.getStatsByTopic());
@@ -28,9 +35,17 @@ export class TopSubtopicsSummary extends RecursiveSummary<SummaryStats> {
     for (let i = 0; i < topSubtopics.length; ++i) {
       subtopicSummaryContents.push(await this.getSubtopicSummary(topSubtopics[i], i));
     }
+    
+    // Get localized title and text from localization system
+    const title = getReportSectionTitle("topSubtopics", this.output_lang, topSubtopics.length);
+    const text = getReportContent("topSubtopics", "text", this.output_lang, {
+      totalCount: allSubtopics.length,
+      topCount: topSubtopics.length
+    });
+    
     return Promise.resolve({
-      title: `## Top ${topSubtopics.length} Most Discussed Subtopics`,
-      text: `${allSubtopics.length} subtopics of discussion emerged. These ${topSubtopics.length} subtopics had the most statements submitted.`,
+      title: title,
+      text: text,
       subContents: subtopicSummaryContents,
     });
   }
@@ -42,10 +57,16 @@ export class TopSubtopicsSummary extends RecursiveSummary<SummaryStats> {
       getPrompt(
         `Please generate a concise bulleted list identifying up to 5 prominent themes across all statements. Each theme should be less than 10 words long.  Do not use bold text. Do not preface the bulleted list with any text. These statements are all about ${st.name}`,
         subtopicComments.map((comment: Comment): string => comment.text),
-        this.additionalContext
-      )
+        this.additionalContext,
+        this.output_lang
+      ),
+      this.output_lang
     );
-    const themesSummary = { title: "Prominent themes were:", text: text };
+    
+    // Get localized themes title from localization system
+    const themesTitle = getSubsectionTitle("prominentThemes", this.output_lang);
+    
+    const themesSummary = { title: themesTitle, text: text };
     return Promise.resolve({
       title: `### ${index + 1}. ${st.name} (${st.commentCount} statements)`,
       text: "",

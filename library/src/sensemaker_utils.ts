@@ -17,6 +17,7 @@
 import { Comment, CommentRecord, SummaryContent, Topic } from "./types";
 import { RETRY_DELAY_MS } from "./models/model_util";
 import { voteInfoToString } from "./tasks/utils/citation_utils";
+import { SupportedLanguage, getLanguagePrefix } from "../templates/l10n";
 
 /**
  * Rerun a function multiple times.
@@ -82,9 +83,11 @@ export function getAbstractPrompt<T>(
   instructions: string,
   data: T[],
   dataWrapper: (data: T) => string,
-  additionalContext?: string
+  additionalContext?: string,
+  output_lang: SupportedLanguage = "en"
 ) {
-  return `
+  const languagePrefix = getLanguagePrefix(output_lang);
+  return languagePrefix + `
 <instructions>
   ${instructions}
 </instructions>
@@ -104,13 +107,15 @@ ${additionalContext ? "\n<additionalContext>\n  " + additionalContext + "\n</add
 export function getPrompt(
   instructions: string,
   data: string[],
-  additionalContext?: string
+  additionalContext?: string,
+  output_lang: SupportedLanguage = "en"
 ): string {
   return getAbstractPrompt(
     instructions,
     data,
     (data: string) => `<comment>${data}</comment>`,
-    additionalContext
+    additionalContext,
+    output_lang
   );
 }
 

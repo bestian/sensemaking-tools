@@ -149,7 +149,8 @@ export async function getTopicsAndSubtopics(
 export async function getSummary(
   comments: Comment[],
   topics?: Topic[],
-  additionalContext?: string
+  additionalContext?: string,
+  output_lang: string = "en"
 ): Promise<Summary> {
   const apiKey = getRequiredEnvVar("OPENROUTER_API_KEY");
   const modelName = getEnvVar("OPENROUTER_MODEL", "openai/gpt-oss-120b");
@@ -163,7 +164,8 @@ export async function getSummary(
     comments,
     SummarizationType.AGGREGATE_VOTE,
     topics,
-    additionalContext
+    additionalContext,
+    output_lang
   );
   // For now, remove all Common Ground, Difference of Opinion, or TopicSummary sections
   return summary.withoutContents((sc) => sc.type === "TopicSummary");
