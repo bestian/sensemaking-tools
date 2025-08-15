@@ -165,6 +165,7 @@ export class OpenRouterModel extends Model {
               messages: Array<{ role: "user"; content: string }>;
               max_tokens: number;
               temperature: number;
+              stream: boolean;
               response_format?: {
                 type: "json_schema";
                 json_schema: {
@@ -178,6 +179,7 @@ export class OpenRouterModel extends Model {
               messages: [{ role: "user", content: prompt }],
               max_tokens: 4000,
               temperature: 0,
+              stream: false,
             };
 
             // 如果有 schema，設定結構化輸出
@@ -192,12 +194,14 @@ export class OpenRouterModel extends Model {
               };
             }
 
-            const completion = await this.openai.chat.completions.create(requestOptions);
+            const completion = await this.openai.chat.completions.create(requestOptions) as any;
             
             // 檢查回應是否有效
             if (!completion.choices || completion.choices.length === 0) {
               throw new Error("No choices returned from OpenRouter API");
             }
+
+            console.log(completion.choices[0]?.message);
             
             const content = completion.choices[0]?.message?.content;
             if (!content || content.trim() === "") {
