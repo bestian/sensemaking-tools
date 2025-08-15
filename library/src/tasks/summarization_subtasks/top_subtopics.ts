@@ -23,13 +23,15 @@ import { getPrompt } from "../../sensemaker_utils";
 import { 
   getReportSectionTitle, 
   getReportContent, 
-  getSubsectionTitle 
+  getSubsectionTitle,
+  getTopicName,
+  type SupportedLanguage
 } from "../../../templates/l10n";
 
 export class TopSubtopicsSummary extends RecursiveSummary<SummaryStats> {
   async getSummary(): Promise<SummaryContent> {
     const allSubtopics = getFlattenedSubtopics(this.input.getStatsByTopic());
-    const topSubtopics = getTopSubtopics(allSubtopics);
+    const topSubtopics = getTopSubtopics(allSubtopics, 5, this.output_lang);
 
     const subtopicSummaryContents: SummaryContent[] = [];
     for (let i = 0; i < topSubtopics.length; ++i) {
@@ -75,14 +77,14 @@ export class TopSubtopicsSummary extends RecursiveSummary<SummaryStats> {
   }
 }
 
-function getTopSubtopics(allSubtopics: TopicStats[], max = 5) {
+function getTopSubtopics(allSubtopics: TopicStats[], max = 5, output_lang: SupportedLanguage = "en") {
   // Sort all subtopics by comment count, desc
   allSubtopics.sort((a, b) => b.commentCount - a.commentCount);
 
   // Get top subtopics, skipping other
   const topSubtopics = [];
   for (const st of allSubtopics) {
-    if (st.name == "Other") {
+    if (st.name == getTopicName("other", output_lang)) {
       continue;
     }
     topSubtopics.push(st);

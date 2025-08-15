@@ -30,11 +30,13 @@ import { RelativeContext } from "./relative_context";
 // Import localization system
 import { 
   type SupportedLanguage,
+  getLanguageName,
   getReportSectionTitle, 
   getReportContent, 
   getSubsectionTitle,
   getTopicSummaryText,
-  getPluralForm
+  getPluralForm,
+  localizeTopicName
 } from "../../../templates/l10n";
 
 const COMMON_INSTRUCTIONS =
@@ -223,7 +225,7 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
    * Returns the section title for this topics summary section of the final report
    */
   getSectionTitle(): string {
-    return `### ${this.topicStat.name} (${this.topicStat.commentCount} statements)`;
+    return `### ${localizeTopicName(this.topicStat.name, this.output_lang)} (${this.topicStat.commentCount} statements)`;
   }
 
   /**
@@ -358,7 +360,7 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
     console.log(`Generating PROMINENT THEMES for subtopic: "${this.topicStat.name}"`);
     const text = await this.model.generateText(
       getPrompt(
-        `Please write a concise bulleted list identifying up to 5 prominent themes across all statements. These statements are all about ${this.topicStat.name}. For each theme, begin with a short theme description written in bold text, followed by a colon, then followed by a SINGLE sentence explaining the theme. Your list should meet the below Criteria and STRICTLY follow the Output Format. Do not preface the bulleted list with any text.
+        `Please use the following language: ${getLanguageName(this.output_lang)} to write a concise bulleted list identifying up to 5 prominent themes across all statements. These statements are all about ${this.topicStat.name}. For each theme, begin with a short theme description written in bold text, followed by a colon, then followed by a SINGLE sentence explaining the theme. Your list should meet the below Criteria and STRICTLY follow the Output Format. Do not preface the bulleted list with any text.
 
       <criteria format="markdown">
       * Impartiality: Do not express your own opinion or pass normative judgments on the statements, like agreement, disagreement, or alarm.
@@ -451,7 +453,7 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
         this.additionalContext
       );
       console.log(`Generating DIFFERENCES OF OPINION for "${topic}"`);
-      const summary = this.model.generateText(prompt);
+      const summary = this.model.generateText(prompt, this.output_lang);
       text = await summary;
     }
     

@@ -15,6 +15,10 @@ export const LANGUAGE_PREFIXES: Record<SupportedLanguage, string> = {
   "fr": "Il est très important d'utiliser la bonne langue. Veuillez répondre en français."
 };
 
+export function getLanguageName(lang: SupportedLanguage): string {
+  return LANGUAGE_NAMES[lang] || "";
+}
+
 export function getLanguagePrefix(lang: SupportedLanguage): string {
   return LANGUAGE_PREFIXES[lang] || "";
 }
