@@ -1,0 +1,69 @@
+# Development files
+*.test.ts
+*.spec.ts
+jest.config.ts
+jest.setup.ts
+eslint.config.mjs
+.prettierrc
+.husky/
+lint-staged.config.js
+
+# Build artifacts
+dist/
+build/
+*.tsbuildinfo
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Examples and templates
+examples/
+templates/
+scaffold/
+
+# Python files
+requirements.txt
+*.py
+__pycache__/
+
+# Binaries
+bin/
+runner-cli/
+
+# Evaluation files
+evals/
+
+# Development dependencies
+node_modules/
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
