@@ -50,11 +50,27 @@ export async function categorizeWithRetry(
       JSON.stringify({ id: comment.id, text: comment.text })
     );
     const outputSchema: TSchema = Type.Array(TopicCategorizedComment);
-    const newCategorized: CommentRecord[] = (await model.generateData(
-      getPrompt(instructions, uncategorizedCommentsForModel, additionalContext, output_lang),
-      outputSchema,
-      output_lang
-    )) as CommentRecord[];
+    let newCategorized: CommentRecord[];
+    
+    try {
+      const rawResponse = await model.generateData(
+        getPrompt(instructions, uncategorizedCommentsForModel, additionalContext, output_lang),
+        outputSchema,
+        output_lang
+      );
+      
+      // 確保回應是一個數組
+      if (!Array.isArray(rawResponse)) {
+        console.error('LLM response is not an array:', typeof rawResponse, rawResponse);
+        throw new Error('LLM response format error: expected array of comments');
+      }
+      
+      newCategorized = rawResponse;
+      console.log(`LLM returned ${newCategorized.length} categorized comments`);
+    } catch (error) {
+      console.error('Error in LLM categorization:', error);
+      throw error;
+    }
 
     const newProcessedComments = processCategorizedComments(
       newCategorized,
@@ -122,6 +138,25 @@ export function validateCommentRecords(
 } {
   const commentsPassedValidation: CommentRecord[] = [];
   const commentsWithInvalidTopics: CommentRecord[] = [];
+  
+  // 防護措施：確保 commentRecords 是一個數組
+  if (!Array.isArray(commentRecords)) {
+    console.error('validateCommentRecords: commentRecords is not an array:', typeof commentRecords, commentRecords);
+    throw new Error('Invalid input: commentRecords must be an array');
+  }
+  
+  // 防護措施：確保 inputComments 是一個數組
+  if (!Array.isArray(inputComments)) {
+    console.error('validateCommentRecords: inputComments is not an array:', typeof inputComments, inputComments);
+    throw new Error('Invalid input: inputComments must be an array');
+  }
+  
+  // 防護措施：確保 topics 是一個數組
+  if (!Array.isArray(topics)) {
+    console.error('validateCommentRecords: topics is not an array:', typeof topics, topics);
+    throw new Error('Invalid input: topics must be an array');
+  }
+  
   // put all input comment ids together for output ids validation
   const inputCommentIds = new Set<string>(inputComments.map((comment) => comment.id));
   // topic -> subtopics lookup for naming validation

@@ -44,7 +44,27 @@ export class OpenRouterModel extends Model {
   }
 
   async generateData(prompt: string, schema: TSchema, output_lang: SupportedLanguage = "en"): Promise<Static<typeof schema>> {
-    return JSON.parse(await this.callLLM(prompt, validateResponse, schema, output_lang));
+    try {
+      const response = await this.callLLM(prompt, validateResponse, schema, output_lang);
+      if (!response) {
+        throw new Error("Empty response from OpenRouter API");
+      }
+      const parsed = JSON.parse(response);
+      
+      // 添加額外的驗證
+      if (schema && Array.isArray(schema)) {
+        // 如果 schema 是數組類型，確保回應也是數組
+        if (!Array.isArray(parsed)) {
+          console.error('Schema expects array but response is not array:', typeof parsed, parsed);
+          throw new Error('Response format error: expected array but got ' + typeof parsed);
+        }
+      }
+      
+      return parsed;
+    } catch (error) {
+      console.error('Error in generateData:', error);
+      throw error;
+    }
   }
 
   async callLLM(prompt: string, validator: (response: string) => boolean = () => true, schema?: TSchema, output_lang: SupportedLanguage = "en"): Promise<string> {
