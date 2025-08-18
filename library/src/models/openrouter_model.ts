@@ -242,8 +242,8 @@ export class OpenRouterModel extends Model {
         chunkCount++;
         
         // 限制 chunk 數量，防止無限循環
-        if (chunkCount > 1000) {
-          console.log('   ⚠️ Reached maximum chunk limit (1000), forcing completion');
+        if (chunkCount > 100000) {
+          console.log('   ⚠️ Reached maximum chunk limit (100000), forcing completion');
           break;
         }
         
