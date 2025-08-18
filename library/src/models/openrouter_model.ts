@@ -57,6 +57,10 @@ export class OpenRouterModel extends Model {
       max_tokens: 4000,
       temperature: 0,
       stream: false as const,
+      n: 1,
+      stop: null,
+      presence_penalty: 0,
+      frequency_penalty: 0,
     };
     // 如果有 schema，設定結構化輸出
     if (schema) {

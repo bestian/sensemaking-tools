@@ -304,7 +304,8 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
           `    <title>${summary.title}</title>\n` +
           `    <text>\n${summary.subContents?.map((s) => s.title + s.text).join("\n\n")}\n` +
           `    </text>\n  </subtopicSummary>`,
-        this.additionalContext
+        this.additionalContext,
+        this.output_lang
       );
       console.log(`Generating TOPIC SUMMARY for: "${this.topicStat.name}"`);
       console.log(`[DEBUG] Calling model.generateText with output_lang: ${this.output_lang}`);
@@ -507,7 +508,8 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
           : DIFFERENCES_OF_OPINION_INSTRUCTIONS,
         [commonGroundSummary].concat(topDisagreeCommentsAcrossGroups),
         formatDifferenceOfOpinionData,
-        this.additionalContext
+        this.additionalContext,
+        this.output_lang
       );
       console.log(`Generating DIFFERENCES OF OPINION for "${topic}"`);
       console.log(`[DEBUG] Calling model.generateText with output_lang: ${this.output_lang}`);

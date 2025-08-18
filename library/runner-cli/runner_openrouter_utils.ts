@@ -33,6 +33,7 @@ import { parse } from "csv-parse";
 import { marked } from "marked";
 import { createObjectCsvWriter } from "csv-writer";
 import { getEnvVar, getRequiredEnvVar } from '../src/utils/env_loader';
+import { SupportedLanguage } from "../templates/l10n";
 
 /**
  * Core comment columns, sans any vote tally rows
@@ -125,10 +126,12 @@ export function writeSummaryToGroundedCSV(summary: Summary, outputFilePath: stri
 /**
  * Identify topics and subtopics when input data has not already been categorized.
  * @param comments The comments from which topics need to be identified
+ * @param output_lang The output language for localization
  * @returns Promise resolving to a Topic collection containing the newly discovered topics and subtopics for the given comments
  */
 export async function getTopicsAndSubtopics(
-  comments: Comment[]
+  comments: Comment[],
+  output_lang: SupportedLanguage = "en"
 ): Promise<Topic[]> {
   const apiKey = getRequiredEnvVar("OPENROUTER_API_KEY");
   const modelName = getEnvVar("OPENROUTER_MODEL", "openai/gpt-oss-120b");
@@ -136,7 +139,7 @@ export async function getTopicsAndSubtopics(
   const sensemaker = new Sensemaker({
     defaultModel: new OpenRouterModel(apiKey, modelName),
   });
-  return await sensemaker.learnTopics(comments, true);
+  return await sensemaker.learnTopics(comments, true, undefined, undefined, 2, output_lang);
 }
 
 /**
@@ -150,7 +153,7 @@ export async function getSummary(
   comments: Comment[],
   topics?: Topic[],
   additionalContext?: string,
-  output_lang: string = "en"
+  output_lang: SupportedLanguage = "en"
 ): Promise<Summary> {
   const apiKey = getRequiredEnvVar("OPENROUTER_API_KEY");
   const modelName = getEnvVar("OPENROUTER_MODEL", "openai/gpt-oss-120b");
