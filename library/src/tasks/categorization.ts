@@ -225,8 +225,9 @@ function isExtraComment(comment: Comment | CommentRecord, inputCommentIds: Set<s
  * @returns True if the comment has empty topics or subtopics, false otherwise.
  */
 function hasEmptyTopicsOrSubtopics(comment: CommentRecord): boolean {
-  if (comment.topics.length === 0) {
-    console.warn(`Comment with empty topics: ${JSON.stringify(comment)}`);
+  // 檢查 topics 欄位是否存在
+  if (!comment.topics || comment.topics.length === 0) {
+    console.warn(`Comment with missing or empty topics: ${JSON.stringify(comment)}`);
     return true;
   }
   if (
@@ -250,6 +251,12 @@ function hasInvalidTopicNames(
   comment: CommentRecord,
   inputTopics: Record<string, string[]>
 ): boolean {
+  // 檢查 topics 欄位是否存在
+  if (!comment.topics || comment.topics.length === 0) {
+    console.warn(`Comment with missing or empty topics: ${JSON.stringify(comment)}`);
+    return true;
+  }
+  
   // We use `some` here to return as soon as we find an invalid topic (or subtopic).
   return comment.topics.some((topic: Topic) => {
     const isValidTopic = topic.name in inputTopics;
@@ -687,12 +694,25 @@ export async function oneLevelCategorization(
     );
   }
 
-  // categorize comment batches, potentially in parallel
+  // categorize comment batches sequentially to avoid streaming conflicts
   const totalBatches = Math.ceil(comments.length / model.categorizationBatchSize);
   console.log(
     `Categorizing ${comments.length} statements in batches (${totalBatches} batches of ${model.categorizationBatchSize} statements)`
   );
-  const CategorizedBatches: CommentRecord[][] = await executeConcurrently(batchesToCategorize);
+  
+  // Execute batches sequentially instead of in parallel to avoid streaming response conflicts
+  const CategorizedBatches: CommentRecord[][] = [];
+  for (let i = 0; i < batchesToCategorize.length; i++) {
+    console.log(`Processing batch ${i + 1}/${totalBatches}...`);
+    try {
+      const result = await batchesToCategorize[i]();
+      CategorizedBatches.push(result);
+      console.log(`✅ Batch ${i + 1} completed successfully with ${result.length} comments`);
+    } catch (error) {
+      console.error(`❌ Batch ${i + 1} failed:`, error);
+      throw error;
+    }
+  }
 
   // flatten categorized batches
   const categorized: CommentRecord[] = [];

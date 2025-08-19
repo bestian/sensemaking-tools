@@ -27,7 +27,8 @@ export class OpenRouterModel extends Model {
   private modelName: string;
 
   constructor(apiKey: string, modelName: string = "anthropic/claude-3.5-sonnet") {
-    super();
+    // 設定更小的批次大小，適合處理大筆資料
+    super(50);
     this.modelName = modelName;
     this.openai = new OpenAI({
       apiKey: apiKey,
@@ -67,7 +68,7 @@ export class OpenRouterModel extends Model {
     }
   }
 
-  async callLLM(prompt: string, validator: (response: string) => boolean = () => true, schema?: TSchema, output_lang: SupportedLanguage = "en"): Promise<string> {
+  async callLLM(prompt: string, validator: (response: string) => boolean = () => true, schema?: TSchema, output_lang: SupportedLanguage = "en", maxRetries: number = 3): Promise<string> {
     // Get language prefix from localization system
     const languagePrefix = getLanguagePrefix(output_lang);
     
@@ -96,42 +97,81 @@ export class OpenRouterModel extends Model {
       };
     }
 
-    // 使用 fetch API 發送 streaming 請求
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.openai.apiKey}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://github.com/your-repo',
-        'X-Title': 'Your App Name',
-      },
-      body: JSON.stringify(requestBody),
-    });
+    let lastError: Error | null = null;
+    
+    // 重試邏輯
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`   🔄 Attempt ${attempt}/${maxRetries}`);
+        
+        // 使用 fetch API 發送 streaming 請求
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.openai.apiKey}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': 'https://github.com/your-repo',
+            'X-Title': 'Your App Name',
+          },
+          body: JSON.stringify(requestBody),
+        });
 
-    if (!response.ok) {
-      throw new Error(`OpenRouter API error: ${response.status} ${response.statusText}`);
-    }
+        if (!response.ok) {
+          throw new Error(`OpenRouter API error: ${response.status} ${response.statusText}`);
+        }
 
-    // 處理 streaming 回應
-    const streamedResponse = await this.processStreamingResponse(response);
-    
-    // 在驗證前記錄詳細資訊
-    console.log('🔍 Streaming Response Debug Info:');
-    console.log('   Original Response Length:', streamedResponse.length);
-    console.log('   Response Preview (first 200 chars):', streamedResponse.substring(0, 200));
-    console.log('   Response Preview (last 200 chars):', streamedResponse.substring(Math.max(0, streamedResponse.length - 200)));
-    console.log('   Full Response:', streamedResponse);
-    
-    // 在最後整併完成後進行驗證
-    if (!validator(streamedResponse)) {
-      console.error('❌ Response validation failed!');
-      console.error('   Validator function:', validator.toString());
-      console.error('   Response that failed validation:', streamedResponse);
-      throw new Error("Response validation failed after streaming completion");
+        // 處理 streaming 回應
+        const streamedResponse = await this.processStreamingResponse(response);
+        
+        // 在驗證前記錄詳細資訊
+        console.log('🔍 Streaming Response Debug Info:');
+        console.log('   Original Response Length:', streamedResponse.length);
+        console.log('   Response Preview (first 200 chars):', streamedResponse.substring(0, 200));
+        console.log('   Response Preview (last 200 chars):', streamedResponse.substring(Math.max(0, streamedResponse.length - 200)));
+        
+        // 在最後整併完成後進行驗證
+        if (!validator(streamedResponse)) {
+          const error = new Error(`Response validation failed on attempt ${attempt}/${maxRetries}`);
+          console.error(`❌ Response validation failed on attempt ${attempt}!`);
+          console.error('   Validator function:', validator.toString());
+          console.error('   Response that failed validation (preview):', streamedResponse.substring(0, 500) + '...');
+          
+          if (attempt === maxRetries) {
+            console.error('   Full Response:', streamedResponse);
+            throw error;
+          }
+          
+          lastError = error;
+          console.log(`   ⏳ Retrying in ${attempt * 1000}ms...`);
+          await this.sleep(attempt * 1000); // 指數退避：1s, 2s, 3s
+          continue;
+        }
+        
+        console.log(`✅ Response validation passed successfully on attempt ${attempt}`);
+        return streamedResponse;
+        
+      } catch (error) {
+        lastError = error as Error;
+        console.error(`❌ Error in callLLM attempt ${attempt}:`, error);
+        
+        if (attempt === maxRetries) {
+          console.error(`💀 All ${maxRetries} attempts failed. Throwing last error.`);
+          throw lastError;
+        }
+        
+        console.log(`   ⏳ Retrying in ${attempt * 1000}ms...`);
+        await this.sleep(attempt * 1000); // 指數退避
+      }
     }
     
-    console.log('✅ Response validation passed successfully');
-    return streamedResponse;
+    throw lastError || new Error("Unexpected error in retry logic");
+  }
+
+  /**
+   * 睡眠指定的毫秒數
+   */
+  private sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   /**
@@ -274,7 +314,10 @@ export class OpenRouterModel extends Model {
                 chunks.push(content);
                 console.log(`   Extracted content chunk: "${content}"`);
               } else {
-                console.log('   No content found in parsed data');
+                // 顯示實際收到的 JSON 結構，幫助診斷
+                if (chunkCount <= 5 || chunkCount % 1000 === 0) {
+                  console.log(`   No content found. JSON structure: ${JSON.stringify(parsed).substring(0, 200)}`);
+                }
               }
             } catch (e) {
               // Ignore invalid JSON
