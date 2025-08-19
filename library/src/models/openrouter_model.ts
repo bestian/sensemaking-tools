@@ -219,7 +219,7 @@ export class OpenRouterModel extends Model {
     let chunkCount = 0;
     
     // 添加超時機制
-    const timeoutMs = 30000; // 30 秒超時
+    const timeoutMs = 300000; // 5 分鐘超時
     const startTime = Date.now();
 
     try {
@@ -250,6 +250,7 @@ export class OpenRouterModel extends Model {
         console.log(`   Received chunk ${chunkCount}, buffer size: ${buffer.length}`);
 
         // Process complete lines from buffer
+        let doneSignalReceived = false;
         while (true) {
           const lineEnd = buffer.indexOf('\n');
           if (lineEnd === -1) break;
@@ -261,21 +262,45 @@ export class OpenRouterModel extends Model {
             const data = line.slice(6);
             if (data === '[DONE]') {
               console.log('   Received [DONE] signal');
-              return this.processStreamedResponse(chunks.join(''));
+              doneSignalReceived = true;
+              // 不要立即返回，繼續處理 buffer 中剩餘的內容
+              break;
             }
 
             try {
               const parsed = JSON.parse(data);
-              const content = parsed.choices[0]?.delta?.content;
+              const content = parsed.choices ? parsed.choices[0]?.delta?.content : parsed.content;
               if (content) {
                 chunks.push(content);
                 console.log(`   Extracted content chunk: "${content}"`);
+              } else {
+                console.log('   No content found in parsed data');
               }
             } catch (e) {
               // Ignore invalid JSON
               console.warn('   Invalid JSON in streaming response:', e, 'Line:', line);
             }
           }
+        }
+        
+        // 如果收到 [DONE] 信號，處理完 buffer 中剩餘的內容後退出主循環
+        if (doneSignalReceived) {
+          // 處理 buffer 中剩餘的內容
+          if (buffer.length > 0) {
+            console.log(`   Processing remaining buffer content (${buffer.length} chars): "${buffer}"`);
+            // 嘗試解析剩餘的 buffer 內容
+            try {
+              const parsed = JSON.parse(buffer);
+              const content = parsed.choices?.[0]?.delta?.content;
+              if (content) {
+                chunks.push(content);
+                console.log(`   Extracted final content chunk: "${content}"`);
+              }
+            } catch {
+              console.log('   Remaining buffer is not valid JSON, skipping');
+            }
+          }
+          break;
         }
       }
     } finally {
