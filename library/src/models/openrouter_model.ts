@@ -354,109 +354,157 @@ export class OpenRouterModel extends Model {
   }
 
   /**
-   * 修復不完整的 JSON
+   * 修復不完整的 JSON - 更智能的版本
    */
   private fixIncompleteJson(response: string): string {
     let fixedResponse = response;
     
-    // 如果回應看起來像是不完整的 JSON，嘗試修復
-    if (fixedResponse.includes('{') && !fixedResponse.trim().endsWith('}')) {
-      // 計算開頭和結尾的大括號數量
-      const openBraces = (fixedResponse.match(/\{/g) || []).length;
-      const closeBraces = (fixedResponse.match(/\}/g) || []).length;
-      
-      if (openBraces > closeBraces) {
-        // 添加缺少的大括號
-        const missingBraces = openBraces - closeBraces;
-        fixedResponse = fixedResponse + '}'.repeat(missingBraces);
-        console.log(`   Fixed incomplete JSON by adding ${missingBraces} missing closing braces`);
-      }
-    }
+    console.log('   🔧 Starting JSON repair process...');
     
-    // 如果回應看起來像是不完整的陣列，嘗試修復
-    if (fixedResponse.includes('[') && !fixedResponse.trim().endsWith(']')) {
-      // 計算開頭和結尾的方括號數量
-      const openBrackets = (fixedResponse.match(/\[/g) || []).length;
-      const closeBrackets = (fixedResponse.match(/\]/g) || []).length;
-      
-      if (openBrackets > closeBrackets) {
-        // 添加缺少的方括號
-        const missingBrackets = openBrackets - closeBrackets;
-        fixedResponse = fixedResponse + ']'.repeat(missingBrackets);
-        console.log(`   Fixed incomplete array by adding ${missingBrackets} missing closing brackets`);
-      }
-    }
-
-    // 移除尾部的省略號和不完整內容
-    const beforeEllipsis = fixedResponse;
-    fixedResponse = fixedResponse.replace(/\.{3,}.*$/, '');
-    if (beforeEllipsis !== fixedResponse) {
-      console.log('   Removed trailing ellipsis and incomplete content');
-    }
-    
-    // 驗證修復後的 JSON 是否有效
+    // 首先嘗試直接解析，如果成功就直接返回
     try {
       JSON.parse(fixedResponse);
-      console.log('   ✅ JSON validation passed after fixing');
+      console.log('   ✅ JSON is already valid, no repair needed');
+      return fixedResponse;
     } catch {
-      console.log('   ❌ JSON validation failed after fixing, attempting additional repairs...');
-      
-      // 如果還是無效，嘗試更激進的修復
-      fixedResponse = this.aggressiveJsonFix(fixedResponse);
+      console.log('   ❌ JSON validation failed, starting repair...');
     }
     
-    return fixedResponse;
-  }
-
-  /**
-   * 激進的 JSON 修復
-   */
-  private aggressiveJsonFix(response: string): string {
-    let fixedResponse = response;
+    // 修復常見的 streaming 問題
+    fixedResponse = this.fixStreamingIssues(fixedResponse);
     
-    // 尋找最後一個完整的物件或陣列
-    let lastValidIndex = -1;
+    // 嘗試解析修復後的內容
+    try {
+      JSON.parse(fixedResponse);
+      console.log('   ✅ JSON validation passed after streaming fixes');
+      return fixedResponse;
+    } catch {
+      console.log('   ❌ Still invalid after streaming fixes, attempting structural repair...');
+    }
+    
+    // 進行結構性修復
+    fixedResponse = this.fixStructuralIssues(fixedResponse);
+    
+    // 最終驗證
+    try {
+      JSON.parse(fixedResponse);
+      console.log('   ✅ JSON validation passed after structural repair');
+      return fixedResponse;
+    } catch (error) {
+      console.log('   ❌ JSON validation failed after all repair attempts');
+      console.log('   Final repair attempt failed:', error);
+      
+      // 最後的嘗試：找到最後一個完整的 JSON 結構
+      return this.findLastValidJson(fixedResponse);
+    }
+  }
+  
+  /**
+   * 修復 streaming 相關的問題
+   */
+  private fixStreamingIssues(response: string): string {
+    let fixed = response;
+    
+    // 移除尾部的省略號和不完整內容
+    fixed = fixed.replace(/\.{3,}.*$/, '');
+    
+    // 修復常見的格式錯誤
+    fixed = fixed.replace(/([^"])\s*topics\s*:/g, '$1,"topics":'); // 修復缺少逗號的 topics
+    fixed = fixed.replace(/([^"])\s*id\s*:/g, '$1,"id":'); // 修復缺少逗號的 id
+    fixed = fixed.replace(/([^"])\s*name\s*:/g, '$1,"name":'); // 修復缺少逗號的 name
+    
+    // 修復缺少引號的屬性名
+    fixed = fixed.replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g, '$1"$2":');
+    
+    // 修復缺少引號的字符串值
+    fixed = fixed.replace(/:\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*([,}])/g, ':"$1"$2');
+    
+    // 移除多餘的逗號
+    fixed = fixed.replace(/,(\s*[}\]])/g, '$1');
+    
+    console.log('   Applied streaming-specific fixes');
+    return fixed;
+  }
+  
+  /**
+   * 修復結構性問題
+   */
+  private fixStructuralIssues(response: string): string {
+    let fixed = response;
+    
+    // 計算括號平衡
+    const openBraces = (fixed.match(/\{/g) || []).length;
+    const closeBraces = (fixed.match(/\}/g) || []).length;
+    const openBrackets = (fixed.match(/\[/g) || []).length;
+    const closeBrackets = (fixed.match(/\]/g) || []).length;
+    
+    console.log(`   Bracket analysis: {${openBraces}:${closeBraces}}, [${openBrackets}:${closeBrackets}]`);
+    
+    // 修復大括號不平衡
+    if (openBraces > closeBraces) {
+      const missingBraces = openBraces - closeBraces;
+      fixed = fixed + '}'.repeat(missingBraces);
+      console.log(`   Fixed braces: added ${missingBraces} closing braces`);
+    }
+    
+    // 修復方括號不平衡
+    if (openBrackets > closeBrackets) {
+      const missingBrackets = openBrackets - closeBrackets;
+      fixed = fixed + ']'.repeat(missingBrackets);
+      console.log(`   Fixed brackets: added ${missingBrackets} closing brackets`);
+    }
+    
+    return fixed;
+  }
+  
+  /**
+   * 找到最後一個有效的 JSON 結構
+   */
+  private findLastValidJson(response: string): string {
+    console.log('   🔍 Searching for last valid JSON structure...');
     
     // 尋找最後一個完整的物件
-    const lastObjectMatch = fixedResponse.match(/\{[^{}]*\}/g);
-    if (lastObjectMatch && lastObjectMatch.length > 0) {
-      const lastObject = lastObjectMatch[lastObjectMatch.length - 1];
-      lastValidIndex = fixedResponse.lastIndexOf(lastObject) + lastObject.length;
-    }
-    
-    // 尋找最後一個完整的陣列
-    const lastArrayMatch = fixedResponse.match(/\[[^\[\]]*\]/g);
-    if (lastArrayMatch && lastArrayMatch.length > 0) {
-      const lastArray = lastArrayMatch[lastArrayMatch.length - 1];
-      const arrayIndex = fixedResponse.lastIndexOf(lastArray) + lastArray.length;
-      if (arrayIndex > lastValidIndex) {
-        lastValidIndex = arrayIndex;
+    const objectMatches = response.match(/\{[^{}]*\}/g);
+    if (objectMatches && objectMatches.length > 0) {
+      const lastObject = objectMatches[objectMatches.length - 1];
+      const lastObjectIndex = response.lastIndexOf(lastObject);
+      
+      // 檢查這個物件是否在陣列中
+      const beforeObject = response.substring(0, lastObjectIndex);
+      const openBrackets = (beforeObject.match(/\[/g) || []).length;
+      const closeBrackets = (beforeObject.match(/\]/g) || []).length;
+      
+      if (openBrackets > closeBrackets) {
+        // 物件在陣列中，需要補上陣列結尾
+        const result = response.substring(0, lastObjectIndex + lastObject.length) + ']';
+        console.log('   Found last valid object in array, truncating there');
+        return result;
       }
     }
     
-    if (lastValidIndex > 0) {
-      // 截斷到最後一個完整的位置
-      const beforeTruncate = fixedResponse;
-      fixedResponse = fixedResponse.substring(0, lastValidIndex);
-      
-      // 根據開頭決定如何結尾
-      if (fixedResponse.startsWith('[')) {
-        if (!fixedResponse.endsWith(']')) {
-          fixedResponse += ']';
-        }
-      } else if (fixedResponse.startsWith('{')) {
-        if (!fixedResponse.endsWith('}')) {
-          fixedResponse += '}';
-        }
-      }
-      
-      console.log('   Applied aggressive JSON fix by truncating at last valid position');
-      console.log('   Before aggressive fix:', beforeTruncate);
-      console.log('   After aggressive fix:', fixedResponse);
+    // 如果沒有找到完整物件，嘗試找到最後一個完整的陣列
+    const arrayMatches = response.match(/\[[^\[\]]*\]/g);
+    if (arrayMatches && arrayMatches.length > 0) {
+      const lastArray = arrayMatches[arrayMatches.length - 1];
+      const lastArrayIndex = response.lastIndexOf(lastArray);
+      const result = response.substring(0, lastArrayIndex + lastArray.length);
+      console.log('   Found last valid array, truncating there');
+      return result;
     }
     
-    return fixedResponse;
+    // 最後的嘗試：如果開頭是陣列，至少補上結尾
+    if (response.trim().startsWith('[')) {
+      const result = response.trim() + ']';
+      console.log('   Array starts but never ends, adding closing bracket');
+      return result;
+    }
+    
+    // 如果都失敗了，返回原始內容
+    console.log('   Could not find valid JSON structure, returning original');
+    return response;
   }
+
+
 }
 
 function validateResponse(response: string): boolean {
