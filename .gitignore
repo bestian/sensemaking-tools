@@ -10,3 +10,4 @@ GEMINI.md
 todo.md
 *.env
 /files
+.vscode
