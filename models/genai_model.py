@@ -139,7 +139,19 @@ class GenaiModel:
               response_mime_type=response_mime_type,
               response_schema=response_schema,
           )
-          if not resp or not resp["text"]:
+          if not resp:
+            raise Exception("Error happened in the _call_gemini method")
+          if resp["error"]:
+            finish_reason = resp["error"]
+            finish_message = resp["finish_message"]
+            token_count = resp["token_count"]
+            exception_str = f"Error reason: {finish_reason}"
+            if finish_message and token_count:
+              exception_str += (
+                  f", token_count: {token_count}, message: {finish_message}"
+              )
+            raise Exception(exception_str)
+          if not resp["text"]:
             raise Exception("Empty response from API")
 
           extracted_statements_df = response_parser(resp["text"])
@@ -156,7 +168,7 @@ class GenaiModel:
 
           logging.info(
               f"✅ [T#{topic_num} Worker-{worker_id}] Successfully processed"
-              f" topic '{topic}'."
+              f" topic '{topic}'. Tokens used: {resp['input_token_count']}"
           )
 
           # Add a delay after a successful call
@@ -171,10 +183,8 @@ class GenaiModel:
               f" input_token: {combined_tokens}, attempt {attempt + 1}: {e}"
           )
           if attempt < retry_attempts - 1:
-            # Exponential backoff with a bit of randomness (jitter)
-            delay = (initial_retry_delay**attempt) + random.uniform(0, 1)
-            logging.info(f"   Retrying in {delay:.2f} seconds...")
-            await asyncio.sleep(delay)
+            logging.info(f"Retrying in {initial_retry_delay:.2f} seconds...")
+            await asyncio.sleep(initial_retry_delay)
           else:
             logging.error(
                 f"Failed to process topic '{topic}' after {retry_attempts}"
@@ -298,11 +308,7 @@ class GenaiModel:
       if not response.candidates:
         logging.error("The response from the API contained no candidates.")
         logging.error("This might be due to a problem with the prompt itself.")
-        try:
-          logging.error(f"Prompt Feedback: {response.prompt_feedback}")
-        except ValueError:
-          pass  # No prompt feedback available
-        return None
+        return {"error": response.prompt_feedback}
 
       candidate = response.candidates[0]
 
@@ -313,7 +319,11 @@ class GenaiModel:
             topic,
         )
         logging.error(f"Safety Ratings: {candidate.safety_ratings}")
-        return None
+        return {
+            "error": candidate.finish_reason.name,
+            "finish_message": candidate.finish_message,
+            "token_count": candidate.token_count,
+        }
 
       return {
           "text": candidate.content.parts[0].text,
@@ -323,7 +333,7 @@ class GenaiModel:
       logging.error(
           "An unexpected error occurred during content generation: %s", e
       )
-      return None
+      return {"error": e}
 
   def call_gemini_embedding(
       self, texts: List[str]
