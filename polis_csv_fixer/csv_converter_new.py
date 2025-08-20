@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-修復CSV檔案欄位腳本 (簡化版)
+修復CSV檔案欄位腳本 (新版，處理pol.is的csv)
 自動添加 votes 和 passes 欄位
 將 comment-body 重命名為 comment_text
 使用標準Python庫，不依賴pandas
@@ -65,33 +65,28 @@ def fix_csv_columns(input_file, output_file=None):
         for val, count in sorted(moderated_counts.items()):
             print(f"  {val}: {count}")
         
-        # 1. 添加 votes 欄位：votes = agrees + disagrees
+        # 1. 添加 votes 欄位：votes = agrees + disagrees + passes
         print("正在計算 votes 欄位...")
         for row in rows:
             agrees = int(row['agrees'])
             disagrees = int(row['disagrees'])
-            row['votes'] = agrees + disagrees
-        
-        # 2. 添加 passes 欄位：從 moderated 欄位推導
-        print("正在計算 passes 欄位...")
-        
-        # 根據 moderated 值推導 passes
-        # 假設: moderated = 1 表示通過，moderated = -1 表示不通過，moderated = 0 表示棄權
-        passes_count = 0
-        for row in rows:
+            # 先計算 passes，因為 votes 需要包含它
             moderated_val = row['moderated']
-            
             if moderated_val == '1':
-                row['passes'] = 0  # 通過的評論沒有 passes
+                passes = 0  # 通過的評論沒有 passes
             elif moderated_val == '-1':
-                row['passes'] = 0  # 不通過的評論沒有 passes
+                passes = 0  # 不通過的評論沒有 passes
             elif moderated_val == '0':
-                row['passes'] = 1  # 棄權的評論計為 1 pass
-                passes_count += 1
+                passes = 1  # 棄權的評論計為 1 pass
             else:
-                # 其他值，假設為棄權
-                row['passes'] = 1
-                passes_count += 1
+                passes = 1  # 其他值，假設為棄權
+            
+            row['passes'] = passes
+            row['votes'] = agrees + disagrees + passes
+        
+        # 2. 統計 passes 數量（用於顯示統計資訊）
+        print("正在統計 passes 數量...")
+        passes_count = sum(1 for row in rows if row['passes'] == 1)
         
         # 將新欄位添加到 fieldnames 中
         if 'votes' not in fieldnames:
@@ -159,9 +154,9 @@ def fix_csv_columns(input_file, output_file=None):
 def main():
     """主函式"""
     if len(sys.argv) < 2:
-        print("使用方法: python3 fix_csv_columns_simple.py <輸入CSV檔案> [輸出CSV檔案]")
-        print("範例: python3 fix_csv_columns_simple.py comments_realdata.csv")
-        print("範例: python3 fix_csv_columns_simple.py comments_realdata.csv comments_fixed.csv")
+        print("使用方法: python3 csv_converter_new.py <輸入CSV檔案> [輸出CSV檔案]")
+        print("範例: python3 csv_converter_new.py comments_realdata.csv")
+        print("範例: python3 csv_converter_new.py comments_realdata.csv comments_fixed.csv")
         return
     
     input_file = sys.argv[1]
