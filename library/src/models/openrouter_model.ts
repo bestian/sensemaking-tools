@@ -52,12 +52,23 @@ export class OpenRouterModel extends Model {
       }
       const parsed = JSON.parse(response);
       
-      // 添加額外的驗證
+      // 在 Cloudflare Workers 環境中，避免使用 TypeBox 編譯器
+      // 改用簡單的 JSON 驗證
       if (schema && Array.isArray(schema)) {
         // 如果 schema 是數組類型，確保回應也是數組
         if (!Array.isArray(parsed)) {
           console.error('Schema expects array but response is not array:', typeof parsed, parsed);
           throw new Error('Response format error: expected array but got ' + typeof parsed);
+        }
+      }
+      
+      // 基本類型檢查（避免使用 TypeBox 編譯器）
+      if (schema && typeof schema === 'object' && 'type' in schema) {
+        if (schema.type === 'array' && !Array.isArray(parsed)) {
+          throw new Error('Response format error: expected array but got ' + typeof parsed);
+        }
+        if (schema.type === 'object' && (typeof parsed !== 'object' || Array.isArray(parsed))) {
+          throw new Error('Response format error: expected object but got ' + typeof parsed);
         }
       }
       
