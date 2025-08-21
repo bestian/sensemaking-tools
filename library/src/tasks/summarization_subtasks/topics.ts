@@ -342,7 +342,23 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
     
     const subContents = [await this.getThemesSummary()];
     // check env variable to decide whether to compute common ground and difference of opinion summaries
-    if (process.env["SKIP_COMMON_GROUND_AND_DIFFERENCES_OF_OPINION"] !== "true") {
+    // 智能環境變量讀取，支持 Node.js 和 Cloudflare Workers
+    function getEnvVar(key: string, defaultValue: string): string {
+      // 檢查是否在 Node.js 環境中
+      if (typeof process !== 'undefined' && process.env && process.versions && process.versions.node) {
+        return process.env[key] || defaultValue;
+      }
+      
+      // 檢查是否在 Cloudflare Workers 環境中
+      if (typeof globalThis !== 'undefined') {
+        return (globalThis as any)[key] || defaultValue;
+      }
+      
+      return defaultValue;
+    }
+    
+    const skipCommonGround = getEnvVar("SKIP_COMMON_GROUND_AND_DIFFERENCES_OF_OPINION", "false");
+    if (skipCommonGround !== "true") {
       const commonGroundSummary = await this.getCommonGroundSummary(this.topicStat.name);
       const differencesOfOpinionSummary = await this.getDifferencesOfOpinionSummary(
         commonGroundSummary,
@@ -351,7 +367,8 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
       subContents.push(commonGroundSummary, differencesOfOpinionSummary);
     }
 
-    if (process.env["DEBUG_MODE"] === "true") {
+    const debugMode = getEnvVar("DEBUG_MODE", "false");
+    if (debugMode === "true") {
       // Based on the common ground and differences of opinion comments,
       // TODO: Should also include common ground disagree comments (aka what everyone agrees they
       // don't like)
