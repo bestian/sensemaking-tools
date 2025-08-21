@@ -52,27 +52,41 @@ export class OpenRouterModel extends Model {
       }
       const parsed = JSON.parse(response);
       
+      // 處理 LLM 可能回傳的包裝格式，如 {"items": [...]}
+      let processedData = parsed;
+      if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+        // 檢查是否有常見的包裝鍵
+        const wrapperKeys = ['items', 'data', 'result', 'content', 'output'];
+        for (const key of wrapperKeys) {
+          if (key in parsed && Array.isArray(parsed[key])) {
+            console.log(`   🔧 Detected wrapped array in '${key}' key, extracting...`);
+            processedData = parsed[key];
+            break;
+          }
+        }
+      }
+      
       // 在 Cloudflare Workers 環境中，避免使用 TypeBox 編譯器
       // 改用簡單的 JSON 驗證
       if (schema && Array.isArray(schema)) {
         // 如果 schema 是數組類型，確保回應也是數組
-        if (!Array.isArray(parsed)) {
-          console.error('Schema expects array but response is not array:', typeof parsed, parsed);
-          throw new Error('Response format error: expected array but got ' + typeof parsed);
+        if (!Array.isArray(processedData)) {
+          console.error('Schema expects array but response is not array:', typeof processedData, processedData);
+          throw new Error('Response format error: expected array but got ' + typeof processedData);
         }
       }
       
       // 基本類型檢查（避免使用 TypeBox 編譯器）
       if (schema && typeof schema === 'object' && 'type' in schema) {
-        if (schema.type === 'array' && !Array.isArray(parsed)) {
-          throw new Error('Response format error: expected array but got ' + typeof parsed);
+        if (schema.type === 'array' && !Array.isArray(processedData)) {
+          throw new Error('Response format error: expected array but got ' + typeof processedData);
         }
-        if (schema.type === 'object' && (typeof parsed !== 'object' || Array.isArray(parsed))) {
-          throw new Error('Response format error: expected object but got ' + typeof parsed);
+        if (schema.type === 'object' && (typeof processedData !== 'object' || Array.isArray(processedData))) {
+          throw new Error('Response format error: expected object but got ' + typeof processedData);
         }
       }
       
-      return parsed;
+      return processedData;
     } catch (error) {
       console.error('Error in generateData:', error);
       throw error;
