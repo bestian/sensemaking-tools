@@ -93,7 +93,7 @@ export class OpenRouterModel extends Model {
     }
   }
 
-  async callLLM(prompt: string, validator: (response: string) => boolean = () => true, schema?: TSchema, output_lang: SupportedLanguage = "en", maxRetries: number = 3): Promise<string> {
+  async callLLM(prompt: string, validator: (response: string) => boolean = () => true, schema?: TSchema, output_lang: SupportedLanguage = "en", maxRetries: number = 5): Promise<string> {
     // Get language prefix from localization system
     const languagePrefix = getLanguagePrefix(output_lang);
     
