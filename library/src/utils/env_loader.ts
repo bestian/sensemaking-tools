@@ -18,7 +18,7 @@ function detectEnvironment(): 'node' | 'worker' | 'unknown' {
   }
   
   // 檢查是否在瀏覽器環境中
-  if (typeof window !== 'undefined') {
+  if (typeof globalThis !== 'undefined' && typeof (globalThis as any).window !== 'undefined') {
     return 'worker'; // 瀏覽器環境也使用 globalThis 方式
   }
   
