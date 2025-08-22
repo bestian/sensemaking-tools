@@ -140,33 +140,31 @@ export function learnOneLevelOfTopics(
 export function learnedTopicsValid(response: Topic[], parentTopic?: Topic): boolean {
   const topicNames = response.map((topic) => topic.name);
 
-  // 1. If a parentTopic is provided, ensure no other top-level topics exist except "Other".
+  // 1. If a parentTopic is provided, we're learning subtopics - allow any meaningful topic names
   if (parentTopic) {
-    const allowedTopicNames = [parentTopic]
-      .map((topic: Topic) => topic.name.toLowerCase())
-      .concat("other");
+    // When learning subtopics, we want the LLM to create new, specific topic names
+    // that are different from the parent topic name
+    const parentTopicName = parentTopic.name.toLowerCase().replace(/[‑\-\s]+/g, ' ').trim();
     
-    // 更寬鬆的主題名稱匹配，允許大小寫和格式差異
-    const normalizedTopicNames = topicNames.map(name => 
-      name.toLowerCase().replace(/[‑\-\s]+/g, ' ').trim()
-    );
-    const normalizedAllowedNames = allowedTopicNames.map(name => 
-      name.toLowerCase().replace(/[‑\-\s]+/g, ' ').trim()
-    );
+    // Check if any subtopic has the same name as the parent topic
+    const hasParentTopicName = topicNames.some(name => {
+      const normalizedName = name.toLowerCase().replace(/[‑\-\s]+/g, ' ').trim();
+      return normalizedName === parentTopicName;
+    });
     
-    if (!normalizedTopicNames.every((name) => normalizedAllowedNames.includes(name))) {
-      normalizedTopicNames.forEach((topicName: string, index: number) => {
-        if (!normalizedAllowedNames.includes(topicName)) {
-          console.warn(
-            "Invalid response: Found top-level topic not present in the provided topics. Provided topics: ",
-            normalizedAllowedNames,
-            " Found topic: ",
-            topicNames[index]
-          );
-        }
-      });
+    if (hasParentTopicName) {
+      console.warn(
+        `Invalid response: Subtopic "${topicNames.find(name => 
+          name.toLowerCase().replace(/[‑\-\s]+/g, ' ').trim() === parentTopicName
+        )}" has the same name as the parent topic "${parentTopic.name}". ` +
+        "Subtopics should have distinct names from their parent topic."
+      );
       return false;
     }
+    
+    // Allow any other meaningful topic names for subtopics
+    console.log(`✅ Valid subtopic learning response: ${topicNames.length} subtopics created under "${parentTopic.name}"`);
+    return true;
   }
 
   // 2. Ensure no subtopic has the same name as any main topic.
