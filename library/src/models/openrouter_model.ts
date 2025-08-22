@@ -54,6 +54,8 @@ export class OpenRouterModel extends Model {
       
       // 處理 LLM 可能回傳的包裝格式，如 {"items": [...]}
       let processedData = parsed;
+      console.log(`   🔍 Raw parsed response:`, JSON.stringify(parsed, null, 2));
+      
       if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
         // 檢查是否有常見的包裝鍵
         const wrapperKeys = ['items', 'data', 'result', 'content', 'output'];
@@ -65,6 +67,8 @@ export class OpenRouterModel extends Model {
           }
         }
       }
+      
+      console.log(`   🔍 Final processed data:`, JSON.stringify(processedData, null, 2));
       
       // 在 Cloudflare Workers 環境中，避免使用 TypeBox 編譯器
       // 改用簡單的 JSON 驗證
@@ -109,18 +113,19 @@ export class OpenRouterModel extends Model {
       frequency_penalty: 0,
     };
     
-    // 如果有 schema，設定結構化輸出
-    if (schema) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (requestBody as any).response_format = {
-        type: "json_schema",
-        json_schema: {
-          name: "response",
-          strict: true,
-          schema: schema
-        }
-      };
-    }
+          // 如果有 schema，設定結構化輸出
+      if (schema) {
+        // OpenRouter 支援 json_schema 格式，格式與官方文檔一致
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (requestBody as any).response_format = {
+          type: "json_schema",
+          json_schema: {
+            name: "response",
+            strict: true,
+            schema: schema
+          }
+        };
+      }
 
     let lastError: Error | null = null;
     
@@ -337,7 +342,7 @@ export class OpenRouterModel extends Model {
               const content = parsed.choices ? parsed.choices[0]?.delta?.content : parsed.content;
               if (content) {
                 chunks.push(content);
-                console.log(`   Extracted content chunk: "${content}"`);
+                // console.log(`   Extracted content chunk: "${content}"`);
               } else {
                 // 顯示實際收到的 JSON 結構，幫助診斷
                 if (chunkCount <= 5 || chunkCount % 1000 === 0) {
@@ -525,6 +530,8 @@ export class OpenRouterModel extends Model {
     return fixed;
   }
   
+
+
   /**
    * 找到最後一個有效的 JSON 結構
    */
