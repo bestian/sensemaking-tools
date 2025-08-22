@@ -304,6 +304,17 @@ The `--output_lang` parameter supports:
 - `zh-TW`: Traditional Chinese output
 
 * [./library/runner-cli/categorization\_runner.ts](https://github.com/Jigsaw-Code/sensemaking-tools/blob/main/library/runner-cli/categorization_runner.ts): takes in a CSV representing a conversation and outputs another CSV with the comments categorized into topics and subtopics.  
+
+* [./library/runner-cli/categorization\_runner\_openrouter.ts](https://github.com/bestian/sensemaking-tools/blob/new-feature-open-router/library/runner-cli/categorization_runner_openrouter.ts): 使用 OpenRouter 模型來對話題進行分類。
+
+```bash
+# 基本用法
+npx ts-node ./library/runner-cli/categorization_runner_openrouter.ts \
+  --inputFile "./files/comments.csv" \
+  --outputFile "./files/categorized_comments.csv"
+
+
+
 * [./library/runner-cli/advanced\_runner.ts](https://github.com/Jigsaw-Code/sensemaking-tools/blob/main/library/runner-cli/advanced_runner.ts): takes in a CSV representing a conversation and outputs three files for an advanced user more interested in the statistics. The first is a JSON of topics, their sizes, and their subtopics. The second is a JSON with all of the comments and their alignment scores and values. Third is the summary object as a JSON which can be used for additional processing.
 
 These tools process CSV input files.  These must contain the columns `comment_text` and `comment-id`.  For deliberations without group information, vote counts should be set in columns titled `agrees`, `disagrees` and `passes`.  If you do not have vote information, these can be set to 0. For deliberations with group breakdowns, you can set the columns `{group_name}-agree-count`, `{group_name}-disagree-count`, `{group_name}-pass-count`.

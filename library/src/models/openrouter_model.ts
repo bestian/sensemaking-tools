@@ -312,7 +312,7 @@ export class OpenRouterModel extends Model {
           break;
         }
         
-        console.log(`   Received chunk ${chunkCount}, buffer size: ${buffer.length}`);
+        // console.log(`   Received chunk ${chunkCount}, buffer size: ${buffer.length}`);
 
         // Process complete lines from buffer
         let doneSignalReceived = false;
