@@ -228,12 +228,12 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
     this.relativeContext = relativeContext;
     
     // Debug: 檢查建構函數中的 output_lang 值
-    console.log(`[DEBUG] TopicSummary constructor output_lang: ${this.output_lang}`);
+    // console.log(`[DEBUG] TopicSummary constructor output_lang: ${this.output_lang}`);
   }
 
   async getSummary(): Promise<SummaryContent> {
     // Debug: 檢查 getSummary 中的 output_lang 值
-    console.log(`[DEBUG] TopicSummary.getSummary() output_lang: ${this.output_lang}`);
+    // console.log(`[DEBUG] TopicSummary.getSummary() output_lang: ${this.output_lang}`);
     
     const nSubtopics: number = this.topicStat.subtopicStats?.length || 0;
     if (nSubtopics == 0) {

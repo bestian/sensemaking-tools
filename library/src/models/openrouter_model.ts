@@ -343,12 +343,12 @@ export class OpenRouterModel extends Model {
               if (content) {
                 chunks.push(content);
                 // console.log(`   Extracted content chunk: "${content}"`);
-              } else {
+              } //else {
                 // 顯示實際收到的 JSON 結構，幫助診斷
-                if (chunkCount <= 5 || chunkCount % 1000 === 0) {
-                  console.log(`   No content found. JSON structure: ${JSON.stringify(parsed).substring(0, 200)}`);
-                }
-              }
+                //if (chunkCount <= 5 || chunkCount % 1000 === 0) {
+                //  // console.log(`   No content found. JSON structure: ${JSON.stringify(parsed).substring(0, 200)}`);
+                //}
+              //}
             } catch (e) {
               // Ignore invalid JSON
               console.warn('   Invalid JSON in streaming response:', e, 'Line:', line);
