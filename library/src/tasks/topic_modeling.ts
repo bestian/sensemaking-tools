@@ -147,23 +147,28 @@ export function learnedTopicsValid(response: Topic[], parentTopic?: Topic): bool
     const parentTopicName = parentTopic.name.toLowerCase().replace(/[‑\-\s]+/g, ' ').trim();
     
     // Check if any subtopic has the same name as the parent topic
-    const hasParentTopicName = topicNames.some(name => {
-      const normalizedName = name.toLowerCase().replace(/[‑\-\s]+/g, ' ').trim();
-      return normalizedName === parentTopicName;
+    // Note: topicNames here are the names of the topics in the response array
+    // We need to check the actual subtopic names within each topic
+    const hasParentTopicName = response.some(topic => {
+      if (topic && "subtopics" in topic && topic.subtopics) {
+        return topic.subtopics.some(subtopic => {
+          const subtopicName = subtopic.name.toLowerCase().replace(/[‑\-\s]+/g, ' ').trim();
+          return subtopicName === parentTopicName;
+        });
+      }
+      return false;
     });
     
     if (hasParentTopicName) {
       console.warn(
-        `Invalid response: Subtopic "${topicNames.find(name => 
-          name.toLowerCase().replace(/[‑\-\s]+/g, ' ').trim() === parentTopicName
-        )}" has the same name as the parent topic "${parentTopic.name}". ` +
+        `Invalid response: Found subtopic with the same name as the parent topic "${parentTopic.name}". ` +
         "Subtopics should have distinct names from their parent topic."
       );
       return false;
     }
     
     // Allow any other meaningful topic names for subtopics
-    console.log(`✅ Valid subtopic learning response: ${topicNames.length} subtopics created under "${parentTopic.name}"`);
+    console.log(`✅ Valid subtopic learning response: ${response.length} topics with subtopics created under "${parentTopic.name}"`);
     return true;
   }
 
