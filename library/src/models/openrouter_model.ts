@@ -103,7 +103,10 @@ export class OpenRouterModel extends Model {
     
     const requestBody = {
       model: this.modelName,
-      messages: [{ role: "user" as const, content: languagePrefix + prompt }],
+      messages: [
+        { role: "system" as const, content: languagePrefix },
+        { role: "user" as const, content: languagePrefix + prompt }
+      ],
       max_tokens: 16000,
       temperature: 0,
       stream: true,

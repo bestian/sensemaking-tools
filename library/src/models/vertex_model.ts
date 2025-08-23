@@ -141,7 +141,7 @@ export class VertexModel extends Model {
     // Get language prefix from localization system
     const languagePrefix = getLanguagePrefix(output_lang);
     
-    const req = getRequest(languagePrefix + prompt);
+    const req = getRequest(languagePrefix, prompt);
 
     // Wrap the entire retryCall sequence with the `p-limit` limiter,
     // so we don't let other calls to start until we're done with the current one
@@ -238,8 +238,12 @@ type Request = {
     parts: { text: string }[];
   }[];
 };
-function getRequest(prompt: string): Request {
+function getRequest(languagePrefix: string, prompt: string): Request {
   return {
-    contents: [{ role: "user", parts: [{ text: prompt }] }],
+    contents: [{
+      role: "system",
+        parts: [{ text: languagePrefix }],
+      }, {
+       role: "user", parts: [{ text: languagePrefix + prompt }] }],
   };
 }
