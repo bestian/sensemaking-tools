@@ -30,7 +30,6 @@ import { RelativeContext } from "./relative_context";
 // Import localization system
 import { 
   type SupportedLanguage,
-  getLanguageName,
   getReportSectionTitle, 
   getReportContent, 
   getSubsectionTitle,
@@ -38,6 +37,8 @@ import {
   getPluralForm,
   localizeTopicName
 } from "../../../templates/l10n";
+// Import multi-language prompts
+import { getThemesPrompt } from "../../../templates/l10n/prompts";
 
 const COMMON_INSTRUCTIONS =
   "Do not use the passive voice. Do not use ambiguous pronouns. Be clear. " +
@@ -221,7 +222,7 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
     model: Model,
     relativeContext: RelativeContext,
     additionalContext?: string,
-    output_lang: SupportedLanguage = "en"
+    output_lang?: SupportedLanguage
   ) {
     super(topicStat.summaryStats, model, additionalContext, output_lang);
     this.topicStat = topicStat;
@@ -351,7 +352,7 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
       
       // 檢查是否在 Cloudflare Workers 環境中
       if (typeof globalThis !== 'undefined') {
-        return (globalThis as any)[key] || defaultValue;
+        return (globalThis as unknown as Record<string, string>)[key] || defaultValue;
       }
       
       return defaultValue;
@@ -420,23 +421,7 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
     console.log(`[DEBUG] Calling model.generateText with output_lang: ${this.output_lang}`);
     const text = await this.model.generateText(
       getPrompt(
-        `Please use the following language: ${getLanguageName(this.output_lang)} to write a concise bulleted list identifying up to 5 prominent themes across all statements. These statements are all about ${this.topicStat.name}. For each theme, begin with a short theme description written in bold text, followed by a colon, then followed by a SINGLE sentence explaining the theme. Your list should meet the below Criteria and STRICTLY follow the Output Format. Do not preface the bulleted list with any text.
-
-      <criteria format="markdown">
-      * Impartiality: Do not express your own opinion or pass normative judgments on the statements, like agreement, disagreement, or alarm.
-      * Faithfulness: Your list should accurately reflect the statements without hallucinations or mischaracterizations.
-        * Similarly, your list should not assume or misstate the amount of agreement across statements. For example, do not present a theme as unanimous if it is only mentioned in some statements.
-        * This criterion also applies to the name of the theme itself: do not assume overwhelming agreement when you name themes if it does not exist. For example, do not name a theme "Support for _______" unless there is overwhelming evidence beyond a reasonable doubt in the statements.
-        * Be **specific**. Avoid overgeneralizations or fuzzy nouns like "things" or "aspects".
-      * Comprehensiveness: Your list should reflect ALL opinions proportional to their representation in the statements. However, **absolutely do not exclude minority opinions**, especially if there are strong objections or mixed stances.  Please be **specific** in including these objections or stances.
-      * Consistent terminology: You should always use "statements" and NOT "comments".
-      </criteria>
-
-      <output_format format="markdown">
-      * **Title Case Theme**: Sentence
-      </output_format>
-      
-      `,
+        getThemesPrompt(this.output_lang, this.topicStat.name),
         allComments.map((comment: Comment): string => comment.text),
         this.additionalContext,
         this.output_lang
