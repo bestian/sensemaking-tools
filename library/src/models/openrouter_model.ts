@@ -105,7 +105,7 @@ export class OpenRouterModel extends Model {
       model: this.modelName,
       messages: [
         { role: "system" as const, content: languagePrefix },
-        { role: "user" as const, content: languagePrefix + prompt }
+        { role: "user" as const, content: prompt }
       ],
       max_tokens: 16000,
       temperature: 0,

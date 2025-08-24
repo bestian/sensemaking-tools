@@ -14,11 +14,11 @@ export const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
 
 export const LANGUAGE_PREFIXES: Record<SupportedLanguage, string> = {
   "en": "",
-  "zh-TW": "非常重要：以下問題請一定要全文使用繁體中文回答，不要用其他語言回答！",
-  "zh-CN": "非常重要：以下问题请一定要全文使用简体中文回答，不要用其他语言回答！",
-  "fr": "Très important : veuillez répondre en français. ne répondez pas en anglais.",
-  "es": "Muy importante: por favor responde completamente en español. No respondas en inglés.",
-  "ja": "非常に重要：以下の質問には必ず日本語で全文回答してください。英語では回答しないでください。"
+  "zh-TW": "你是一個只會寫繁體中文的AI，請一定要全文使用繁體中文回答",
+  "zh-CN": "你是一个只会写简体中文的AI，请一定要全文使用简体中文回答",
+  "fr": "Tu es une IA qui ne sait écrire qu'en français. Veuillez répondre en français.",
+  "es": "Eres una IA que solo sabe escribir en español. Por favor responde en español.",
+  "ja": "あなたは日本語しか書けないAIです。必ず日本語で回答してください。"
 };
 
 export function getLanguageName(lang: SupportedLanguage): string {

@@ -244,6 +244,6 @@ function getRequest(languagePrefix: string, prompt: string): Request {
       role: "system",
         parts: [{ text: languagePrefix }],
       }, {
-       role: "user", parts: [{ text: languagePrefix + prompt }] }],
+       role: "user", parts: [{ text: prompt }] }],
   };
 }
