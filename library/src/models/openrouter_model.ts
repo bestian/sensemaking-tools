@@ -465,6 +465,19 @@ export class OpenRouterModel extends Model {
       console.log('   ❌ JSON validation failed, starting repair...');
     }
     
+    // 嘗試從 Markdown 回應中提取 JSON
+    const extractedJson = this.extractJsonFromMarkdown(fixedResponse);
+    if (extractedJson) {
+      console.log('   🔍 Found JSON in Markdown, attempting to extract...');
+      try {
+        JSON.parse(extractedJson);
+        console.log('   ✅ Successfully extracted valid JSON from Markdown');
+        return extractedJson;
+      } catch {
+        console.log('   ⚠️ Extracted JSON is invalid, continuing with other repair methods...');
+      }
+    }
+    
     // 修復常見的 streaming 問題
     fixedResponse = this.fixStreamingIssues(fixedResponse);
     
@@ -495,6 +508,97 @@ export class OpenRouterModel extends Model {
   }
   
   /**
+   * 從 Markdown 回應中提取 JSON
+   */
+  private extractJsonFromMarkdown(response: string): string | null {
+    console.log('   🔍 Searching for JSON in Markdown response...');
+    
+    // 方法 1: 尋找 ```json 代碼塊
+    const jsonCodeBlockMatch = response.match(/```json\s*([\s\S]*?)\s*```/);
+    if (jsonCodeBlockMatch) {
+      console.log('   ✅ Found JSON code block');
+      return jsonCodeBlockMatch[1].trim();
+    }
+    
+    // 方法 2: 尋找 ``` 代碼塊（沒有 json 標籤）
+    const codeBlockMatch = response.match(/```\s*([\s\S]*?)\s*```/);
+    if (codeBlockMatch) {
+      const content = codeBlockMatch[1].trim();
+      // 檢查內容是否看起來像 JSON
+      if (content.startsWith('{') || content.startsWith('[')) {
+        console.log('   ✅ Found JSON-like code block');
+        return content;
+      }
+    }
+    
+    // 方法 3: 尋找 JSON 對象（從 { 開始到 } 結束）
+    const jsonObjectMatch = response.match(/\{[\s\S]*\}/);
+    if (jsonObjectMatch) {
+      console.log('   ✅ Found JSON object in response');
+      return jsonObjectMatch[0];
+    }
+    
+    // 方法 4: 尋找 JSON 陣列（從 [ 開始到 ] 結束）
+    const jsonArrayMatch = response.match(/\[[\s\S]*\]/);
+    if (jsonArrayMatch) {
+      console.log('   ✅ Found JSON array in response');
+      return jsonArrayMatch[0];
+    }
+    
+    // 方法 5: 尋找可能的 JSON 結構（更寬鬆的匹配）
+    const possibleJsonMatch = response.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
+    if (possibleJsonMatch) {
+      console.log('   ⚠️ Found possible JSON structure, attempting to clean...');
+      return this.cleanPossibleJson(possibleJsonMatch[0]);
+    }
+    
+    console.log('   ❌ No JSON found in Markdown response');
+    return null;
+  }
+  
+  /**
+   * 清理可能的 JSON 結構
+   */
+  private cleanPossibleJson(possibleJson: string): string {
+    let cleaned = possibleJson;
+    
+    // 移除可能的 Markdown 標記
+    cleaned = cleaned.replace(/\*\*/g, ''); // 移除粗體標記
+    cleaned = cleaned.replace(/\*/g, '');   // 移除斜體標記
+    cleaned = cleaned.replace(/`/g, '');    // 移除代碼標記
+    cleaned = cleaned.replace(/#{1,6}\s*/g, ''); // 移除標題標記
+    cleaned = cleaned.replace(/-\s*/g, ''); // 移除列表標記
+    
+    // 移除多餘的空白行
+    cleaned = cleaned.replace(/\n\s*\n/g, '\n');
+    
+    // 嘗試找到 JSON 的開始和結束
+    let startIndex = -1;
+    let endIndex = -1;
+    
+    // 尋找 JSON 開始
+    if (cleaned.includes('{')) {
+      startIndex = cleaned.indexOf('{');
+    } else if (cleaned.includes('[')) {
+      startIndex = cleaned.indexOf('[');
+    }
+    
+    // 尋找 JSON 結束
+    if (cleaned.includes('}')) {
+      endIndex = cleaned.lastIndexOf('}') + 1;
+    } else if (cleaned.includes(']')) {
+      endIndex = cleaned.lastIndexOf(']') + 1;
+    }
+    
+    if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
+      cleaned = cleaned.substring(startIndex, endIndex);
+      console.log('   🔧 Cleaned JSON structure');
+    }
+    
+    return cleaned;
+  }
+  
+  /**
    * 修復 streaming 相關的問題
    */
   private fixStreamingIssues(response: string): string {
@@ -516,6 +620,35 @@ export class OpenRouterModel extends Model {
     
     // 移除多餘的逗號
     fixed = fixed.replace(/,(\s*[}\]])/g, '$1');
+    
+    // 針對陣列格式的特殊修復
+    if (fixed.trim().startsWith('[')) {
+      // 修復陣列中物件之間缺少逗號的問題
+      fixed = fixed.replace(/\}(\s*)\{/g, '},$1{');
+      
+      // 修復陣列結尾可能缺少的 ]
+      if (!fixed.trim().endsWith(']')) {
+        // 檢查是否有未閉合的陣列
+        const openBrackets = (fixed.match(/\[/g) || []).length;
+        const closeBrackets = (fixed.match(/\]/g) || []).length;
+        if (openBrackets > closeBrackets) {
+          fixed = fixed.trim() + ']';
+        }
+      }
+      
+      // 修復陣列中最後一個物件可能不完整的問題
+      const lastObjectMatch = fixed.match(/\{[^{}]*$/);
+      if (lastObjectMatch) {
+        // 找到最後一個完整的物件
+        const lastCompleteObject = fixed.match(/\{[^{}]*\}/g);
+        if (lastCompleteObject && lastCompleteObject.length > 0) {
+          const lastComplete = lastCompleteObject[lastCompleteObject.length - 1];
+          const lastCompleteIndex = fixed.lastIndexOf(lastComplete);
+          // 截取到最後一個完整物件
+          fixed = fixed.substring(0, lastCompleteIndex + lastComplete.length) + ']';
+        }
+      }
+    }
     
     console.log('   Applied streaming-specific fixes');
     return fixed;
@@ -560,7 +693,49 @@ export class OpenRouterModel extends Model {
   private findLastValidJson(response: string): string {
     console.log('   🔍 Searching for last valid JSON structure...');
     
-    // 尋找最後一個完整的物件
+    // 針對陣列格式的回應進行特殊處理
+    if (response.trim().startsWith('[')) {
+      console.log('   Detected array format, searching for complete objects...');
+      
+      // 尋找所有完整的物件
+      const objectMatches = response.match(/\{[^{}]*\}/g);
+      if (objectMatches && objectMatches.length > 0) {
+        console.log(`   Found ${objectMatches.length} complete objects`);
+        
+        // 找到最後一個完整物件的位置
+        const lastObject = objectMatches[objectMatches.length - 1];
+        const lastObjectIndex = response.lastIndexOf(lastObject);
+        
+        // 檢查這個物件是否完整（包含所有必要屬性）
+        if (this.isCompleteObject(lastObject)) {
+          // 截取到最後一個完整物件，並補上陣列結尾
+          const result = response.substring(0, lastObjectIndex + lastObject.length) + ']';
+          console.log('   ✅ Truncated to last complete object and closed array');
+          return result;
+        } else {
+          // 如果最後一個物件不完整，嘗試前一個
+          if (objectMatches.length > 1) {
+            const secondLastObject = objectMatches[objectMatches.length - 2];
+            const secondLastIndex = response.lastIndexOf(secondLastObject, lastObjectIndex - 1);
+            if (this.isCompleteObject(secondLastObject)) {
+              const result = response.substring(0, secondLastIndex + secondLastObject.length) + ']';
+              console.log('   ✅ Truncated to second-to-last complete object and closed array');
+              return result;
+            }
+          }
+        }
+      }
+      
+      // 如果沒有找到完整物件，嘗試修復最後一個不完整的物件
+      const lastIncompleteObject = this.findLastIncompleteObject(response);
+      if (lastIncompleteObject) {
+        const result = lastIncompleteObject + ']';
+        console.log('   ✅ Repaired last incomplete object and closed array');
+        return result;
+      }
+    }
+    
+    // 尋找最後一個完整的物件（通用情況）
     const objectMatches = response.match(/\{[^{}]*\}/g);
     if (objectMatches && objectMatches.length > 0) {
       const lastObject = objectMatches[objectMatches.length - 1];
@@ -599,6 +774,63 @@ export class OpenRouterModel extends Model {
     // 如果都失敗了，返回原始內容
     console.log('   Could not find valid JSON structure, returning original');
     return response;
+  }
+  
+  /**
+   * 檢查物件是否完整（包含必要的屬性）
+   */
+  private isCompleteObject(objectStr: string): boolean {
+    try {
+      const obj = JSON.parse(objectStr);
+      // 檢查是否有 id 和 topics 屬性
+      return obj.hasOwnProperty('id') && obj.hasOwnProperty('topics') && Array.isArray(obj.topics);
+    } catch {
+      return false;
+    }
+  }
+  
+  /**
+   * 尋找並修復最後一個不完整的物件
+   */
+  private findLastIncompleteObject(response: string): string | null {
+    // 尋找最後一個不完整的物件（以 { 開始但沒有 } 結尾）
+    const lastOpenBrace = response.lastIndexOf('{');
+    if (lastOpenBrace === -1) return null;
+    
+    // 從最後一個 { 開始，尋找可能的物件結構
+    const afterOpenBrace = response.substring(lastOpenBrace);
+    
+    // 嘗試找到 id 屬性
+    const idMatch = afterOpenBrace.match(/"id"\s*:\s*"([^"]+)"/);
+    if (!idMatch) return null;
+    
+    // 嘗試找到 topics 屬性
+    const topicsMatch = afterOpenBrace.match(/"topics"\s*:\s*\[/);
+    if (!topicsMatch) return null;
+    
+    // 嘗試找到 name 屬性
+    const nameMatch = afterOpenBrace.match(/"name"\s*:\s*"([^"]+)"/);
+    if (!nameMatch) return null;
+    
+    // 如果找到了基本結構，嘗試補上缺失的部分
+    const nameEndIndex = afterOpenBrace.indexOf(nameMatch[0]) + nameMatch[0].length;
+    const beforeNameEnd = afterOpenBrace.substring(0, nameEndIndex);
+    
+    // 補上缺失的結尾
+    let result = beforeNameEnd;
+    
+    // 補上 topics 陣列結尾
+    if (!result.includes(']')) {
+      result += ']';
+    }
+    
+    // 補上物件結尾
+    if (!result.includes('}')) {
+      result += '}';
+    }
+    
+    console.log('   Repaired incomplete object structure');
+    return result;
   }
 
 
