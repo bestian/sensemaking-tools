@@ -98,21 +98,21 @@ export function learnedTopicsValid(response: Topic[], parentTopic?: Topic): bool
   const topicNames = response.map((topic) => topic.name);
 
   // 0. 檢測是否所有主題都是 "Other" 或類似籠統名稱 - 立即觸發 retry
-  const genericTopicPatterns = [
-    'other', 'Other'
-  ];
+  // const genericTopicPatterns = [
+  //   'other', 'Other'
+  // ];
   
-  const allGenericTopics = response.every(topic => {
-    const topicName = topic.name.toLowerCase().trim();
-    return genericTopicPatterns.some(pattern => topicName.includes(pattern));
-  });
+  // const allGenericTopics = response.every(topic => {
+  //   const topicName = topic.name.toLowerCase().trim();
+  //   return genericTopicPatterns.some(pattern => topicName.includes(pattern));
+  // });
   
-  if (allGenericTopics) {
-    console.warn(
-      `❌ 檢測到所有主題都是籠統名稱 (${response.map(t => t.name).join(', ')}), 觸發 retry`
-    );
-    return false;
-  }
+  // if (allGenericTopics) {
+  //   console.warn(
+  //     `❌ 檢測到所有主題都是籠統名稱 (${response.map(t => t.name).join(', ')}), 觸發 retry`
+  //   );
+  //   return false;
+  // }
 
   // 1. If a parentTopic is provided, we're learning subtopics - allow any meaningful topic names
   if (parentTopic) {
