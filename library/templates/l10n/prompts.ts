@@ -45,7 +45,7 @@ export const THEMES_PROMPT: Record<SupportedLanguage, string> = {
   * 此標準也適用於主題本身的命名：如果您沒有壓倒性證據，請勿假設壓倒性同意來命名主題。例如，除非陳述中有壓倒性證據，否則請勿將主題命名為「支持_______」。
   * 要具體。避免過度概括或模糊名詞如「事物」或「方面」。
 * 全面性：您的清單應按比例反映陳述中所有意見的代表性。但是，絕對不要排除少數意見，特別是有強烈反對或混合立場的情況。請具體包含這些反對或立場。
-* 一致術語：您應始終使用「陳述」而非「評論」。
+* 一致術語：您應始終使用「陳述」和NOT「評論」。
 </criteria>
 
 <output_format format="markdown">
@@ -108,7 +108,7 @@ export const THEMES_PROMPT: Record<SupportedLanguage, string> = {
   * 同様に、あなたのリストは声明文間の同意の程度を仮定したり誤って述べたりすべきではありません。例えば、テーマが一部の声明文でのみ言及されている場合、それを全会一致として提示しないでください。
   * この基準はテーマ自体の名前にも適用されます：存在しない場合、テーマに名前を付ける際に圧倒的な同意を仮定しないでください。例えば、声明文に合理的な疑いを超える圧倒的な証拠がない限り、テーマを「_______への支持」と名付けないでください。
   * 具体的にしてください。「もの」や「側面」などの過度な一般化や曖昧な名詞を避けてください。
-* 包括性：あなたのリストは、声明文での表現に比例してすべての意見を反映する必要があります。しかし、少数意見を絶対に除外しないでください。特に強い反対や混合した立場がある場合はそうです。これらの反対や立場を含める際は具体的にしてください。
+* 包括性：あなたのリストは、声明文での表現に比例してすべての意見を反映する必要があります。しかし、少数意見を絶対に除外しないでください。特別に強い反対や混合した立場がある場合はそうです。これらの反対や立場を含める際は具体的にしてください。
 * 一貫した用語：常に「声明文」を使用し、「コメント」は使用しないでください。
 </criteria>
 
@@ -135,7 +135,7 @@ Here are the topics:
 以下是主題：
 {topicNames}`,
 
-  "zh-CN": `您的工作是根据已编写的摘要来撰写公开讨论关键发现的摘要，这些摘要对应于讨论中识别的主题和子主题。这些主题和子主题摘要是基于参与者作为讨论一部分提交的评论和投票模式。您应该将结果格式化为 markdown 列表，包含在最终报告的顶部附近，该报告将包含完整的主题和子主题摘要。请勿假装您持有这些意见中的任何一个。您不是此讨论的参与者。请勿包含关于每个主题或子主题包含多少评论的具体数字，因为这些将在最终报告输出中稍后包含。您也不需要重述对话的上下文，因为这将在报告的早期已经说明。在可能的情况下，请优先描述提交的「陈述」或整体「对话」的结果，而不是参与者的观点（注意：「评论」和「陈述」是同一件事，但为了这部分摘要，只使用「陈述」一词）。记住：这只是更大报告的一个组成部分，您应该撰写它，使其在报告其余部分的上下文中自然流動。在写作中要清晰简洁，不要使用被动语态或模糊的代词。
+  "zh-CN": `您的工作是根据已编写的摘要来撰写公开讨论关键发现的摘要，这些摘要对应于讨论中识别的主题和子主题。这些主题和子主题摘要是基于参与者作为讨论一部分提交的评论和投票模式。您应该将结果格式化为 markdown 列表，包含在最终报告的顶部附近，该报告将包含完整的主题和子主题摘要。请勿假装您持有这些意见中的任何一个。您不是此讨论的参与者。请勿包含关于每个主题或子主题包含多少评论的具体数字，因为这些将在最终报告输出中稍后包含。您也不需要重述对话的上下文，因为这将在报告的早期已经说明。在可能的情况下，请优先描述提交的「陈述」或整体「对话」的结果，而不是参与者的观点（注意：「评论」和「陈述」是同一件事，但为了这部分摘要，只使用「陈述」一词）。记住：这只是更大报告的一个组成部分，您应该撰写它，使其在报告其余部分的上下文中自然流動。在寫作中要清晰簡潔，不要使用被動語態或模糊的代詞。
 
 您输出的列表结构应该按照主题名称，按照以下顺序。每个列表项目应该以粗体开始，包含主题名称（包括百分比，完全按照下面列出的），然后是冒号，然后是对应主题的简短一两句话摘要。完整回应应该只是 markdown 列表，没有其他文字。例如，列表项目可能看起来像这样：
 <output_format format="markdown">* **主题名称 (45%):** 主题摘要。</output_format>
@@ -149,19 +149,13 @@ La structure de la liste que vous produisez doit être en termes de noms de suje
 Voici les sujets :
 {topicNames}`,
 
-  "es": `Su trabajo es componer un resumen de los hallazgos clave de una discusión pública, basado en resúmenes ya compuestos que corresponden a temas y subtemas identificados en dicha discusión. Estos resúmenes de temas y subtemas se basan en comentarios y patrones de votación que los participantes enviaron como parte de la discusión. Debe formatear los resultados como una lista markdown, para ser incluida cerca de la parte superior del informe final, que incluirá los resúmenes completos de temas y subtemas. No pretenda que sostiene alguna de estas opiniones. Usted no es un participante en esta discusión. No incluya números específicos sobre cuántos comentarios se incluyeron en cada tema o subtema, ya que estos se incluirán más tarde en la salida del informe final. Tampoco necesita recapitular el contexto de la conversación, ya que esto se habrá establecido anteriormente en el informe. Cuando sea posible, prefiera describir los resultados en términos de las "declaraciones" enviadas o la "conversación" general, en lugar de en términos de las perspectivas de los participantes (Nota: "comentarios" y "declaraciones" son lo mismo, pero por el bien de esta parte del resumen, solo use el término "declaraciones"). Recuerde: esto es solo un componente de un informe más grande, y debe componerlo para que fluya naturalmente en el contexto del resto del informe. Sea claro y conciso en su escritura, y no use la voz pasiva o pronombres ambiguos.
+  "es": `Su trabajo es componer un resumen de los hallazgos clave de una discusión pública, basado en resúmenes ya compuestos que corresponden a temas y subtemas identificados en dicha discusión. Estos resúmenes de temas y subtemas se basan en comentarios y patrones de votación que los participantes enviaron como parte de la discusión. Este resumen se formateará como una lista markdown, para ser incluida cerca de la parte superior del informe final, que incluirá los resúmenes completos de temas y subtemas. No pretenda que sostiene alguna de estas opiniones. Usted no es un participante en esta discusión. Cuando sea posible, prefiera describir los resultados en términos de las "declaraciones" enviadas o la "conversación" general, en lugar de en términos de las perspectivas de los participantes (Nota: "comentarios" y "declaraciones" son lo mismo, pero por el bien de esta parte del resumen, solo use el término "declaraciones"). No incluya números específicos sobre cuántos comentarios se incluyeron en cada tema o subtema, ya que estos se incluirán más tarde en la salida del informe final. Tampoco necesita recapitular el contexto de la conversación, ya que esto se habrá establecido anteriormente en el informe. Recuerde: esto es solo un componente de un informe más grande, y debe componerlo para que fluya naturalmente en el contexto del resto del informe. Sea claro y conciso en su escritura, y no use la voz pasiva o pronombres ambiguos.
 
-La estructura de la lista que produce debe ser en términos de los nombres de los temas, en el orden que sigue. Cada elemento de la lista debe comenzar en negrita con el nombre del tema (incluyendo el porcentaje, exactamente como se enumera a continuación), luego dos puntos, y luego un resumen corto de una o dos oraciones para el tema correspondiente. La respuesta completa debe ser solo la lista markdown, sin otro texto. Por ejemplo, un elemento de la lista podría verse así:
-<output_format format="markdown">* **Nombre del Tema (45%):** Resumen del tema.</output_format>
-Aquí están los temas:
-{topicNames}`,
+Otros temas vendrán más tarde, pero por ahora, su trabajo es componer un resumen muy corto de una o dos oraciones del siguiente tema: {topicName}. Este resumen se pondrá más tarde en una lista con otros resúmenes de este tipo.`,
 
-  "ja": `あなたの仕事は、既に作成された要約に基づいて公開討論の主要な発見の要約を作成することです。これらの要約は、討論で特定されたトピックとサブトピックに対応しています。これらのトピックとサブトピックの要約は、参加者が討論の一部として提出したコメントと投票パターンに基づいています。結果をmarkdownリストとしてフォーマットし、最終レポートの上部近くに含める必要があります。最終レポートには、完全なトピックとサブトピックの要約が含まれます。これらの意見のいずれかを保持しているふりをしないでください。あなたはこの討論の参加者ではありません。各トピックまたはサブトピックに含まれるコメントの数について具体的な数字を含めないでください。これらは最終レポートの出力で後ほど含まれるからです。また、会話の文脈を再説明する必要もありません。これはレポートの早い段階で既に述べられているからです。可能な限り、参加者の視点ではなく、提出された「声明」または全体的な「会話」の観点から結果を説明することを好んでください（注：「コメント」と「声明」は同じものですが、この要約の部分では、「声明」という用語のみを使用してください）。覚えておいてください：これはより大きなレポートの1つのコンポーネントにすぎず、レポートの残りの部分の文脈で自然に流れるようにこれを構成する必要があります。文章を明確で簡潔にし、受動態や曖昧な代名詞を使用しないでください。
+  "ja": `あなたの仕事は、既に作成された要約に基づいて公開討論の主要な発見の要約を作成することです。これらの要約は、討論で特定されたトピックとサブトピックに対応しています。これらのトピックとサブトピックの要約は、参加者が討論の一部として提出したコメントと投票パターンに基づいています。この要約はmarkdownリストとしてフォーマットされ、最終レポートの上部近くに含まれます。最終レポートには、完全なトピックとサブトピックの要約が含まれます。これらの意見のいずれかを保持しているふりをしないでください。あなたはこの討論の参加者ではありません。可能な限り、参加者の視点ではなく、提出された「声明」または全体的な「会話」の観点から結果を説明することを好んでください（注：「コメント」と「声明」は同じものですが、この要約の部分では、「声明」という用語のみを使用してください）。各トピックまたはサブトピックに含まれるコメントの数について具体的な数字を含めないでください。これらは最終レポートの出力で後ほど含まれるからです。また、会話の文脈を再説明する必要もありません。これはレポートの早い段階で既に述べられているからです。覚えておいてください：これはより大きなレポートの1つのコンポーネントにすぎず、レポートの残りの部分の文脈で自然に流れるようにこれを構成する必要があります。文章を明確で簡潔にし、受動態や曖昧な代名詞を使用しないでください。
 
-出力するリストの構造は、トピック名の観点から、以下の順序で行う必要があります。各リスト項目は、トピック名（以下に正確にリストされているパーセンテージを含む）を太字で開始し、次にコロン、次に対応するトピックの短い1つまたは2つの文の要約で開始する必要があります。完全な応答はmarkdownリストのみで、他のテキストは含まれません。例えば、リスト項目は次のようになります：
-<output_format format="markdown">* **トピック名 (45%):** トピックの要約。</output_format>
-以下がトピックです：
-{topicNames}`
+他のトピックは後で来ますが、今のところ、あなたの仕事は以下のトピックの非常に短い1つまたは2つの文の要約を作成することです：{topicName}。この要約は後で他のそのような要約と一緒にリストにまとめられます。`
 };
 
 /**
@@ -192,6 +186,279 @@ Otros temas vendrán más tarde, pero por ahora, su trabajo es componer un resum
 
 他のトピックは後で来ますが、今のところ、あなたの仕事は以下のトピックの非常に短い1つまたは2つの文の要約を作成することです：{topicName}。この要約は後で他のそのような要約と一緒にリストにまとめられます。`
 };
+
+/**
+ * Multi-language prompt for learning topics from comments
+ */
+export const LEARN_TOPICS_PROMPT: Record<SupportedLanguage, string> = {
+  "en": `Analyze the following comments and identify common topics.
+Consider the granularity of topics: too few topics may oversimplify the content and miss important nuances, while too many topics may lead to redundancy and make the overall structure less clear.
+Aim for a balanced number of topics that effectively summarizes the key themes without excessive detail.
+After analysis of the comments, determine the optimal number of topics to represent the content effectively.
+Justify why having fewer topics would be less optimal (potentially oversimplifying and missing key nuances), and why having more topics would also be less optimal (potentially leading to redundancy and a less clear overall structure).
+After determining the optimal number of topics, identify those topics.
+
+IMPORTANT: 
+- Do NOT create a topic named "Other" or "Miscellaneous" or similar catch-all names.
+- Each topic should have a specific, descriptive name that clearly represents the content.
+- Output only the actual topics found in the comments, with clear, meaningful names.
+- Use the exact JSON schema format specified: [{"name": "Topic Name"}]`,
+
+  "zh-TW": `分析以下評論並識別共同主題。
+考慮主題的粒度：主題太少可能會過度簡化內容並錯過重要細微差別，而主題太多可能會導致冗餘並使整體結構不太清晰。
+目標是平衡數量的主題，能夠有效總結關鍵主題而不過度詳細。
+分析評論後，確定最佳主題數量以有效表示內容。
+證明為什麼主題較少會不太理想（可能過度簡化並錯過關鍵細微差別），以及為什麼主題較多也會不太理想（可能導致冗餘和不太清晰的整體結構）。
+確定最佳主題數量後，識別這些主題。
+
+重要事項：
+- 請勿創建名為「其他」或「雜項」或類似包羅萬象名稱的主題。
+- 每個主題都應該有一個具體、描述性的名稱，清楚代表內容。
+- 僅輸出在評論中找到的實際主題，具有清晰、有意義的名稱。
+- 使用指定的確切 JSON 架構格式：[{"name": "主題名稱"}]`,
+
+  "zh-CN": `分析以下评论并识别共同主题。
+考虑主题的粒度：主题太少可能会过度简化内容并错过重要细微差别，而主题太多可能会导致冗余并使整体结构不太清晰。
+目标是平衡数量的主题，能够有效总结关键主题而不过度详细。
+分析评论后，确定最佳主题数量以有效表示内容。
+证明为什么主题较少会不太理想（可能过度简化并错过关键细微差别），以及为什么主题较多也会不太理想（可能导致冗余和不太清晰的整体结构）。
+确定最佳主题数量后，识别这些主题。
+
+重要事项：
+- 请勿创建名为「其他」或「杂项」或类似包罗万象名称的主题。
+- 每个主题都应该有一个具体、描述性的名称，清楚代表内容。
+- 仅输出在评论中找到的实际主题，具有清晰、有意义的名称。
+- 使用指定的确切 JSON 架构格式：[{"name": "主题名称"}]`,
+
+  "fr": `Analysez les commentaires suivants et identifiez les sujets communs.
+Considérez la granularité des sujets : trop peu de sujets peuvent simplifier à l'excès le contenu et manquer des nuances importantes, tandis que trop de sujets peuvent mener à la redondance et rendre la structure globale moins claire.
+Visez un nombre équilibré de sujets qui résume efficacement les thèmes clés sans détails excessifs.
+Après analyse des commentaires, déterminez le nombre optimal de sujets pour représenter efficacement le contenu.
+Justifiez pourquoi avoir moins de sujets serait moins optimal (potentiellement simplifier à l'excès et manquer des nuances clés), et pourquoi avoir plus de sujets serait également moins optimal (potentiellement mener à la redondance et une structure globale moins claire).
+Après avoir déterminé le nombre optimal de sujets, identifiez ces sujets.
+
+IMPORTANT :
+- Ne créez PAS de sujet nommé "Autre" ou "Divers" ou des noms similaires fourre-tout.
+- Chaque sujet doit avoir un nom spécifique et descriptif qui représente clairement le contenu.
+- N'outputez que les sujets réels trouvés dans les commentaires, avec des noms clairs et significatifs.
+- Utilisez le format de schéma JSON exact spécifié : [{"name": "Nom du Sujet"}]`,
+
+  "es": `Analice los siguientes comentarios e identifique temas comunes.
+Considere la granularidad de los temas: muy pocos temas pueden simplificar en exceso el contenido y perder matices importantes, mientras que demasiados temas pueden llevar a la redundancia y hacer que la estructura general sea menos clara.
+Aim for a balanced number of topics that effectively summarizes the key themes without excessive detail.
+Después del análisis de los comentarios, determine el número óptimo de temas para representar efectivamente el contenido.
+Justifique por qué tener menos temas sería menos óptimo (potencialmente simplificando en exceso y perdiendo matices clave), y por qué tener más temas también sería menos óptimo (potencialmente llevando a la redundancia y una estructura general menos clara).
+Después de determinar el número óptimo de temas, identifique esos temas.
+
+IMPORTANTE:
+- NO cree un tema llamado "Otros" o "Misceláneos" o nombres similares de captura general.
+- Cada tema debe tener un nombre específico y descriptivo que represente claramente el contenido.
+- Solo outpute los temas reales encontrados en los comentarios, con nombres claros y significativos.
+- Use el formato de esquema JSON exacto especificado: [{"name": "Nombre del Tema"}]`,
+
+  "ja": `以下のコメントを分析し、共通のトピックを特定してください。
+トピックの粒度を考慮してください：トピックが少なすぎると内容を過度に簡素化し、重要なニュアンスを見逃す可能性があります。一方、トピックが多すぎると冗長性を招き、全体的な構造が不明確になる可能性があります。
+内容を効果的に要約するバランスの取れた数のトピックを目指し、過度な詳細は避けてください。
+コメントの分析後、内容を効果的に表現する最適なトピック数を決定してください。
+トピックが少なすぎることが最適でない理由（内容を過度に簡素化し、重要なニュアンスを見逃す可能性）と、トピックが多すぎることも最適でない理由（冗長性を招き、全体的な構造が不明確になる可能性）を証明してください。
+最適なトピック数を決定した後、それらのトピックを特定してください。
+
+重要：
+- 「その他」や「雑多」、または類似の包括的な名前のトピックを作成しないでください。
+- 各トピックは、内容を明確に表現する具体的で説明的な名前を持つ必要があります。
+- コメントで見つかった実際のトピックのみを出力し、明確で意味のある名前を使用してください。
+- 指定された正確なJSONスキーマ形式を使用してください：[{"name": "トピック名"}]`
+};
+
+/**
+ * Multi-language prompt for learning subtopics from comments
+ */
+export const LEARN_SUBTOPICS_PROMPT: Record<SupportedLanguage, string> = {
+  "en": `Analyze the following comments and identify common subtopics within the following overarching topic: "{parentTopicName}".
+Consider the granularity of subtopics: too few subtopics may oversimplify the content and miss important nuances, while too many subtopics may lead to redundancy and make the overall structure less clear.
+Aim for a balanced number of subtopics that effectively summarizes the key themes without excessive detail.
+After analysis of the comments, determine the optimal number of subtopics to represent the content effectively.
+Justify why having fewer subtopics would be less optimal (potentially oversimplifying and missing key nuances), and why having more subtopics would also be less optimal (potentially leading to redundancy and a less clear overall structure).
+After determining the optimal number of subtopics, identify those subtopics.
+
+Important Considerations:
+- No subtopics should have the same name as the overarching topic.
+- There are other overarching topics that are being used on different sets of comments, do not use these overarching topic names as identified subtopics names: {otherTopicNames}
+
+Example of Incorrect Output:
+
+[
+  {
+    "name": "Economic Development",
+    "subtopics": [
+        { "name": "Job Creation" },
+        { "name": "Business Growth" },
+        { "name": "Small Business Development" },
+        { "name": "Small Business Marketing" } // Incorrect: Too closely related to the "Small Business Development" subtopic
+        { "name": "Infrastructure & Transportation" } // Incorrect: This is the name of a main topic
+      ]
+  }
+]`,
+
+  "zh-TW": `分析以下評論並識別以下總體主題內的共同子主題：「{parentTopicName}」。
+考慮子主題的粒度：子主題太少可能會過度簡化內容並錯過重要細微差別，而子主題太多可能會導致冗餘並使整體結構不太清晰。
+目標是平衡數量的子主題，能夠有效總結關鍵主題而不過度詳細。
+分析評論後，確定最佳子主題數量以有效表示內容。
+證明為什麼子主題較少會不太理想（可能過度簡化並錯過關鍵細微差別），以及為什麼子主題較多也會不太理想（可能導致冗餘和不太清晰的整體結構）。
+確定最佳子主題數量後，識別這些子主題。
+
+重要考慮事項：
+- 任何子主題都不應該與總體主題同名。
+- 有其他總體主題正在不同的評論集合中使用，請勿將這些總體主題名稱用作識別的子主題名稱：{otherTopicNames}
+
+錯誤輸出示例：
+
+[
+  {
+    "name": "經濟發展",
+    "subtopics": [
+        { "name": "創造就業" },
+        { "name": "業務增長" },
+        { "name": "小企業發展" },
+        { "name": "小企業營銷" } // 錯誤：與「小企業發展」子主題過於密切相關
+        { "name": "基礎設施與交通" } // 錯誤：這是主要主題的名稱
+      ]
+  }
+]`,
+
+  "zh-CN": `分析以下评论并识别以下总体主题内的共同子主题：「{parentTopicName}」。
+考虑子主题的粒度：子主题太少可能会过度简化内容并错过重要细微差别，而子主题太多可能会导致冗余并使整体结构不太清晰。
+目标是平衡数量的子主题，能够有效总结关键主题而不过度详细。
+分析评论后，确定最佳子主题数量以有效表示内容。
+证明为什么子主题较少会不太理想（可能过度简化并错过关键细微差别），以及为什么子主题较多也会不太理想（可能导致冗余和不太清晰的整体结构）。
+确定最佳子主题数量后，识别这些子主题。
+
+重要考虑事项：
+- 任何子主题都不应该与总体主题同名。
+- 有其他总体主题正在不同的评论集合中使用，请勿将这些总体主题名称用作识别的子主题名称：{otherTopicNames}
+
+错误输出示例：
+
+[
+  {
+    "name": "经济发展",
+    "subtopics": [
+        { "name": "创造就业" },
+        { "name": "业务增长" },
+        { "name": "小企业发展" },
+        { "name": "小企业营销" } // 错误：与「小企业发展」子主题过于密切相关
+        { "name": "基础设施与交通" } // 错误：这是主要主题的名称
+      ]
+  }
+]`,
+
+  "fr": `Analysez les commentaires suivants et identifiez les sous-sujets communs dans le sujet général suivant : "{parentTopicName}".
+Considérez la granularité des sous-sujets : trop peu de sous-sujets peuvent simplifier à l'excès le contenu et manquer des nuances importantes, tandis que trop de sous-sujets peuvent mener à la redondance et rendre la structure globale moins claire.
+Visez un nombre équilibré de sous-sujets qui résume efficacement les thèmes clés sans détails excessifs.
+Après analyse des commentaires, déterminez le nombre optimal de sous-sujets pour représenter efficacement le contenu.
+Justifiez pourquoi avoir moins de sous-sujets serait moins optimal (potentiellement simplifier à l'excès et manquer des nuances clés), et pourquoi avoir plus de sous-sujets serait également moins optimal (potentiellement mener à la redondance et une structure globale moins claire).
+Après avoir déterminé le nombre optimal de sous-sujets, identifiez ces sous-sujets.
+
+Considérations importantes :
+- Aucun sous-sujet ne doit avoir le même nom que le sujet général.
+- Il y a d'autres sujets généraux qui sont utilisés sur différents ensembles de commentaires, n'utilisez pas ces noms de sujets généraux comme noms de sous-sujets identifiés : {otherTopicNames}
+
+Exemple de sortie incorrecte :
+
+[
+  {
+    "name": "Développement économique",
+    "subtopics": [
+        { "name": "Création d'emplois" },
+        { "name": "Croissance des entreprises" },
+        { "name": "Développement des petites entreprises" },
+        { "name": "Marketing des petites entreprises" } // Incorrect : Trop étroitement lié au sous-sujet "Développement des petites entreprises"
+        { "name": "Infrastructure et transport" } // Incorrect : C'est le nom d'un sujet principal
+      ]
+  }
+]`,
+
+  "es": `Analice los siguientes comentarios e identifique subtemas comunes dentro del siguiente tema general: "{parentTopicName}".
+Considere la granularidad de los subtemas: muy pocos subtemas pueden simplificar en exceso el contenido y perder matices importantes, mientras que demasiados subtemas pueden llevar a la redundancia y hacer que la estructura general sea menos clara.
+Aim for a balanced number of subtopics that effectively summarizes the key themes without excessive detail.
+Después del análisis de los comentarios, determine el número óptimo de subtemas para representar efectivamente el contenido.
+Justifique por qué tener menos subtemas sería menos óptimo (potencialmente simplificando en exceso y perdiendo matices clave), y por qué tener más subtemas también sería menos óptimo (potencialmente llevando a la redundancia y una estructura general menos clara).
+Después de determinar el número óptimo de subtemas, identifique esos subtemas.
+
+Consideraciones importantes:
+- Ningún subtema debe tener el mismo nombre que el tema general.
+- Hay otros temas generales que se están utilizando en diferentes conjuntos de comentarios, no use estos nombres de temas generales como nombres de subtemas identificados: {otherTopicNames}
+
+Ejemplo de salida incorrecta:
+
+[
+  {
+    "name": "Desarrollo Económico",
+    "subtopics": [
+        { "name": "Creación de Empleos" },
+        { "name": "Crecimiento Empresarial" },
+        { "name": "Desarrollo de Pequeñas Empresas" },
+        { "name": "Marketing de Pequeñas Empresas" } // Incorrecto: Demasiado estrechamente relacionado con el subtema "Desarrollo de Pequeñas Empresas"
+        { "name": "Infraestructura y Transporte" } // Incorrecto: Este es el nombre de un tema principal
+      ]
+  }
+]`,
+
+  "ja": `以下のコメントを分析し、以下の包括的なトピック内の共通のサブトピックを特定してください：「{parentTopicName}」。
+サブトピックの粒度を考慮してください：サブトピックが少なすぎると内容を過度に簡素化し、重要なニュアンスを見逃す可能性があります。一方、サブトピックが多すぎると冗長性を招き、全体的な構造が不明確になる可能性があります。
+内容を効果的に要約するバランスの取れた数のサブトピックを目指し、過度な詳細は避けてください。
+コメントの分析後、内容を効果的に表現する最適なサブトピック数を決定してください。
+サブトピックが少なすぎることが最適でない理由（内容を過度に簡素化し、重要なニュアンスを見逃す可能性）と、サブトピックが多すぎることも最適でない理由（冗長性を招き、全体的な構造が不明確になる可能性）を証明してください。
+最適なサブトピック数を決定した後、それらのサブトピックを特定してください。
+
+重要な考慮事項：
+- サブトピックは包括的なトピックと同じ名前を持つべきではありません。
+- 異なるコメントセットで使用されている他の包括的なトピックがあります。これら包括的なトピック名を識別されたサブトピック名として使用しないでください：{otherTopicNames}
+
+誤った出力の例：
+
+[
+  {
+    "name": "経済発展",
+    "subtopics": [
+        { "name": "雇用創出" },
+        { "name": "事業成長" },
+        { "name": "小企業発展" },
+        { "name": "小企業マーケティング" } // 誤り：「小企業発展」サブトピックと密接に関連しすぎている
+        { "name": "インフラと交通" } // 誤り：これはメイントピックの名前です
+      ]
+  }
+]`
+};
+
+/**
+ * Get the localized prompt for learning topics
+ * @param language The target language
+ * @returns The localized prompt for learning topics
+ */
+export function getLearnTopicsPrompt(language: SupportedLanguage): string {
+  console.log(`[DEBUG] getLearnTopicsPrompt() language: ${language}`);
+  return LEARN_TOPICS_PROMPT[language] || LEARN_TOPICS_PROMPT["en"];
+}
+
+/**
+ * Get the localized prompt for learning subtopics
+ * @param language The target language
+ * @param parentTopicName The name of the parent topic
+ * @param otherTopicNames The names of other topics to avoid
+ * @returns The localized prompt for learning subtopics
+ */
+export function getLearnSubtopicsPrompt(
+  language: SupportedLanguage, 
+  parentTopicName: string, 
+  otherTopicNames: string
+): string {
+  console.log(`[DEBUG] getLearnSubtopicsPrompt() language: ${language}`);
+  const prompt = LEARN_SUBTOPICS_PROMPT[language] || LEARN_SUBTOPICS_PROMPT["en"];
+  return prompt
+    .replace("{parentTopicName}", parentTopicName)
+    .replace("{otherTopicNames}", otherTopicNames);
+}
 
 /**
  * Get the localized prompt for themes generation
@@ -227,4 +494,166 @@ export function getOverviewPerTopicPrompt(language: SupportedLanguage, topicName
   console.log(`[DEBUG] getOverviewPerTopicPrompt() language: ${language}`);
   const prompt = OVERVIEW_PER_TOPIC_PROMPT[language] || OVERVIEW_PER_TOPIC_PROMPT["en"];
   return prompt.replace("{topicName}", topicName);
+}
+
+/**
+ * Multi-language prompt for differences of opinion instructions
+ */
+export const DIFFERENCES_OF_OPINION_INSTRUCTIONS: Record<SupportedLanguage, string> = {
+  "en": `You are going to be presented with several comments from a discussion on which there were differing opinions, ` +
+  `as well as a summary of points of common ground from this discussion. Your job is summarize the ideas ` +
+  `contained in the comments, keeping in mind the points of common ground as backgrounnd in describing ` +
+  `the differences of opinion. Do not pretend that you hold any of these opinions. You are not a ` +
+  `participant in this discussion. Write a concise summary of these comments that is at least ` +
+  `one sentence and at most five sentences long. Refer to the people who made these comments as ` +
+  `participants, not commenters.  Do not talk about how strongly they disagree with these ` +
+  `comments. Use complete sentences. Do not use the passive voice. Do not use ambiguous pronouns. Be clear. ` +
+  `Do not generate bullet points or special formatting. Do not yap.
+
+Do not assume that these comments were written by different participants. These comments could be from ` +
+  `the same participant, so do not say some participants prosed one things while other ` +
+  `participants proposed another.  Do not say "Some participants proposed X while others Y".  ` +
+  `Instead say "One statement proposed X while another Y"
+
+Where the difference of opinion comments refer to topics that are also covered in the common ground ` +
+  `summary, your output should begin in some variant of the form "While there was broad support for ..., ` +
+  `opinions differed with respect to ...". When this is not the case, you can beging simple as ` +
+  `"There was disagreement ..." or something similar to contextualize that the comments you are ` +
+  `summarizing had mixed support.`,
+
+  "zh-TW": `您將被呈現來自討論中意見分歧的幾個評論，以及該討論中共同點的摘要。您的工作是總結這些評論中包含的想法，在描述意見分歧時要記住共同點作為背景。請勿假裝您持有這些意見中的任何一個。您不是此討論的參與者。撰寫這些評論的簡潔摘要，至少一個句子，最多五個句子。將發表這些評論的人稱為參與者，而不是評論者。請勿談論他們對這些評論的不同意程度。使用完整句子。不要使用被動語態。不要使用模糊的代詞。要清晰。不要生成項目符號或特殊格式。不要廢話。
+
+請勿假設這些評論是由不同參與者撰寫的。這些評論可能來自同一個參與者，所以請勿說一些參與者提出一件事，而其他參與者提出另一件事。請勿說「一些參與者提出X，而其他人提出Y」。相反，請說「一個聲明提出X，而另一個提出Y」。
+
+當意見分歧的評論涉及在共同點摘要中也涵蓋的主題時，您的輸出應該以「雖然對...有廣泛支持，但對...的意見有所不同」的形式開始。當不是這種情況時，您可以簡單地開始為「存在分歧...」或類似的內容，以說明您正在總結的評論有混合支持。`,
+
+  "zh-CN": `您将被呈现来自讨论中意见分歧的几个评论，以及该讨论中共同点的摘要。您的工作是总结这些评论中包含的想法，在描述意见分歧时要记住共同点作为背景。请勿假装您持有这些意见中的任何一个。您不是此讨论的参与者。撰写这些评论的简洁摘要，至少一个句子，最多五个句子。将发表这些评论的人称为参与者，而不是评论者。请勿谈论他们对这些评论的不同意程度。使用完整句子。不要使用被动语态。不要使用模糊的代词。要清晰。不要生成项目符号或特殊格式。不要废话。
+
+请勿假设这些评论是由不同参与者撰写的。这些评论可能来自同一个参与者，所以请勿说一些参与者提出一件事，而其他参与者提出另一件事。请勿说「一些参与者提出X，而其他人提出Y」。相反，请说「一个声明提出X，而另一个提出Y」。
+
+当意见分歧的评论涉及在共同点摘要中也涵盖的主题时，您的输出应该以「虽然对...有广泛支持，但对...的意见有所不同」的形式开始。当不是这种情况时，您可以简单地开始为「存在分歧...」或类似的内容，以说明您正在总结的评论有混合支持。`,
+
+  "fr": `Votre travail consiste à composer un résumé des principales découvertes d'une discussion publique, basé sur des résumés déjà composés correspondant aux sujets et sous-sujets identifiés dans ladite discussion. Ces résumés de sujets et sous-sujets sont basés sur les commentaires et les modèles de vote que les participants ont soumis dans le cadre de la discussion. Vous devez formater les résultats sous forme de liste markdown, à inclure près du haut du rapport final, qui inclura les résumés complets des sujets et sous-sujets. Ne prétendez pas que vous détenez l'une de ces opinions. Vous n'êtes pas un participant à cette discussion. N'incluez pas de chiffres spécifiques sur le nombre de commentaires inclus dans chaque sujet ou sous-sujet, car ceux-ci seront inclus plus tard dans la sortie du rapport final. Vous n'avez pas non plus besoin de récapituler le contexte de la conversation, car cela aura déjà été énoncé plus tôt dans le rapport. Dans la mesure du possible, préférez décrire les résultats en termes de "déclarations" soumises ou de "conversation" globale, plutôt qu'en termes de perspectives des participants (Note : "commentaires" et "déclarations" sont la même chose, mais pour cette partie du résumé, utilisez uniquement le terme "déclarations"). Rappelez-vous : ce n'est qu'un composant d'un rapport plus large, et vous devez le composer pour qu'il s'intègre naturellement dans le contexte du reste du rapport. Soyez clair et concis dans votre écriture, et n'utilisez pas la voix passive ou des pronoms ambigus.
+
+La structure de la liste que vous produisez doit être en termes de noms de sujets, dans l'ordre qui suit. Chaque élément de liste doit commencer en gras avec le nom du sujet (y compris le pourcentage, exactement comme listé ci-dessous), puis deux points, puis un résumé court d'une ou deux phrases pour le sujet correspondant. La réponse complète doit être uniquement la liste markdown, sans autre texte. Par exemple, un élément de liste pourrait ressembler à ceci :
+<output_format format="markdown">* **Nom du sujet (45%) :** Résumé du sujet.</output_format>
+Voici les sujets :
+{topicNames}`,
+
+  "es": `Su trabajo es componer un resumen de los hallazgos clave de una discusión pública, basado en resúmenes ya compuestos que corresponden a temas y subtemas identificados en dicha discusión. Estos resúmenes de temas y subtemas se basan en comentarios y patrones de votación que los participantes enviaron como parte de la discusión. Este resumen se formateará como una lista markdown, para ser incluida cerca de la parte superior del informe final, que incluirá los resúmenes completos de temas y subtemas. No pretenda que sostiene alguna de estas opiniones. Usted no es un participante en esta discusión. Cuando sea posible, prefiera describir los resultados en términos de las "declaraciones" enviadas o la "conversación" general, en lugar de en términos de las perspectivas de los participantes (Nota: "comentarios" y "declaraciones" son lo mismo, pero por el bien de esta parte del resumen, solo use el término "declaraciones"). No incluya números específicos sobre cuántos comentarios se incluyeron en cada tema o subtema, ya que estos se incluirán más tarde en la salida del informe final. Tampoco necesita recapitular el contexto de la conversación, ya que esto se habrá establecido anteriormente en el informe. Recuerde: esto es solo un componente de un informe más grande, y debe componerlo para que fluya naturalmente en el contexto del resto del informe. Sea claro y conciso en su escritura, y no use la voz pasiva o pronombres ambiguos.
+
+Otros temas vendrán más tarde, pero por ahora, su trabajo es componer un resumen muy corto de una o dos oraciones del siguiente tema: {topicName}. Este resumen se pondrá más tarde en una lista con otros resúmenes de este tipo.`,
+
+  "ja": `あなたの仕事は、既に作成された要約に基づいて公開討論の主要な発見の要約を作成することです。これらの要約は、討論で特定されたトピックとサブトピックに対応しています。これらのトピックとサブトピックの要約は、参加者が討論の一部として提出したコメントと投票パターンに基づいています。この要約はmarkdownリストとしてフォーマットされ、最終レポートの上部近くに含まれます。最終レポートには、完全なトピックとサブトピックの要約が含まれます。これらの意見のいずれかを保持しているふりをしないでください。あなたはこの討論の参加者ではありません。可能な限り、参加者の視点ではなく、提出された「声明」または全体的な「会話」の観点から結果を説明することを好んでください（注：「コメント」と「声明」は同じものですが、この要約の部分では、「声明」という用語のみを使用してください）。各トピックまたはサブトピックに含まれるコメントの数について具体的な数字を含めないでください。これらは最終レポートの出力で後ほど含まれるからです。また、会話の文脈を再説明する必要もありません。これはレポートの早い段階で既に述べられているからです。覚えておいてください：これはより大きなレポートの1つのコンポーネントにすぎず、レポートの残りの部分の文脈で自然に流れるようにこれを構成する必要があります。文章を明確で簡潔にし、受動態や曖昧な代名詞を使用しないでください。
+
+他のトピックは後で来ますが、今のところ、あなたの仕事は以下のトピックの非常に短い1つまたは2つの文の要約を作成することです：{topicName}。この要約は後で他のそのような要約と一緒にリストにまとめられます。`
+};
+
+/**
+ * Multi-language prompt for differences of opinion single comment instructions
+ */
+export const DIFFERENCES_OF_OPINION_SINGLE_COMMENT_INSTRUCTIONS: Record<SupportedLanguage, string> = {
+  "en": `You are going to be presented with a single comment from a discussion on which there were differing opinions, ` +
+  `as well as a summary of points of common ground from this discussion. ` +
+  `Your job is to rewrite this comment to summarize the main points or ideas it is trying to make, clearly and without embellishment,` +
+  `keeping in mind the points of common ground as backgrounnd in describing the differences of opinion participants had in relation to this comment. ` +
+  `Do not pretend that you hold opinions. You are not a participant in this discussion. ` +
+  `Write your summary as a single complete sentence.` +
+  `Refer to the people who made these comments as participants, not commenters. ` +
+  `Do not talk about how strongly they disagree with these comments. Do not use the passive voice. Do not use ambiguous pronouns. Be clear. ` +
+  `Do not generate bullet points or special formatting. Do not yap.
+
+Where the difference of opinion comments refer to topics that are also covered in the common ground ` +
+  `summary, your output should begin in some variant of the form "While there was broad support for ..., ` +
+  `opinions differed with respect to ...". When this is not the case, you can beging simple as ` +
+  `"There was disagreement ..." or something similar to contextualize that the comments you are ` +
+  `summarizing had mixed support.`,
+
+  "zh-TW": `您將被呈現來自討論中意見分歧的單個評論，以及該討論中共同點的摘要。您的工作是重寫此評論，以總結它試圖表達的主要觀點或想法，清晰且不加修飾，在描述參與者對此評論的意見分歧時要記住共同點作為背景。請勿假裝您持有意見。您不是此討論的參與者。將您的摘要寫成單個完整句子。將發表這些評論的人稱為參與者，而不是評論者。請勿談論他們對這些評論的不同意程度。不要使用被動語態。不要使用模糊的代詞。要清晰。不要生成項目符號或特殊格式。不要廢話。
+
+當意見分歧的評論涉及在共同點摘要中也涵蓋的主題時，您的輸出應該以「雖然對...有廣泛支持，但對...的意見有所不同」的形式開始。當不是這種情況時，您可以簡單地開始為「存在分歧...」或類似的內容，以說明您正在總結的評論有混合支持。`,
+
+  "zh-CN": `您将被呈现来自讨论中意见分歧的单个评论，以及该讨论中共同点的摘要。您的工作是重写此评论，以总结它试图表达的主要观点或想法，清晰且不加修饰，在描述参与者对此评论的意见分歧时要记住共同点作为背景。请勿假装您持有意见。您不是此讨论的参与者。将您的摘要写成单个完整句子。将发表这些评论的人称为参与者，而不是评论者。请勿谈论他们对这些评论的不同意程度。不要使用被动语态。不要使用模糊的代词。要清晰。不要生成项目符号或特殊格式。不要废话。
+
+当意见分歧的评论涉及在共同点摘要中也涵盖的主题时，您的输出应该以「虽然对...有广泛支持，但对...的意见有所不同」的形式开始。当不是这种情况时，您可以简单地开始为「存在分歧...」或类似的内容，以说明您正在总结的评论有混合支持。`,
+
+  "fr": `Vous allez être présenté avec un seul commentaire d'une discussion sur laquelle il y avait des opinions divergentes, ` +
+  `ainsi qu'un résumé des points de terrain d'entente de cette discussion. ` +
+  `Votre travail est de réécrire ce commentaire pour résumer les points principaux ou les idées qu'il essaie de faire valoir, clairement et sans embellissement,` +
+  `en gardant à l'esprit les points de terrain d'entente comme arrière-plan en décrivant les différences d'opinion que les participants avaient par rapport à ce commentaire. ` +
+  `Ne prétendez pas que vous détenez des opinions. Vous n'êtes pas un participant à cette discussion. ` +
+  `Rédigez votre résumé comme une seule phrase complète.` +
+  `Référez-vous aux personnes qui ont fait ces commentaires comme participants, pas comme commentateurs. ` +
+  `Ne parlez pas de la force avec laquelle ils sont en désaccord avec ces commentaires. N'utilisez pas la voix passive. N'utilisez pas de pronoms ambigus. Soyez clair. ` +
+  `Ne générez pas de puces ou de formatage spécial. Ne bavardez pas.
+
+Lorsque les commentaires de différence d'opinion se réfèrent à des sujets qui sont également couverts dans le résumé du terrain d'entente, ` +
+  `votre sortie devrait commencer par une variante de la forme "Bien qu'il y ait eu un large soutien pour ..., ` +
+  `les opinions différaient en ce qui concerne ...". Quand ce n'est pas le cas, vous pouvez commencer simplement par ` +
+  `"Il y avait un désaccord ..." ou quelque chose de similaire pour contextualiser que les commentaires que vous ` +
+  `résumez avaient un soutien mitigé.`,
+
+  "es": `Se le presentará un solo comentario de una discusión sobre la cual había opiniones divergentes, ` +
+  `así como un resumen de los puntos de terreno común de esta discusión. ` +
+  `Su trabajo es reescribir este comentario para resumir los puntos principales o ideas que está tratando de hacer, claramente y sin embellecimiento,` +
+  `teniendo en cuenta los puntos de terreno común como fondo al describir las diferencias de opinión que los participantes tenían en relación con este comentario. ` +
+  `No pretenda que sostiene opiniones. Usted no es un participante en esta discusión. ` +
+  `Escriba su resumen como una sola oración completa.` +
+  `Refiérase a las personas que hicieron estos comentarios como participantes, no como comentaristas. ` +
+  `No hable sobre qué tan fuertemente están en desacuerdo con estos comentarios. No use la voz pasiva. No use pronombres ambiguos. Sea claro. ` +
+  `No genere viñetas o formato especial. No divague.
+
+Donde los comentarios de diferencia de opinión se refieren a temas que también están cubiertos en el resumen del terreno común, ` +
+  `su salida debe comenzar en alguna variante de la forma "Mientras había un amplio apoyo para ..., ` +
+  `las opiniones diferían con respecto a ...". Cuando este no es el caso, puede comenzar simple como ` +
+  `"Había desacuerdo ..." o algo similar para contextualizar que los comentarios que está ` +
+  `resumiendo tenían un apoyo mixto.`,
+
+  "ja": `意見の相違があった議論からの単一のコメントと、その議論の共通点の要約が提示されます。あなたの仕事は、このコメントを書き直して、それが伝えようとしている主要なポイントやアイデアを要約することです。明確で、飾り気なく、参加者がこのコメントに関して持っていた意見の相違を説明する際は、共通点を背景として心に留めておいてください。意見を保持しているふりをしないでください。あなたはこの議論の参加者ではありません。あなたの要約を単一の完全な文として書いてください。これらのコメントをした人々を「コメンター」ではなく「参加者」として言及してください。これらのコメントにどの程度反対しているかについて話さないでください。受動態を使用しないでください。曖昧な代名詞を使用しないでください。明確にしてください。箇条書きや特別なフォーマットを生成しないでください。無駄話をしないでください。
+
+意見の相違のコメントが共通点の要約でもカバーされているトピックを参照する場合、あなたの出力は「...に対して広範な支持があった一方で、...に関して意見が分かれた」の形式のバリエーションで始まる必要があります。これが当てはまらない場合、あなたが要約しているコメントが混合した支持を持っていたことを文脈化するために、「意見の相違があった...」または同様の何かで簡単に始めることができます。`
+};
+
+/**
+ * Get the localized prompt for differences of opinion instructions
+ * @param language The target language
+ * @returns The localized prompt for differences of opinion instructions
+ */
+export function getDifferencesOfOpinionInstructions(language: SupportedLanguage): string {
+  console.log(`[DEBUG] getDifferencesOfOpinionInstructions() language: ${language}`);
+  return DIFFERENCES_OF_OPINION_INSTRUCTIONS[language] || DIFFERENCES_OF_OPINION_INSTRUCTIONS["en"];
+}
+
+/**
+ * Get the localized prompt for differences of opinion single comment instructions
+ * @param language The target language
+ * @param containsGroups Whether the conversation contains opinion groups
+ * @returns The localized prompt for differences of opinion single comment instructions
+ */
+export function getDifferencesOfOpinionSingleCommentInstructions(
+  language: SupportedLanguage, 
+  containsGroups: boolean
+): string {
+  console.log(`[DEBUG] getDifferencesOfOpinionSingleCommentInstructions() language: ${language}, containsGroups: ${containsGroups}`);
+  
+  let prompt = DIFFERENCES_OF_OPINION_SINGLE_COMMENT_INSTRUCTIONS[language] || DIFFERENCES_OF_OPINION_SINGLE_COMMENT_INSTRUCTIONS["en"];
+  
+  // Add group-specific instructions if needed
+  if (containsGroups) {
+    const groupSpecificText = language === "zh-TW" || language === "zh-CN" 
+      ? "此對話的參與者已被聚類為意見群組。兩個意見群組對此評論的同意程度非常不同。"
+      : language === "fr"
+      ? "Les participants à cette conversation ont été regroupés en groupes d'opinion. Il y avait des niveaux très différents d'accord entre les deux groupes d'opinion concernant ce commentaire. "
+      : language === "es"
+      ? "Los participantes en esta conversación han sido agrupados en grupos de opinión. Había niveles muy diferentes de acuerdo entre los dos grupos de opinión con respecto a este comentario. "
+      : language === "ja"
+      ? "この会話の参加者は意見グループにクラスター化されています。2つの意見グループがこのコメントに関して非常に異なるレベルの同意を持っていました。"
+      : "Participants in this conversation have been clustered into opinion groups. There were very different levels of agreement between the two opinion groups regarding this comment. ";
+    
+    // Insert group-specific text after the first sentence
+    const firstSentenceEnd = prompt.indexOf('.') + 1;
+    prompt = prompt.slice(0, firstSentenceEnd) + " " + groupSpecificText + prompt.slice(firstSentenceEnd);
+  }
+  
+  return prompt;
 }

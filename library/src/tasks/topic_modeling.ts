@@ -18,69 +18,25 @@ import { MAX_RETRIES } from "../models/model_util";
 import { getPrompt, retryCall } from "../sensemaker_utils";
 import { Comment, FlatTopic, NestedTopic, Topic } from "../types";
 import { SupportedLanguage } from "../../templates/l10n";
+import { getLearnTopicsPrompt, getLearnSubtopicsPrompt } from "../../templates/l10n/prompts";
 
 /**
  * @fileoverview Helper functions for performing topic modeling on sets of comments.
  */
 
-export const LEARN_TOPICS_PROMPT = `
-Analyze the following comments and identify common topics.
-Consider the granularity of topics: too few topics may oversimplify the content and miss important nuances, while too many topics may lead to redundancy and make the overall structure less clear.
-Aim for a balanced number of topics that effectively summarizes the key themes without excessive detail.
-After analysis of the comments, determine the optimal number of topics to represent the content effectively.
-Justify why having fewer topics would be less optimal (potentially oversimplifying and missing key nuances), and why having more topics would also be less optimal (potentially leading to redundancy and a less clear overall structure).
-After determining the optimal number of topics, identify those topics.
-
-IMPORTANT: 
-- Do NOT create a topic named "Other" or "Miscellaneous" or similar catch-all names.
-- Each topic should have a specific, descriptive name that clearly represents the content.
-- Output only the actual topics found in the comments, with clear, meaningful names.
-- Use the exact JSON schema format specified: [{"name": "Topic Name"}]
-`;
-
-export function learnSubtopicsForOneTopicPrompt(parentTopic: Topic, otherTopics?: Topic[]): string {
-  const otherTopicNames = otherTopics?.map((topic) => topic.name).join(", ") ?? "";
-
-  return `
-Analyze the following comments and identify common subtopics within the following overarching topic: "${parentTopic.name}".
-Consider the granularity of subtopics: too few subtopics may oversimplify the content and miss important nuances, while too many subtopics may lead to redundancy and make the overall structure less clear.
-Aim for a balanced number of subtopics that effectively summarizes the key themes without excessive detail.
-After analysis of the comments, determine the optimal number of subtopics to represent the content effectively.
-Justify why having fewer subtopics would be less optimal (potentially oversimplifying and missing key nuances), and why having more subtopics would also be less optimal (potentially leading to redundancy and a less clear overall structure).
-After determining the optimal number of subtopics, identify those subtopics.
-
-Important Considerations:
-- No subtopics should have the same name as the overarching topic.
-- There are other overarching topics that are being used on different sets of comments, do not use these overarching topic names as identified subtopics names: ${otherTopicNames}
-
-Example of Incorrect Output:
-
-[
-  {
-    "name": "Economic Development",
-    "subtopics": [
-        { "name": "Job Creation" },
-        { "name": "Business Growth" },
-        { "name": "Small Business Development" },
-        { "name": "Small Business Marketing" } // Incorrect: Too closely related to the "Small Business Development" subtopic
-        { "name": "Infrastructure & Transportation" } // Incorrect: This is the name of a main topic
-      ]
-  }
-]
-`;
-}
-
 /**
  * Generates an LLM prompt for topic modeling of a set of comments.
  *
  * @param parentTopics - Optional. An array of top-level topics to use.
+ * @param output_lang - The target language for the prompt.
  * @returns The generated prompt string.
  */
-export function generateTopicModelingPrompt(parentTopic?: Topic, otherTopics?: Topic[]): string {
+export function generateTopicModelingPrompt(parentTopic?: Topic, otherTopics?: Topic[], output_lang: SupportedLanguage = "en"): string {
   if (parentTopic) {
-    return learnSubtopicsForOneTopicPrompt(parentTopic, otherTopics);
+    const otherTopicNames = otherTopics?.map((topic) => topic.name).join(", ") ?? "";
+    return getLearnSubtopicsPrompt(output_lang, parentTopic.name, otherTopicNames);
   } else {
-    return LEARN_TOPICS_PROMPT;
+    return getLearnTopicsPrompt(output_lang);
   }
 }
 
@@ -102,7 +58,7 @@ export function learnOneLevelOfTopics(
   additionalContext?: string,
   output_lang: SupportedLanguage = "en"
 ): Promise<Topic[]> {
-  const instructions = generateTopicModelingPrompt(topic, otherTopics);
+  const instructions = generateTopicModelingPrompt(topic, otherTopics, output_lang);
   const schema = topic ? Type.Array(NestedTopic) : Type.Array(FlatTopic);
 
   return retryCall(
@@ -130,6 +86,8 @@ export function learnOneLevelOfTopics(
   );
 }
 
+
+
 /**
  * Validates the topic modeling response from the LLM.
  *
@@ -138,6 +96,16 @@ export function learnOneLevelOfTopics(
  * @returns True if the response is valid, false otherwise.
  */
 export function learnedTopicsValid(response: Topic[], parentTopic?: Topic): boolean {
+  // Check if response is empty
+  if (!response || response.length === 0) {
+    if (parentTopic) {
+      console.warn(`Empty response when learning subtopics for "${parentTopic.name}". This may indicate the LLM couldn't identify meaningful subtopics.`);
+    } else {
+      console.warn("Empty response when learning topics. This may indicate the LLM couldn't identify meaningful topics.");
+    }
+    return false;
+  }
+
   const topicNames = response.map((topic) => topic.name);
 
   // 1. If a parentTopic is provided, we're learning subtopics - allow any meaningful topic names
