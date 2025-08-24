@@ -649,7 +649,7 @@ export async function categorizeCommentsRecursive(
       const newTopicAndSubtopics = (
         await learnOneLevelOfTopics(commentsInTopic, model, topic, parentTopics, additionalContext, output_lang)
       )[0];
-      if (!("subtopics" in newTopicAndSubtopics)) {
+      if (!newTopicAndSubtopics || !("subtopics" in newTopicAndSubtopics)) {
         throw Error("Badly formed LLM response - expected 'subtopics' to be in topics ");
       }
       topic = { name: topic.name, subtopics: newTopicAndSubtopics.subtopics };
