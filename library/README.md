@@ -295,7 +295,7 @@ then run
 npx ts-node ./library/runner-cli/runner_openrouter.ts \
   --outputBasename out \
   --inputFile "./files/comments.csv" \
-  --additionalContext "Description of the conversation" \
+  --additionalContext "請摘要描述此公共討論" \
   --output_lang zh-TW
 ```
 
