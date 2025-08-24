@@ -22,11 +22,22 @@ import { TSchema, Static } from "@sinclair/typebox";
 // Import localization system
 import { getLanguagePrefix, type SupportedLanguage } from "../../templates/l10n";
 
+/**
+ * 獨立的 buffer 上下文，用於避免並行處理時的 buffer 干擾
+ */
+interface StreamBufferContext {
+  buffer: string;
+  chunks: string[];
+  chunkCount: number;
+  startTime: number;
+  timeoutMs: number;
+}
+
 export class OpenRouterModel extends Model {
   private openai: OpenAI;
   private modelName: string;
 
-  constructor(apiKey: string, modelName: string = "anthropic/claude-3.5-sonnet") {
+  constructor(apiKey: string, modelName: string = "openai/gpt-oss-120b") {
     // 設定更小的批次大小，適合處理大筆資料
     super(50);
     this.modelName = modelName;
@@ -205,6 +216,19 @@ export class OpenRouterModel extends Model {
   }
 
   /**
+   * 創建新的 buffer 上下文，確保每個請求都有獨立的狀態
+   */
+  private createBufferContext(): StreamBufferContext {
+    return {
+      buffer: '',
+      chunks: [],
+      chunkCount: 0,
+      startTime: Date.now(),
+      timeoutMs: 300000, // 5 分鐘超時
+    };
+  }
+
+  /**
    * 處理 streaming 回應 - 支援 OpenRouter 的 SSE 格式
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -252,14 +276,14 @@ export class OpenRouterModel extends Model {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async handleAsyncIterable(stream: AsyncIterable<any>): Promise<string> {
-    const chunks: string[] = [];
+    const context = this.createBufferContext();
     
     try {
       for await (const chunk of stream) {
         if (chunk && chunk.choices && chunk.choices[0]) {
           const choice = chunk.choices[0];
           if (choice.delta && choice.delta.content) {
-            chunks.push(choice.delta.content);
+            context.chunks.push(choice.delta.content);
           }
         }
       }
@@ -268,7 +292,7 @@ export class OpenRouterModel extends Model {
       throw error;
     }
     
-    const fullResponse = chunks.join('');
+    const fullResponse = context.chunks.join('');
     return this.processStreamedResponse(fullResponse);
   }
 
@@ -283,50 +307,45 @@ export class OpenRouterModel extends Model {
       throw new Error('Response body is not readable');
     }
 
+    // 為每個請求創建獨立的 buffer 上下文
+    const context = this.createBufferContext();
     const decoder = new TextDecoder();
-    let buffer = '';
-    const chunks: string[] = [];
-    let chunkCount = 0;
-    
-    // 添加超時機制
-    const timeoutMs = 300000; // 5 分鐘超時
-    const startTime = Date.now();
 
     try {
       while (true) {
         // 檢查超時
-        if (Date.now() - startTime > timeoutMs) {
-          console.log(`   ⏰ Timeout after ${timeoutMs}ms, forcing stream completion`);
+        if (Date.now() - context.startTime > context.timeoutMs) {
+          console.log(`   ⏰ Timeout after ${context.timeoutMs}ms, forcing stream completion`);
           break;
         }
         
         const { done, value } = await reader.read();
         if (done) {
-          console.log('   Stream completed, total chunks received:', chunkCount);
+          console.log('   Stream completed, total chunks received:', context.chunkCount);
           break;
         }
 
         // Append new chunk to buffer
         const decodedChunk = decoder.decode(value, { stream: true });
-        buffer += decodedChunk;
-        chunkCount++;
+        context.buffer += decodedChunk;
+        context.chunkCount++;
         
         // 限制 chunk 數量，防止無限循環
-        if (chunkCount > 100000) {
+        if (context.chunkCount > 100000) {
           console.log('   ⚠️ Reached maximum chunk limit (100000), forcing completion');
           break;
         }
         
-        // console.log(`   Received chunk ${chunkCount}, buffer size: ${buffer.length}`);
+        // console.log(`   Received chunk ${context.chunkCount}, buffer size: ${context.buffer.length}`);
 
         // Process complete lines from buffer
         let doneSignalReceived = false;
         while (true) {
-          const lineEnd = buffer.indexOf('\n');
+          const lineEnd = context.buffer.indexOf('\n');
           if (lineEnd === -1) break;
 
-          const line = buffer.slice(0, lineEnd).trim();
-          buffer = buffer.slice(lineEnd + 1);
+          const line = context.buffer.slice(0, lineEnd).trim();
+          context.buffer = context.buffer.slice(lineEnd + 1);
 
           if (line.startsWith('data: ')) {
             const data = line.slice(6);
@@ -341,11 +360,11 @@ export class OpenRouterModel extends Model {
               const parsed = JSON.parse(data);
               const content = parsed.choices ? parsed.choices[0]?.delta?.content : parsed.content;
               if (content) {
-                chunks.push(content);
+                context.chunks.push(content);
                 // console.log(`   Extracted content chunk: "${content}"`);
               } //else {
                 // 顯示實際收到的 JSON 結構，幫助診斷
-                //if (chunkCount <= 5 || chunkCount % 1000 === 0) {
+                //if (context.chunkCount <= 5 || context.chunkCount % 1000 === 0) {
                 //  // console.log(`   No content found. JSON structure: ${JSON.stringify(parsed).substring(0, 200)}`);
                 //}
               //}
@@ -359,14 +378,14 @@ export class OpenRouterModel extends Model {
         // 如果收到 [DONE] 信號，處理完 buffer 中剩餘的內容後退出主循環
         if (doneSignalReceived) {
           // 處理 buffer 中剩餘的內容
-          if (buffer.length > 0) {
-            console.log(`   Processing remaining buffer content (${buffer.length} chars): "${buffer}"`);
+          if (context.buffer.length > 0) {
+            console.log(`   Processing remaining buffer content (${context.buffer.length} chars): "${context.buffer}"`);
             // 嘗試解析剩餘的 buffer 內容
             try {
-              const parsed = JSON.parse(buffer);
+              const parsed = JSON.parse(context.buffer);
               const content = parsed.choices?.[0]?.delta?.content;
               if (content) {
-                chunks.push(content);
+                context.chunks.push(content);
                 console.log(`   Extracted final content chunk: "${content}"`);
               }
             } catch {
@@ -381,9 +400,9 @@ export class OpenRouterModel extends Model {
       console.log('   Reader cancelled');
     }
 
-    const fullResponse = chunks.join('');
+    const fullResponse = context.chunks.join('');
     console.log('   Total content length:', fullResponse.length);
-    console.log('   Number of content chunks:', chunkCount);
+    console.log('   Number of content chunks:', context.chunkCount);
     
     return this.processStreamedResponse(fullResponse);
   }

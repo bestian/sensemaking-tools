@@ -694,25 +694,15 @@ export async function oneLevelCategorization(
     );
   }
 
-  // categorize comment batches sequentially to avoid streaming conflicts
+  // 恢復並行處理：每個請求現在都有獨立的 buffer 上下文，不會互相干擾
   const totalBatches = Math.ceil(comments.length / model.categorizationBatchSize);
   console.log(
-    `Categorizing ${comments.length} statements in batches (${totalBatches} batches of ${model.categorizationBatchSize} statements)`
+    `Categorizing ${comments.length} statements in batches (${totalBatches} batches of ${model.categorizationBatchSize} statements) - using parallel processing`
   );
   
-  // Execute batches sequentially instead of in parallel to avoid streaming response conflicts
-  const CategorizedBatches: CommentRecord[][] = [];
-  for (let i = 0; i < batchesToCategorize.length; i++) {
-    console.log(`Processing batch ${i + 1}/${totalBatches}...`);
-    try {
-      const result = await batchesToCategorize[i]();
-      CategorizedBatches.push(result);
-      console.log(`✅ Batch ${i + 1} completed successfully with ${result.length} comments`);
-    } catch (error) {
-      console.error(`❌ Batch ${i + 1} failed:`, error);
-      throw error;
-    }
-  }
+  // 使用 executeConcurrently 進行並行處理，每個批次都有獨立的 buffer 上下文
+  const CategorizedBatches: CommentRecord[][] = await executeConcurrently(batchesToCategorize);
+  console.log(`✅ All ${totalBatches} batches completed successfully in parallel`);
 
   // flatten categorized batches
   const categorized: CommentRecord[] = [];
