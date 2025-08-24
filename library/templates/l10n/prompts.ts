@@ -657,3 +657,233 @@ export function getDifferencesOfOpinionSingleCommentInstructions(
   
   return prompt;
 }
+
+/**
+ * Multi-language prompt for common ground instructions
+ */
+export const COMMON_GROUND_INSTRUCTIONS: Record<SupportedLanguage, string> = {
+  "en": `Here are several comments sharing different opinions. Your job is to summarize these ` +
+  `comments. Do not pretend that you hold any of these opinions. You are not a participant in ` +
+  `this discussion. Write a concise summary of these ` +
+  `comments that is at least one sentence and at most five sentences long. The summary should ` +
+  `be substantiated, detailed and informative: include specific findings, requests, proposals, ` +
+  `action items and examples, grounded in the comments. Refer to the people who made these ` +
+  `comments as participants, not commenters. Do not talk about how strongly they approve of ` +
+  `these comments. Use complete sentences. Do not use the passive voice. Do not use ambiguous pronouns. Be clear. ` +
+  `Do not generate bullet points or special formatting. Do not yap.`,
+
+  "zh-TW": `這裡有幾個分享不同意見的評論。您的工作是總結這些評論。請勿假裝您持有這些意見中的任何一個。您不是此討論的參與者。撰寫這些評論的簡潔摘要，至少一個句子，最多五個句子。摘要應該有根據、詳細且信息豐富：包括具體的發現、請求、提案、行動項目和例子，基於評論內容。將發表這些評論的人稱為參與者，而不是評論者。請勿談論他們對這些評論的贊同程度。使用完整句子。不要使用被動語態。不要使用模糊的代詞。要清晰。不要生成項目符號或特殊格式。不要廢話。`,
+
+  "zh-CN": `这里有几个分享不同意见的评论。您的工作是总结这些评论。请勿假装您持有这些意见中的任何一个。您不是此讨论的参与者。撰写这些评论的简洁摘要，至少一个句子，最多五个句子。摘要应该有根据、详细且信息丰富：包括具体的发现、请求、提案、行动项目和例子，基于评论内容。将发表这些评论的人称为参与者，而不是评论者。请勿谈论他们对这些评论的赞同程度。使用完整句子。不要使用被动语态。不要使用模糊的代词。要清晰。不要生成项目符号或特殊格式。不要废话。`,
+
+  "fr": `Voici plusieurs commentaires partageant des opinions différentes. Votre travail est de résumer ces ` +
+  `commentaires. Ne prétendez pas que vous détenez l'une de ces opinions. Vous n'êtes pas un participant à ` +
+  `cette discussion. Rédigez un résumé concis de ces ` +
+  `commentaires qui fait au moins une phrase et au plus cinq phrases. Le résumé doit ` +
+  `être fondé, détaillé et informatif : incluez des découvertes spécifiques, des demandes, des propositions, ` +
+  `des éléments d'action et des exemples, basés sur les commentaires. Référez-vous aux personnes qui ont fait ces ` +
+  `commentaires comme participants, pas comme commentateurs. Ne parlez pas de la force avec laquelle ils approuvent ` +
+  `ces commentaires. Utilisez des phrases complètes. N'utilisez pas la voix passive. N'utilisez pas de pronoms ambigus. Soyez clair. ` +
+  `Ne générez pas de puces ou de formatage spécial. Ne bavardez pas.`,
+
+  "es": `Aquí hay varios comentarios que comparten diferentes opiniones. Su trabajo es resumir estos ` +
+  `comentarios. No pretenda que sostiene alguna de estas opiniones. Usted no es un participante en ` +
+  `esta discusión. Escriba un resumen conciso de estos ` +
+  `comentarios que tenga al menos una oración y como máximo cinco oraciones. El resumen debe ` +
+  `ser fundamentado, detallado e informativo: incluya hallazgos específicos, solicitudes, propuestas, ` +
+  `elementos de acción y ejemplos, basados en los comentarios. Refiérase a las personas que hicieron estos ` +
+  `comentarios como participantes, no como comentaristas. No hable sobre qué tan fuertemente aprueban ` +
+  `estos comentarios. Use oraciones completas. No use la voz pasiva. No use pronombres ambiguos. Sea claro. ` +
+  `No genere viñetas o formato especial. No divague.`,
+
+  "ja": `ここには異なる意見を共有している複数のコメントがあります。あなたの仕事はこれらのコメントを要約することです。これらの意見のいずれかを保持しているふりをしないでください。あなたはこの議論の参加者ではありません。これらのコメントの簡潔な要約を書いてください。少なくとも1つの文で、最大5つの文にしてください。要約は根拠があり、詳細で情報に富んでいる必要があります：具体的な発見、要求、提案、行動項目、例を含めてください。これらはコメントに基づいています。これらのコメントをした人々を「コメンター」ではなく「参加者」として言及してください。彼らがこれらのコメントをどの程度承認しているかについて話さないでください。完全な文を使用してください。受動態を使用しないでください。曖昧な代名詞を使用しないでください。明確にしてください。箇条書きや特別なフォーマットを生成しないでください。無駄話をしないでください。`
+};
+
+/**
+ * Multi-language prompt for common ground single comment instructions
+ */
+export const COMMON_GROUND_SINGLE_COMMENT_INSTRUCTIONS: Record<SupportedLanguage, string> = {
+  "en": `Here is a comment presenting an opinion from a discussion. Your job is to rewrite this ` +
+  `comment clearly without embellishment. Do not pretend that you hold this opinion. You are not ` +
+  `a participant in this discussion. Refer to the people who ` +
+  `made these comments as participants, not commenters. Do not talk about how strongly they ` +
+  `approve of these comments. Write a complete sentence. Do not use the passive voice. Do not use ambiguous pronouns. Be clear. ` +
+  `Do not generate bullet points or special formatting. Do not yap.`,
+
+  "zh-TW": `這裡有一個來自討論的意見評論。您的工作是清楚地重寫此評論，不加修飾。請勿假裝您持有此意見。您不是此討論的參與者。將發表這些評論的人稱為參與者，而不是評論者。請勿談論他們對這些評論的贊同程度。寫一個完整句子。不要使用被動語態。不要使用模糊的代詞。要清晰。不要生成項目符號或特殊格式。不要廢話。`,
+
+  "zh-CN": `这里有一个来自讨论的意见评论。您的工作是清楚地重写此评论，不加修饰。请勿假装您持有此意见。您不是此讨论的参与者。将发表这些评论的人称为参与者，而不是评论者。请勿谈论他们对这些评论的赞同程度。写一个完整句子。不要使用被动语态。不要使用模糊的代词。要清晰。不要生成项目符号或特殊格式。不要废话。`,
+
+  "fr": `Voici un commentaire présentant une opinion d'une discussion. Votre travail est de réécrire ce ` +
+  `commentaire clairement sans embellissement. Ne prétendez pas que vous détenez cette opinion. Vous n'êtes ` +
+  `pas un participant à cette discussion. Référez-vous aux personnes qui ` +
+  `ont fait ces commentaires comme participants, pas comme commentateurs. Ne parlez pas de la force avec laquelle ils ` +
+  `approuvent ces commentaires. Rédigez une phrase complète. N'utilisez pas la voix passive. N'utilisez pas de pronoms ambigus. Soyez clair. ` +
+  `Ne générez pas de puces ou de formatage spécial. Ne bavardez pas.`,
+
+  "es": `Aquí hay un comentario que presenta una opinión de una discusión. Su trabajo es reescribir este ` +
+  `comentario claramente sin embellecimiento. No pretenda que sostiene esta opinión. Usted no ` +
+  `es un participante en esta discusión. Refiérase a las personas que ` +
+  `hicieron estos comentarios como participantes, no como comentaristas. No hable sobre qué tan fuertemente ` +
+  `aprueban estos comentarios. Escriba una oración completa. No use la voz pasiva. No use pronombres ambiguos. Sea claro. ` +
+  `No genere viñetas o formato especial. No divague.`,
+
+  "ja": `ここには議論からの意見を提示するコメントがあります。あなたの仕事は、このコメントを飾り気なく明確に書き直すことです。この意見を保持しているふりをしないでください。あなたはこの議論の参加者ではありません。これらのコメントをした人々を「コメンター」ではなく「参加者」として言及してください。彼らがこれらのコメントをどの程度承認しているかについて話さないでください。完全な文を書いてください。受動態を使用しないでください。曖昧な代名詞を使用しないでください。明確にしてください。箇条書きや特別なフォーマットを生成しないでください。無駄話をしないでください。`
+};
+
+/**
+ * Get the localized prompt for common ground instructions
+ * @param language The target language
+ * @param containsGroups Whether the conversation contains opinion groups
+ * @returns The localized prompt for common ground instructions
+ */
+export function getCommonGroundInstructions(
+  language: SupportedLanguage, 
+  containsGroups: boolean
+): string {
+  console.log(`[DEBUG] getCommonGroundInstructions() language: ${language}, containsGroups: ${containsGroups}`);
+  
+  let prompt = COMMON_GROUND_INSTRUCTIONS[language] || COMMON_GROUND_INSTRUCTIONS["en"];
+  
+  // Add group-specific instructions if needed
+  if (containsGroups) {
+    const groupSpecificText = language === "zh-TW" || language === "zh-CN" 
+      ? "此對話的參與者已被聚類為意見群組。這些意見群組大多贊同這些評論。"
+      : language === "fr"
+      ? "Les participants à cette conversation ont été regroupés en groupes d'opinion. Ces groupes d'opinion approuvent principalement ces commentaires. "
+      : language === "es"
+      ? "Los participantes en esta conversación han sido agrupados en grupos de opinión. Estos grupos de opinión aprueban principalmente estos comentarios. "
+      : language === "ja"
+      ? "この会話の参加者は意見グループにクラスター化されています。これらの意見グループは主にこれらのコメントを承認しています。"
+      : "Participants in this conversation have been clustered into opinion groups. These opinion groups mostly approve of these comments. ";
+    
+    // Insert group-specific text after the first sentence
+    const firstSentenceEnd = prompt.indexOf('.') + 1;
+    prompt = prompt.slice(0, firstSentenceEnd) + " " + groupSpecificText + prompt.slice(firstSentenceEnd);
+  }
+  
+  return prompt;
+}
+
+/**
+ * Get the localized prompt for common ground single comment instructions
+ * @param language The target language
+ * @param containsGroups Whether the conversation contains opinion groups
+ * @returns The localized prompt for common ground single comment instructions
+ */
+export function getCommonGroundSingleCommentInstructions(
+  language: SupportedLanguage, 
+  containsGroups: boolean
+): string {
+  console.log(`[DEBUG] getCommonGroundSingleCommentInstructions() language: ${language}, containsGroups: ${containsGroups}`);
+  
+  let prompt = COMMON_GROUND_SINGLE_COMMENT_INSTRUCTIONS[language] || COMMON_GROUND_SINGLE_COMMENT_INSTRUCTIONS["en"];
+  
+  // Add group-specific instructions if needed
+  if (containsGroups) {
+    const groupSpecificText = language === "zh-TW" || language === "zh-CN" 
+      ? "此對話的參與者已被聚類為意見群組。這些意見群組大多贊同這些評論。"
+      : language === "fr"
+      ? "Les participants à cette conversation ont été regroupés en groupes d'opinion. Ces groupes d'opinion approuvent principalement ces commentaires. "
+      : language === "es"
+      ? "Los participantes en esta conversación han sido agrupados en grupos de opinión. Estos grupos de opinión aprueban principalmente estos comentarios. "
+      : language === "ja"
+      ? "この会話の参加者は意見グループにクラスター化されています。これらの意見グループは主にこれらのコメントを承認しています。"
+      : "Participants in this conversation have been clustered into opinion groups. These opinion groups mostly approve of these comments. ";
+    
+    // Insert group-specific text after the first sentence
+    const firstSentenceEnd = prompt.indexOf('.') + 1;
+    prompt = prompt.slice(0, firstSentenceEnd) + " " + groupSpecificText + prompt.slice(firstSentenceEnd);
+  }
+  
+  return prompt;
+}
+
+/**
+ * Multi-language prompt for recursive topic summary instructions
+ */
+export const RECURSIVE_TOPIC_SUMMARY_INSTRUCTIONS: Record<SupportedLanguage, string> = {
+  "en": `Your job is to compose a summary paragraph to be included in a report on the results of a ` +
+  `discussion among some number of participants. You are specifically tasked with producing ` +
+  `a paragraph about the following topic of discussion: {topicName}. ` +
+  `You will base this summary off of a number of already composed summaries corresponding to ` +
+  `subtopics of said topic. These summaries have been based on comments that participants submitted ` +
+  `as part of the discussion. ` +
+  `Do not pretend that you hold any of these opinions. You are not a participant in this ` +
+  `discussion. Write a concise summary of these summaries that is at least one sentence ` +
+  `and at most three to five sentences long. The summary should be substantiated, detailed and ` +
+  `informative. However, do not provide any meta-commentary ` +
+  `about your task, or the fact that your summary is being based on other summaries. Also do not ` +
+  `include specific numbers about how many comments were included in each subtopic, as these will be ` +
+  `included later in the final report output. ` +
+  `Also refrain from describing specific areas of agreement or disagreement, and instead focus on themes discussed. ` +
+  `You also do not need to recap the context of the conversation, ` +
+  `as this will have already been stated earlier in the report. Remember: this is just one paragraph in a larger ` +
+  `summary, and you should compose this paragraph so that it will flow naturally in the context of the rest of the report. ` +
+  `Do not use the passive voice. Do not use ambiguous pronouns. Be clear. ` +
+  `Do not generate bullet points or special formatting. Do not yap.`,
+
+  "zh-TW": `您的工作是撰寫一個摘要段落，該段落將包含在關於參與者討論結果的報告中。您的具體任務是撰寫關於以下討論主題的段落：{topicName}。您將基於對應於該主題子主題的若干已撰寫摘要來撰寫此摘要。這些摘要基於參與者作為討論一部分提交的評論。請勿假裝您持有這些意見中的任何一個。您不是此討論的參與者。撰寫這些摘要的簡潔摘要，至少一個句子，最多三到五個句子。摘要應該有根據、詳細且信息豐富。但是，請勿提供關於您任務的任何元評論，或您的摘要基於其他摘要的事實。也不要包含關於每個子主題包含多少評論的具體數字，因為這些將在最終報告輸出中稍後包含。也要避免描述具體的同意或不同意領域，而是專注於討論的主題。您也不需要重述對話的上下文，因為這將在報告的早期已經說明。記住：這只是更大摘要中的一個段落，您應該撰寫此段落，使其在報告其餘部分的上下文中自然流動。不要使用被動語態。不要使用模糊的代詞。要清晰。不要生成項目符號或特殊格式。不要廢話。`,
+
+  "zh-CN": `您的工作是撰写一个摘要段落，该段落将包含在关于参与者讨论结果的报告中。您的具体任务是撰写关于以下讨论主题的段落：{topicName}。您将基于对应于该主题子主题的若干已撰写摘要来撰写此摘要。这些摘要基于参与者作为讨论一部分提交的评论。请勿假装您持有这些意见中的任何一个。您不是此讨论的参与者。撰写这些摘要的简洁摘要，至少一个句子，最多三到五个句子。摘要应该有根据、详细且信息丰富。但是，请勿提供关于您任务的任何元评论，或您的摘要基于其他摘要的事实。也不要包含关于每个子主题包含多少评论的具体数字，因为这些将在最终报告输出中稍后包含。也要避免描述具体的同意或不同意领域，而是专注于讨论的主题。您也不需要重述对话的上下文，因为这将在报告的早期已经说明。记住：这只是更大摘要中的一个段落，您应该撰写此段落，使其在报告其余部分的上下文中自然流动。不要使用被动语态。不要使用模糊的代词。要清晰。不要生成项目符号或特殊格式。不要废话。`,
+
+  "fr": `Votre travail consiste à composer un paragraphe de résumé à inclure dans un rapport sur les résultats d'une ` +
+  `discussion entre un certain nombre de participants. Vous êtes spécifiquement chargé de produire ` +
+  `un paragraphe sur le sujet de discussion suivant : {topicName}. ` +
+  `Vous baserez ce résumé sur un certain nombre de résumés déjà composés correspondant aux ` +
+  `sous-sujets dudit sujet. Ces résumés ont été basés sur des commentaires que les participants ont soumis ` +
+  `dans le cadre de la discussion. ` +
+  `Ne prétendez pas que vous détenez l'une de ces opinions. Vous n'êtes pas un participant à cette ` +
+  `discussion. Rédigez un résumé concis de ces résumés qui fait au moins une phrase ` +
+  `et au plus trois à cinq phrases. Le résumé doit être fondé, détaillé et ` +
+  `informatif. Cependant, ne fournissez aucune méta-commentaire ` +
+  `sur votre tâche, ou le fait que votre résumé est basé sur d'autres résumés. N'incluez pas non plus ` +
+  `de chiffres spécifiques sur le nombre de commentaires inclus dans chaque sous-sujet, car ceux-ci seront ` +
+  `inclus plus tard dans la sortie du rapport final. ` +
+  `Abstenez-vous également de décrire des domaines spécifiques d'accord ou de désaccord, et concentrez-vous plutôt sur les thèmes discutés. ` +
+  `Vous n'avez pas non plus besoin de récapituler le contexte de la conversation, ` +
+  `car cela aura déjà été énoncé plus tôt dans le rapport. Rappelez-vous : ce n'est qu'un paragraphe dans un résumé plus large, ` +
+  `et vous devez composer ce paragraphe pour qu'il s'intègre naturellement dans le contexte du reste du rapport. ` +
+  `N'utilisez pas la voix passive. N'utilisez pas de pronoms ambigus. Soyez clair. ` +
+  `Ne générez pas de puces ou de formatage spécial. Ne bavardez pas.`,
+
+  "es": `Su trabajo es componer un párrafo de resumen para ser incluido en un informe sobre los resultados de una ` +
+  `discusión entre un número de participantes. Usted está específicamente encargado de producir ` +
+  `un párrafo sobre el siguiente tema de discusión: {topicName}. ` +
+  `Usted basará este resumen en un número de resúmenes ya compuestos que corresponden a ` +
+  `subtemas de dicho tema. Estos resúmenes se han basado en comentarios que los participantes enviaron ` +
+  `como parte de la discusión. ` +
+  `No pretenda que sostiene alguna de estas opiniones. Usted no es un participante en esta ` +
+  `discusión. Escriba un resumen conciso de estos resúmenes que tenga al menos una oración ` +
+  `y como máximo tres a cinco oraciones. El resumen debe ser fundamentado, detallado e ` +
+  `informativo. Sin embargo, no proporcione ningún meta-comentario ` +
+  `sobre su tarea, o el hecho de que su resumen se basa en otros resúmenes. Tampoco ` +
+  `incluya números específicos sobre cuántos comentarios se incluyeron en cada subtema, ya que estos serán ` +
+  `incluidos más tarde en la salida del informe final. ` +
+  `También absténgase de describir áreas específicas de acuerdo o desacuerdo, y en su lugar concéntrese en los temas discutidos. ` +
+  `Tampoco necesita recapitular el contexto de la conversación, ` +
+  `ya que esto se habrá establecido anteriormente en el informe. Recuerde: esto es solo un párrafo en un resumen más grande, ` +
+  `y debe componer este párrafo para que fluya naturalmente en el contexto del resto del informe. ` +
+  `No use la voz pasiva. No use pronombres ambiguos. Sea claro. ` +
+  `No genere viñetas o formato especial. No divague.`,
+
+  "ja": `あなたの仕事は、参加者間の議論の結果に関する報告書に含める要約段落を作成することです。あなたは特に以下の議論トピックについて段落を作成する任務を負っています：{topicName}。あなたは、そのトピックのサブトピックに対応する既に作成された要約の数に基づいてこの要約を作成します。これらの要約は、参加者が議論の一部として提出したコメントに基づいています。これらの意見のいずれかを保持しているふりをしないでください。あなたはこの議論の参加者ではありません。これらの要約の簡潔な要約を書いてください。少なくとも1つの文で、最大3つから5つの文にしてください。要約は根拠があり、詳細で情報に富んでいる必要があります。ただし、あなたのタスクについて、またはあなたの要約が他の要約に基づいているという事実について、メタコメンタリーを提供しないでください。また、各サブトピックに含まれるコメントの数について具体的な数字を含めないでください。これらは最終報告書の出力で後ほど含まれるからです。また、具体的な同意または不同意の領域を説明することを避け、代わりに議論されたテーマに焦点を当ててください。また、会話の文脈を再説明する必要もありません。これは報告書の早い段階で既に述べられているからです。覚えておいてください：これはより大きな要約の1つの段落にすぎず、あなたはこの段落を、報告書の残りの部分の文脈で自然に流れるように構成する必要があります。受動態を使用しないでください。曖昧な代名詞を使用しないでください。明確にしてください。箇条書きや特別なフォーマットを生成しないでください。無駄話をしないでください。`
+};
+
+/**
+ * Get the localized prompt for recursive topic summary instructions
+ * @param language The target language
+ * @param topicName The name of the topic to summarize
+ * @returns The localized prompt for recursive topic summary instructions
+ */
+export function getRecursiveTopicSummaryInstructions(
+  language: SupportedLanguage, 
+  topicName: string
+): string {
+  console.log(`[DEBUG] getRecursiveTopicSummaryInstructions() language: ${language}, topicName: ${topicName}`);
+  
+  const prompt = RECURSIVE_TOPIC_SUMMARY_INSTRUCTIONS[language] || RECURSIVE_TOPIC_SUMMARY_INSTRUCTIONS["en"];
+  
+  // Replace the placeholder with the actual topic name
+  return prompt.replace("{topicName}", topicName);
+}

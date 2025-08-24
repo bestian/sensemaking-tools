@@ -41,41 +41,19 @@ import {
 import { 
   getThemesPrompt,
   getDifferencesOfOpinionInstructions,
-  getDifferencesOfOpinionSingleCommentInstructions
+  getDifferencesOfOpinionSingleCommentInstructions,
+  getCommonGroundInstructions,
+  getCommonGroundSingleCommentInstructions,
+  getRecursiveTopicSummaryInstructions
 } from "../../../templates/l10n/prompts";
 
-const COMMON_INSTRUCTIONS =
-  "Do not use the passive voice. Do not use ambiguous pronouns. Be clear. " +
-  "Do not generate bullet points or special formatting. Do not yap.";
+// Note: These constants are now replaced by multi-language versions from prompts.ts
+// const COMMON_INSTRUCTIONS = ...
+// const GROUP_SPECIFIC_INSTRUCTIONS = ...
 
-const GROUP_SPECIFIC_INSTRUCTIONS =
-  `Participants in this conversation have been clustered into opinion groups. ` +
-  `These opinion groups mostly approve of these comments. `;
-
-function getCommonGroundInstructions(containsGroups: boolean): string {
-  const groupSpecificText = containsGroups ? GROUP_SPECIFIC_INSTRUCTIONS : "";
-  return (
-    `Here are several comments sharing different opinions. Your job is to summarize these ` +
-    `comments. Do not pretend that you hold any of these opinions. You are not a participant in ` +
-    `this discussion. ${groupSpecificText}Write a concise summary of these ` +
-    `comments that is at least one sentence and at most five sentences long. The summary should ` +
-    `be substantiated, detailed and informative: include specific findings, requests, proposals, ` +
-    `action items and examples, grounded in the comments. Refer to the people who made these ` +
-    `comments as participants, not commenters. Do not talk about how strongly they approve of ` +
-    `these comments. Use complete sentences. ${COMMON_INSTRUCTIONS}`
-  );
-}
-
-function getCommonGroundSingleCommentInstructions(containsGroups: boolean): string {
-  const groupSpecificText = containsGroups ? GROUP_SPECIFIC_INSTRUCTIONS : "";
-  return (
-    `Here is a comment presenting an opinion from a discussion. Your job is to rewrite this ` +
-    `comment clearly without embellishment. Do not pretend that you hold this opinion. You are not` +
-    ` a participant in this discussion. ${groupSpecificText}Refer to the people who ` +
-    `made these comments as participants, not commenters. Do not talk about how strongly they ` +
-    `approve of these comments. Write a complete sentence. ${COMMON_INSTRUCTIONS}`
-  );
-}
+// Note: These functions are now replaced by multi-language versions from prompts.ts
+// function getCommonGroundInstructions(containsGroups: boolean): string { ... }
+// function getCommonGroundSingleCommentInstructions(containsGroups: boolean): string { ... }
 
 // TODO: Test whether conditionally including group specific text in this prompt improves
 // performance.
@@ -103,28 +81,8 @@ function getCommonGroundSingleCommentInstructions(containsGroups: boolean): stri
 
 
 
-function getRecursiveTopicSummaryInstructions(topicStat: TopicStats): string {
-  return (
-    `Your job is to compose a summary paragraph to be included in a report on the results of a ` +
-    `discussion among some number of participants. You are specifically tasked with producing ` +
-    `a paragraph about the following topic of discussion: ${topicStat.name}. ` +
-    `You will base this summary off of a number of already composed summaries corresponding to ` +
-    `subtopics of said topic. These summaries have been based on comments that participants submitted ` +
-    `as part of the discussion. ` +
-    `Do not pretend that you hold any of these opinions. You are not a participant in this ` +
-    `discussion. Write a concise summary of these summaries that is at least one sentence ` +
-    `and at most three to five sentences long. The summary should be substantiated, detailed and ` +
-    `informative. However, do not provide any meta-commentary ` +
-    `about your task, or the fact that your summary is being based on other summaries. Also do not ` +
-    `include specific numbers about how many comments were included in each subtopic, as these will be ` +
-    `included later in the final report output. ` +
-    `Also refrain from describing specific areas of agreement or disagreement, and instead focus on themes discussed. ` +
-    `You also do not need to recap the context of the conversation, ` +
-    `as this will have already been stated earlier in the report. Remember: this is just one paragraph in a larger ` +
-    `summary, and you should compose this paragraph so that it will flow naturally in the context of the rest of the report. ` +
-    `${COMMON_INSTRUCTIONS}`
-  );
-}
+// Note: This function is now replaced by getRecursiveTopicSummaryInstructions() function from prompts.ts
+// function getRecursiveTopicSummaryInstructions(topicStat: TopicStats): string { ... }
 
 /**
  * This RecursiveSummary subclass constructs a top level "Topics" summary section,
@@ -280,7 +238,7 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
       console.log(`[DEBUG] TopicSummary.getAllSubTopicSummaries() topicSummary result: "${topicSummary}"`);
       
       const subtopicSummaryPrompt = getAbstractPrompt(
-        getRecursiveTopicSummaryInstructions(this.topicStat),
+        getRecursiveTopicSummaryInstructions(this.output_lang, this.topicStat.name),
         subtopicSummaryContents,
         (summary: SummaryContent) =>
           `<subtopicSummary>\n` +
@@ -345,8 +303,7 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
       const commonGroundSummary = await this.getCommonGroundSummary(this.topicStat.name);
       const differencesOfOpinionSummary = await this.getDifferencesOfOpinionSummary(
         commonGroundSummary,
-        this.topicStat.name,
-        this.output_lang
+        this.topicStat.name
       );
       subContents.push(commonGroundSummary, differencesOfOpinionSummary);
     }
@@ -443,8 +400,8 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
       const summary = this.model.generateText(
         getPrompt(
           nComments === 1
-            ? getCommonGroundSingleCommentInstructions(this.input.groupBasedSummarization)
-            : getCommonGroundInstructions(this.input.groupBasedSummarization),
+            ? getCommonGroundSingleCommentInstructions(this.output_lang, this.input.groupBasedSummarization)
+            : getCommonGroundInstructions(this.output_lang, this.input.groupBasedSummarization),
           commonGroundComments.map((comment: Comment): string => comment.text),
           this.additionalContext,
           this.output_lang
@@ -476,8 +433,7 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
    */
   async getDifferencesOfOpinionSummary(
     commonGroundSummary: SummaryContent,
-    topic: string,
-    output_lang: SupportedLanguage = "en"
+    topic: string
   ): Promise<SummaryContent> {
     // Debug: 檢查 getDifferencesOfOpinionSummary 中的 output_lang 值
     console.log(`[DEBUG] TopicSummary.getDifferencesOfOpinionSummary() output_lang: ${this.output_lang}`);
