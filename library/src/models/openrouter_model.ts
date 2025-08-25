@@ -557,6 +557,32 @@ export class OpenRouterModel extends Model {
   private findLastValidJson(response: string): string {
     console.log('   🔍 Searching for last valid JSON structure...');
     
+    // 首先嘗試提取 JSON 陣列
+    const jsonArrayMatch = response.match(/\[[\s\S]*\]/);
+    if (jsonArrayMatch) {
+      const jsonArray = jsonArrayMatch[0];
+      try {
+        JSON.parse(jsonArray);
+        console.log('   Found valid JSON array, truncating there');
+        return jsonArray;
+      } catch {
+        console.log('   JSON array found but invalid, trying to fix...');
+      }
+    }
+    
+    // 嘗試處理多行 JSON 格式（每行一個 JSON 物件）
+    const jsonLines = response.split('\n').filter(line => line.trim().startsWith('{'));
+    if (jsonLines.length > 0) {
+      try {
+        const jsonArray = '[' + jsonLines.join(',') + ']';
+        JSON.parse(jsonArray);
+        console.log('   Found valid multi-line JSON, converting to array');
+        return jsonArray;
+      } catch {
+        console.log('   Multi-line JSON found but invalid, trying to fix...');
+      }
+    }
+    
     // 尋找最後一個完整的物件
     const objectMatches = response.match(/\{[^{}]*\}/g);
     if (objectMatches && objectMatches.length > 0) {

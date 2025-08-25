@@ -27,15 +27,14 @@ export const LEARN_TOPICS_PROMPT = `
 Analyze the following comments and identify common topics.
 Consider the granularity of topics: too few topics may oversimplify the content and miss important nuances, while too many topics may lead to redundancy and make the overall structure less clear.
 Aim for a balanced number of topics that effectively summarizes the key themes without excessive detail.
-After analysis of the comments, determine the optimal number of topics to represent the content effectively.
-Justify why having fewer topics would be less optimal (potentially oversimplifying and missing key nuances), and why having more topics would also be less optimal (potentially leading to redundancy and a less clear overall structure).
-After determining the optimal number of topics, identify those topics.
 
 IMPORTANT: 
 - Do NOT create a topic named "Other" or "Miscellaneous" or similar catch-all names.
 - Each topic should have a specific, descriptive name that clearly represents the content.
-- Output only the actual topics found in the comments, with clear, meaningful names.
-- Use the exact JSON schema format specified: [{"name": "Topic Name"}]
+- Output ONLY the JSON array with topics, NO explanations or additional text.
+- Use the exact JSON schema format: [{"name": "Topic Name"}]
+
+CRITICAL: Respond with ONLY the JSON array, no other text or explanations.
 `;
 
 export function learnSubtopicsForOneTopicPrompt(parentTopic: Topic, otherTopics?: Topic[]): string {
@@ -45,28 +44,14 @@ export function learnSubtopicsForOneTopicPrompt(parentTopic: Topic, otherTopics?
 Analyze the following comments and identify common subtopics within the following overarching topic: "${parentTopic.name}".
 Consider the granularity of subtopics: too few subtopics may oversimplify the content and miss important nuances, while too many subtopics may lead to redundancy and make the overall structure less clear.
 Aim for a balanced number of subtopics that effectively summarizes the key themes without excessive detail.
-After analysis of the comments, determine the optimal number of subtopics to represent the content effectively.
-Justify why having fewer subtopics would be less optimal (potentially oversimplifying and missing key nuances), and why having more subtopics would also be less optimal (potentially leading to redundancy and a less clear overall structure).
-After determining the optimal number of subtopics, identify those subtopics.
 
 Important Considerations:
 - No subtopics should have the same name as the overarching topic.
 - There are other overarching topics that are being used on different sets of comments, do not use these overarching topic names as identified subtopics names: ${otherTopicNames}
+- Output ONLY the JSON array with subtopics in the correct format: [{"name": "Subtopic Name"}]
+- NO explanations or additional text.
 
-Example of Incorrect Output:
-
-[
-  {
-    "name": "Economic Development",
-    "subtopics": [
-        { "name": "Job Creation" },
-        { "name": "Business Growth" },
-        { "name": "Small Business Development" },
-        { "name": "Small Business Marketing" } // Incorrect: Too closely related to the "Small Business Development" subtopic
-        { "name": "Infrastructure & Transportation" } // Incorrect: This is the name of a main topic
-      ]
-  }
-]
+CRITICAL: Respond with ONLY the JSON array in format [{"name": "Subtopic Name"}], no other text or explanations.
 `;
 }
 

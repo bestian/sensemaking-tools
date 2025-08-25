@@ -646,13 +646,21 @@ export async function categorizeCommentsRecursive(
     }
     if (!("subtopics" in topic)) {
       // The subtopics are added to the existing topic, so a list of length one is returned.
-      const newTopicAndSubtopics = (
-        await learnOneLevelOfTopics(commentsInTopic, model, topic, parentTopics, additionalContext, output_lang)
-      )[0];
-      if (!("subtopics" in newTopicAndSubtopics)) {
-        throw Error("Badly formed LLM response - expected 'subtopics' to be in topics ");
+      const newTopicsArray = await learnOneLevelOfTopics(commentsInTopic, model, topic, parentTopics, additionalContext, output_lang);
+      
+      // 處理 AI 回傳的格式：AI 回傳的是 Topic[] 陣列，我們需要提取其中的 subtopics
+      console.log('🔍 Debug: newTopicsArray type:', typeof newTopicsArray);
+      console.log('🔍 Debug: newTopicsArray:', JSON.stringify(newTopicsArray, null, 2));
+      
+      let subtopics;
+      if (Array.isArray(newTopicsArray)) {
+        // AI 回傳了 Topic[] 陣列，這些就是 subtopics
+        subtopics = newTopicsArray;
+      } else {
+        throw Error("Badly formed LLM response - expected array of topics");
       }
-      topic = { name: topic.name, subtopics: newTopicAndSubtopics.subtopics };
+      
+      topic = { name: topic.name, subtopics: subtopics };
     }
 
     // Use the subtopics as high-level topics and merge them in later.
