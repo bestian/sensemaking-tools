@@ -585,32 +585,20 @@ export class OpenRouterModel extends Model {
       console.log('   ❌ Still invalid after streaming fixes, attempting structural repair...');
     }
     
-    // 進行結構性修復（括號對齊）
+    // 進行結構性修復
     fixedResponse = this.fixStructuralIssues(fixedResponse);
-    
-    // 嘗試解析修復後的內容
-    try {
-      JSON.parse(fixedResponse);
-      console.log('   ✅ JSON validation passed after structural repair');
-      return fixedResponse;
-    } catch {
-      console.log('   ❌ Still invalid after structural repair, attempting smart truncation...');
-    }
-    
-    // 智能截斷：在括號對齊的基礎上進行截斷
-    fixedResponse = this.smartTruncateJson(fixedResponse);
     
     // 最終驗證
     try {
       JSON.parse(fixedResponse);
-      console.log('   ✅ JSON validation passed after smart truncation');
+      console.log('   ✅ JSON validation passed after structural repair');
       return fixedResponse;
     } catch (error) {
       console.log('   ❌ JSON validation failed after all repair attempts');
       console.log('   Final repair attempt failed:', error);
       
-      // 最後的嘗試：強制修復成有效的 JSON
-      return this.forceFixJson(fixedResponse);
+      // 最後的嘗試：找到最後一個完整的 JSON 結構
+      return this.findLastValidJson(fixedResponse);
     }
   }
   
@@ -675,94 +663,11 @@ export class OpenRouterModel extends Model {
 
 
   /**
-   * 智能截斷 JSON：在括號對齊的基礎上進行截斷
+   * 找到最後一個有效的 JSON 結構
    */
-  private smartTruncateJson(response: string): string {
-    console.log('   🔍 Starting smart JSON truncation...');
+  private findLastValidJson(response: string): string {
+    console.log('   🔍 Searching for last valid JSON structure...');
     
-    // 分析括號結構
-    const bracketAnalysis = this.analyzeBracketStructure(response);
-    console.log('   Bracket analysis:', bracketAnalysis);
-    
-    // 如果括號已經平衡，嘗試找到最後一個完整的物件或陣列
-    if (bracketAnalysis.isBalanced) {
-      console.log('   Brackets are balanced, looking for complete structures...');
-      return this.findCompleteJsonStructure(response);
-    }
-    
-    // 如果括號不平衡，先嘗試修復
-    const fixedResponse = this.balanceBrackets(response, bracketAnalysis);
-    
-    // 嘗試解析修復後的內容
-    try {
-      JSON.parse(fixedResponse);
-      console.log('   ✅ Successfully balanced brackets and created valid JSON');
-      return fixedResponse;
-    } catch {
-      console.log('   ❌ Still invalid after bracket balancing, attempting structure completion...');
-    }
-    
-    // 如果修復後仍然無效，嘗試完成結構
-    return this.completeJsonStructure(fixedResponse);
-  }
-  
-  /**
-   * 分析括號結構
-   */
-  private analyzeBracketStructure(response: string): {
-    openBraces: number;
-    closeBraces: number;
-    openBrackets: number;
-    closeBrackets: number;
-    isBalanced: boolean;
-    braceBalance: number;
-    bracketBalance: number;
-  } {
-    const openBraces = (response.match(/\{/g) || []).length;
-    const closeBraces = (response.match(/\}/g) || []).length;
-    const openBrackets = (response.match(/\[/g) || []).length;
-    const closeBrackets = (response.match(/\]/g) || []).length;
-    
-    const braceBalance = openBraces - closeBraces;
-    const bracketBalance = openBrackets - closeBrackets;
-    const isBalanced = braceBalance === 0 && bracketBalance === 0;
-    
-    return {
-      openBraces,
-      closeBraces,
-      openBrackets,
-      closeBrackets,
-      isBalanced,
-      braceBalance,
-      bracketBalance
-    };
-  }
-  
-  /**
-   * 平衡括號
-   */
-  private balanceBrackets(response: string, analysis: ReturnType<typeof this.analyzeBracketStructure>): string {
-    let balanced = response;
-    
-    // 補上缺少的右大括號
-    if (analysis.braceBalance > 0) {
-      balanced += '}'.repeat(analysis.braceBalance);
-      console.log(`   Added ${analysis.braceBalance} closing braces`);
-    }
-    
-    // 補上缺少的右方括號
-    if (analysis.bracketBalance > 0) {
-      balanced += ']'.repeat(analysis.bracketBalance);
-      console.log(`   Added ${analysis.bracketBalance} closing brackets`);
-    }
-    
-    return balanced;
-  }
-  
-  /**
-   * 找到完整的 JSON 結構
-   */
-  private findCompleteJsonStructure(response: string): string {
     // 尋找最後一個完整的物件
     const objectMatches = response.match(/\{[^{}]*\}/g);
     if (objectMatches && objectMatches.length > 0) {
@@ -777,7 +682,7 @@ export class OpenRouterModel extends Model {
       if (openBrackets > closeBrackets) {
         // 物件在陣列中，需要補上陣列結尾
         const result = response.substring(0, lastObjectIndex + lastObject.length) + ']';
-        console.log('   Found last complete object in array, truncating there');
+        console.log('   Found last valid object in array, truncating there');
         return result;
       }
     }
@@ -788,7 +693,7 @@ export class OpenRouterModel extends Model {
       const lastArray = arrayMatches[arrayMatches.length - 1];
       const lastArrayIndex = response.lastIndexOf(lastArray);
       const result = response.substring(0, lastArrayIndex + lastArray.length);
-      console.log('   Found last complete array, truncating there');
+      console.log('   Found last valid array, truncating there');
       return result;
     }
     
@@ -800,94 +705,8 @@ export class OpenRouterModel extends Model {
     }
     
     // 如果都失敗了，返回原始內容
-    console.log('   Could not find complete JSON structure, returning original');
+    console.log('   Could not find valid JSON structure, returning original');
     return response;
-  }
-  
-  /**
-   * 完成 JSON 結構
-   */
-  private completeJsonStructure(response: string): string {
-    console.log('   🔧 Completing JSON structure...');
-    
-    let completed = response;
-    
-    // 如果是以陣列開頭，確保陣列結構完整
-    if (response.trim().startsWith('[')) {
-      // 找到最後一個完整的物件
-      const objectMatches = response.match(/\{[^{}]*\}/g);
-      if (objectMatches && objectMatches.length > 0) {
-        const lastObject = objectMatches[objectMatches.length - 1];
-        const lastObjectIndex = response.lastIndexOf(lastObject);
-        
-        // 截斷到最後一個完整物件，然後補上陣列結尾
-        completed = response.substring(0, lastObjectIndex + lastObject.length) + ']';
-        console.log('   Completed array structure with last valid object');
-      } else {
-        // 沒有完整物件，補上空陣列
-        completed = '[]';
-        console.log('   No valid objects found, returning empty array');
-      }
-    }
-    // 如果是以物件開頭，確保物件結構完整
-    else if (response.trim().startsWith('{')) {
-      // 找到最後一個完整的屬性
-      const propertyMatches = response.match(/"\w+"\s*:\s*[^,}]+/g);
-      if (propertyMatches && propertyMatches.length > 0) {
-        const lastProperty = propertyMatches[propertyMatches.length - 1];
-        const lastPropertyIndex = response.lastIndexOf(lastProperty);
-        
-        // 截斷到最後一個完整屬性，然後補上物件結尾
-        completed = response.substring(0, lastPropertyIndex + lastProperty.length) + '}';
-        console.log('   Completed object structure with last valid property');
-      } else {
-        // 沒有完整屬性，補上空物件
-        completed = '{}';
-        console.log('   No valid properties found, returning empty object');
-      }
-    }
-    
-    return completed;
-  }
-  
-  /**
-   * 強制修復 JSON（最後手段）
-   */
-  private forceFixJson(response: string): string {
-    console.log('   🚨 Force fixing JSON as last resort...');
-    
-    const trimmed = response.trim();
-    
-    // 如果開頭是陣列，強制補上結尾
-    if (trimmed.startsWith('[')) {
-      // 尋找最後一個看起來完整的物件
-      const lastBraceIndex = trimmed.lastIndexOf('}');
-      if (lastBraceIndex > 0) {
-        const result = trimmed.substring(0, lastBraceIndex + 1) + ']';
-        console.log('   Force fixed array structure');
-        return result;
-      } else {
-        console.log('   Force returning empty array');
-        return '[]';
-      }
-    }
-    
-    // 如果開頭是物件，強制補上結尾
-    if (trimmed.startsWith('{')) {
-      const lastBraceIndex = trimmed.lastIndexOf('}');
-      if (lastBraceIndex > 0) {
-        const result = trimmed.substring(0, lastBraceIndex + 1);
-        console.log('   Force fixed object structure');
-        return result;
-      } else {
-        console.log('   Force returning empty object');
-        return '{}';
-      }
-    }
-    
-    // 如果都不符合，嘗試包裝成陣列
-    console.log('   Force wrapping in array');
-    return `[${trimmed}]`;
   }
 
   /**
