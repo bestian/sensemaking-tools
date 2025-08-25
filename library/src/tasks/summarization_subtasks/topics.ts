@@ -127,7 +127,7 @@ export class AllTopicsSummary extends RecursiveSummary<SummaryStats> {
     console.log(`[DEBUG] AllTopicsSummary.getSummary() overviewText result: "${overviewText}"`);
 
     // Now construct the individual Topic summaries
-    const relativeContext = new RelativeContext(topicStats);
+    const relativeContext = new RelativeContext(topicStats, this.output_lang);
     const topicSummaries: (() => Promise<SummaryContent>)[] = topicStats.map(
       (topicStat) =>
         // Create a callback function for each summary and add it to the list, preparing them for parallel execution.
