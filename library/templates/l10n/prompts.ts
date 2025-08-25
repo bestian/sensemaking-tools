@@ -971,3 +971,111 @@ export function getTopSubtopicsTitleTemplate(
     .replace("{topicName}", topicName)
     .replace("{commentCount}", commentCount.toString());
 }
+
+/**
+ * Multi-language labels for relative agreement levels
+ */
+export const RELATIVE_AGREEMENT_LABELS: Record<SupportedLanguage, Record<string, string>> = {
+  "en": {
+    "lowAlignment": "low alignment",
+    "moderatelyLowAlignment": "moderately low alignment",
+    "moderatelyHighAlignment": "moderately high alignment",
+    "highAlignment": "high alignment"
+  },
+  "zh-TW": {
+    "lowAlignment": "低度一致",
+    "moderatelyLowAlignment": "中度偏低一致",
+    "moderatelyHighAlignment": "中度偏高一致",
+    "highAlignment": "高度一致"
+  },
+  "zh-CN": {
+    "lowAlignment": "低度一致",
+    "moderatelyLowAlignment": "中度偏低一致",
+    "moderatelyHighAlignment": "中度偏高一致",
+    "highAlignment": "高度一致"
+  },
+  "fr": {
+    "lowAlignment": "faible alignement",
+    "moderatelyLowAlignment": "alignement modérément faible",
+    "moderatelyHighAlignment": "alignement modérément élevé",
+    "highAlignment": "alignement élevé"
+  },
+  "es": {
+    "lowAlignment": "baja alineación",
+    "moderatelyLowAlignment": "alineación moderadamente baja",
+    "moderatelyHighAlignment": "alineación moderadamente alta",
+    "highAlignment": "alta alineación"
+  },
+  "ja": {
+    "lowAlignment": "低い一致",
+    "moderatelyLowAlignment": "中程度に低い一致",
+    "moderatelyHighAlignment": "中程度に高い一致",
+    "highAlignment": "高い一致"
+  }
+};
+
+/**
+ * Multi-language labels for relative engagement levels
+ */
+export const RELATIVE_ENGAGEMENT_LABELS: Record<SupportedLanguage, Record<string, string>> = {
+  "en": {
+    "lowEngagement": "low engagement",
+    "moderatelyLowEngagement": "moderately low engagement",
+    "moderatelyHighEngagement": "moderately high engagement",
+    "highEngagement": "high engagement"
+  },
+  "zh-TW": {
+    "lowEngagement": "低度參與",
+    "moderatelyLowEngagement": "中度偏低參與",
+    "moderatelyHighEngagement": "中度偏高參與",
+    "highEngagement": "高度參與"
+  },
+  "zh-CN": {
+    "lowEngagement": "低度参与",
+    "moderatelyLowEngagement": "中度偏低参与",
+    "moderatelyHighEngagement": "中度偏高参与",
+    "highEngagement": "高度参与"
+  },
+  "fr": {
+    "lowEngagement": "faible engagement",
+    "moderatelyLowEngagement": "engagement modérément faible",
+    "moderatelyHighEngagement": "engagement modérément élevé",
+    "highEngagement": "engagement élevé"
+  },
+  "es": {
+    "lowEngagement": "bajo compromiso",
+    "moderatelyLowEngagement": "compromiso moderadamente bajo",
+    "moderatelyHighEngagement": "compromiso moderadamente alto",
+    "highEngagement": "alto compromiso"
+  },
+  "ja": {
+    "lowEngagement": "低い関与",
+    "moderatelyLowEngagement": "中程度に低い関与",
+    "moderatelyHighEngagement": "中程度に高い関与",
+    "highEngagement": "高い関与"
+  }
+};
+
+/**
+ * Get the localized label for relative agreement
+ * @param language The target language
+ * @param labelKey The key for the specific label
+ * @returns The localized label for relative agreement
+ */
+export function getRelativeAgreementLabel(language: SupportedLanguage, labelKey: string): string {
+  console.log(`[DEBUG] getRelativeAgreementLabel() language: ${language}, labelKey: ${labelKey}`);
+  const labels = RELATIVE_AGREEMENT_LABELS[language] || RELATIVE_AGREEMENT_LABELS["en"];
+  return labels[labelKey] || labels["lowAlignment"];
+}
+
+/**
+ * Get the localized label for relative engagement
+ * @param language The target language
+ * @param labelKey The key for the specific label
+ * @returns The localized label for relative engagement
+ */
+export function getRelativeEngagementLabel(language: SupportedLanguage, labelKey: string): string {
+  console.log(`[DEBUG] getRelativeEngagementLabel() language: ${language}, labelKey: ${labelKey}`);
+  const labels = RELATIVE_ENGAGEMENT_LABELS[language] || RELATIVE_ENGAGEMENT_LABELS["en"];
+  return labels[labelKey] || labels["lowEngagement"];
+}
