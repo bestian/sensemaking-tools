@@ -339,8 +339,11 @@ export class OpenRouterModel extends Model {
           break;
         }
         
-        // console.log(`   Received chunk ${context.chunkCount}, buffer size: ${context.buffer.length}`);
-
+        // 顯示前幾個chunks的原始內容
+        /* if (context.chunkCount <= 5) {
+          console.log(`   Raw chunk ${context.chunkCount}: "${decodedChunk}"`);
+        } */
+        
         // Process complete lines from buffer
         let doneSignalReceived = false;
         while (true) {
@@ -376,6 +379,12 @@ export class OpenRouterModel extends Model {
               console.warn('   Invalid JSON in streaming response:', e, 'Line:', line);
             }
           }
+          /*  else if (line.trim()) {
+            // 顯示非data行的內容
+            if (context.chunkCount <= 10) {
+              console.log(`   Non-data line: "${line}"`);
+            }
+          } */
         }
         
         // 如果收到 [DONE] 信號，處理完 buffer 中剩餘的內容後退出主循環
@@ -419,6 +428,37 @@ export class OpenRouterModel extends Model {
   }
 
   /**
+   * 檢測是否為包含 JSON 的混合格式
+   */
+  private isMixedFormat(response: string): boolean {
+    const trimmed = response.trim();
+    
+    // 檢查是否包含 JSON 代碼區塊
+    const hasJsonBlock = /```json\s*[\s\S]*?```/g.test(trimmed);
+    const hasCodeBlock = /```\s*[\s\S]*?```/g.test(trimmed);
+    
+    // 檢查是否包含 JSON 結構（大括號或方括號）
+    const hasJsonStructure = /\{[\s\S]*\}|\[[\s\S]*\]/g.test(trimmed);
+    
+    // 檢查是否為純文本描述（包含中文、英文等自然語言）
+    const hasNaturalLanguage = /[\u4e00-\u9fff\u3400-\u4dbf]|[a-zA-Z]{3,}/g.test(trimmed);
+    
+    // 如果同時包含自然語言和 JSON 結構，則為混合格式
+    if (hasNaturalLanguage && (hasJsonBlock || hasCodeBlock || hasJsonStructure)) {
+      console.log('   🔍 Detected mixed format: natural language + JSON structure');
+      return true;
+    }
+    
+    // 如果包含 JSON 代碼區塊，也視為混合格式
+    if (hasJsonBlock || hasCodeBlock) {
+      console.log('   🔍 Detected code block format');
+      return true;
+    }
+    
+    return false;
+  }
+
+  /**
    * 處理可能的 streaming 回應，嘗試修復不完整的回應
    */
   private processStreamedResponse(response: string): string {
@@ -438,6 +478,16 @@ export class OpenRouterModel extends Model {
     // 移除多餘的空白行
     processedResponse = processedResponse.replace(/\n\s*\n/g, '\n');
     
+    // 智能格式檢測：檢查是否為混合格式（文本 + JSON）
+    if (this.isMixedFormat(processedResponse)) {
+      console.log('   📝 Detected mixed format, extracting JSON blocks...');
+      const extractedJson = this.extractJsonFromMixedContent(processedResponse);
+      if (extractedJson) {
+        console.log('   ✅ Successfully extracted JSON from mixed content');
+        return extractedJson;
+      }
+    }
+    
     // 檢查並修復 JSON 完整性
     processedResponse = this.fixIncompleteJson(processedResponse);
     
@@ -446,6 +496,64 @@ export class OpenRouterModel extends Model {
     console.log('   Final processed content:', finalResponse);
     
     return finalResponse;
+  }
+
+  /**
+   * 從混合內容中提取 JSON
+   */
+  private extractJsonFromMixedContent(content: string): string | null {
+    // 優先尋找 ```json ... ``` 區塊
+    const jsonBlockRegex = /```json\s*([\s\S]*?)\s*```/g;
+    const jsonMatches = [...content.matchAll(jsonBlockRegex)];
+    
+    if (jsonMatches.length > 0) {
+      console.log(`   🔍 Found ${jsonMatches.length} JSON code blocks`);
+      const jsonContent = jsonMatches[0][1].trim();
+      if (this.isValidJson(jsonContent)) {
+        console.log(`   ✅ Extracted valid JSON from json block`);
+        return jsonContent;
+      }
+    }
+    
+    // 尋找 ``` ... ``` 區塊（沒有 json 標籤）
+    const codeBlockRegex = /```\s*([\s\S]*?)\s*```/g;
+    const codeMatches = [...content.matchAll(codeBlockRegex)];
+    
+    if (codeMatches.length > 0) {
+      console.log(`   🔍 Found ${codeMatches.length} code blocks`);
+      for (const match of codeMatches) {
+        const codeContent = match[1].trim();
+        if (this.isValidJson(codeContent)) {
+          console.log(`   ✅ Found valid JSON in code block`);
+          return codeContent;
+        }
+      }
+    }
+    
+    // 尋找內嵌的 JSON 結構
+    const jsonObjectRegex = /\{[\s\S]*\}/g;
+    const jsonArrayRegex = /\[[\s\S]*\]/g;
+    
+    const objectMatches = [...content.matchAll(jsonObjectRegex)];
+    const arrayMatches = [...content.matchAll(jsonArrayRegex)];
+    
+    if (objectMatches.length > 0 || arrayMatches.length > 0) {
+      console.log(`   🔍 Found ${objectMatches.length} JSON objects and ${arrayMatches.length} JSON arrays`);
+      
+      // 返回最長的匹配項
+      const allMatches = [...objectMatches, ...arrayMatches];
+      const longestMatch = allMatches.reduce((longest, current) => 
+        current[0].length > longest[0].length ? current : longest
+      );
+      
+      if (this.isValidJson(longestMatch[0])) {
+        console.log(`   ✅ Found valid JSON structure`);
+        return longestMatch[0];
+      }
+    }
+    
+    console.log('   ❌ No valid JSON found in mixed content');
+    return null;
   }
 
   /**
@@ -601,6 +709,18 @@ export class OpenRouterModel extends Model {
     return response;
   }
 
+  /**
+   * 驗證 JSON 是否有效
+   */
+  private isValidJson(json: string): boolean {
+    try {
+      JSON.parse(json);
+      return true;
+    } catch (e) {
+      console.warn('   Invalid JSON in extracted block:', e);
+      return false;
+    }
+  }
 
 }
 
