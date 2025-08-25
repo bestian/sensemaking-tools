@@ -214,11 +214,32 @@ export function isMdListValid(mdList: string, topicNames: string[]): boolean {
       console.log("Line does not match expected format:", line);
       return false;
     }
+    
     // Check to make sure that every single topicName in topicNames is in the list, and in the right order
-    if (!line.includes(topicNames[index])) {
-      console.log(`Topic "${topicNames[index]}" not found at line:\n`, line);
+    // 使用更寬鬆的檢查，處理可能的格式變化
+    const expectedTopicName = topicNames[index];
+    const normalizedExpected = normalizeTopicName(expectedTopicName);
+    const normalizedLine = normalizeTopicName(line);
+    
+    if (!normalizedLine.includes(normalizedExpected)) {
+      console.log(`Topic "${expectedTopicName}" not found at line:\n`, line);
+      console.log(`Normalized expected: "${normalizedExpected}"`);
+      console.log(`Normalized line: "${normalizedLine}"`);
       return false;
     }
   }
   return true;
+}
+
+/**
+ * 標準化主題名稱，移除可能影響匹配的字符
+ */
+function normalizeTopicName(topicName: string): string {
+  return topicName
+    .toLowerCase()
+    .replace(/["""]/g, '')           // 移除各種引號
+    .replace(/['']/g, '')            // 移除各種單引號
+    .replace(/[()]/g, '')            // 移除括號
+    .replace(/\s+/g, ' ')            // 標準化空白字符
+    .trim();
 }
