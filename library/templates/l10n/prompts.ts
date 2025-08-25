@@ -289,7 +289,9 @@ After analysis of the comments, determine the optimal number of subtopics to rep
 Justify why having fewer subtopics would be less optimal (potentially oversimplifying and missing key nuances), and why having more subtopics would also be less optimal (potentially leading to redundancy and a less clear overall structure).
 After determining the optimal number of subtopics, identify those subtopics.
 
-Important Considerations:
+CRITICAL REQUIREMENTS:
+- You MUST return at least one subtopic. NEVER return an empty array or empty content.
+- If you cannot identify distinct subtopics, create at least one subtopic that captures the main theme of the comments.
 - No subtopics should have the same name as the overarching topic.
 - There are other overarching topics that are being used on different sets of comments, do not use these overarching topic names as identified subtopics names: {otherTopicNames}
 
@@ -315,7 +317,9 @@ Example of Incorrect Output:
 證明為什麼子主題較少會不太理想（可能過度簡化並錯過關鍵細微差別），以及為什麼子主題較多也會不太理想（可能導致冗餘和不太清晰的整體結構）。
 確定最佳子主題數量後，識別這些子主題。
 
-重要考慮事項：
+關鍵要求：
+- 您必須返回至少一個子主題。絕對不要返回空陣列或空白內容。
+- 如果您無法識別不同的子主題，請創建至少一個能捕捉評論主要主題的子主題。
 - 任何子主題都不應該與總體主題同名。
 - 有其他總體主題正在不同的評論集合中使用，請勿將這些總體主題名稱用作識別的子主題名稱：{otherTopicNames}
 
@@ -341,7 +345,9 @@ Example of Incorrect Output:
 证明为什么子主题较少会不太理想（可能过度简化并错过关键细微差别），以及为什么子主题较多也会不太理想（可能导致冗余和不太清晰的整体结构）。
 确定最佳子主题数量后，识别这些子主题。
 
-重要考虑事项：
+关键要求：
+- 您必须返回至少一个子主题。绝对不要返回空数组或空白内容。
+- 如果您无法识别不同的子主题，请创建至少一个能捕捉评论主要主题的子主题。
 - 任何子主题都不应该与总体主题同名。
 - 有其他总体主题正在不同的评论集合中使用，请勿将这些总体主题名称用作识别的子主题名称：{otherTopicNames}
 
@@ -367,7 +373,9 @@ Après analyse des commentaires, déterminez le nombre optimal de sous-sujets po
 Justifiez pourquoi avoir moins de sous-sujets serait moins optimal (potentiellement simplifier à l'excès et manquer des nuances clés), et pourquoi avoir plus de sous-sujets serait également moins optimal (potentiellement mener à la redondance et une structure globale moins claire).
 Après avoir déterminé le nombre optimal de sous-sujets, identifiez ces sous-sujets.
 
-Considérations importantes :
+Exigences critiques :
+- Vous DEVEZ retourner au moins un sous-sujet. NE retournez JAMAIS un tableau vide ou un contenu vide.
+- Si vous ne pouvez pas identifier des sous-sujets distincts, créez au moins un sous-sujet qui capture le thème principal des commentaires.
 - Aucun sous-sujet ne doit avoir le même nom que le sujet général.
 - Il y a d'autres sujets généraux qui sont utilisés sur différents ensembles de commentaires, n'utilisez pas ces noms de sujets généraux comme noms de sous-sujets identifiés : {otherTopicNames}
 
@@ -393,7 +401,9 @@ Después del análisis de los comentarios, determine el número óptimo de subte
 Justifique por qué tener menos subtemas sería menos óptimo (potencialmente simplificando en exceso y perdiendo matices clave), y por qué tener más subtemas también sería menos óptimo (potencialmente llevando a la redundancia y una estructura general menos clara).
 Después de determinar el número óptimo de subtemas, identifique esos subtemas.
 
-Consideraciones importantes:
+Requisitos críticos:
+- DEBE devolver al menos un subtema. NUNCA devuelva un array vacío o contenido vacío.
+- Si no puede identificar subtemas distintos, cree al menos un subtema que capture el tema principal de los comentarios.
 - Ningún subtema debe tener el mismo nombre que el tema general.
 - Hay otros temas generales que se están utilizando en diferentes conjuntos de comentarios, no use estos nombres de temas generales como nombres de subtemas identificados: {otherTopicNames}
 
@@ -419,7 +429,9 @@ Ejemplo de salida incorrecta:
 サブトピックが少なすぎることが最適でない理由（内容を過度に簡素化し、重要なニュアンスを見逃す可能性）と、サブトピックが多すぎることも最適でない理由（冗長性を招き、全体的な構造が不明確になる可能性）を証明してください。
 最適なサブトピック数を決定した後、それらのサブトピックを特定してください。
 
-重要な考慮事項：
+重要な要件：
+- 少なくとも1つのサブトピックを返す必要があります。空の配列や空のコンテンツを返してはいけません。
+- 異なるサブトピックを識別できない場合は、コメントの主要なテーマを捉える少なくとも1つのサブトピックを作成してください。
 - サブトピックは包括的なトピックと同じ名前を持つべきではありません。
 - 異なるコメントセットで使用されている他の包括的なトピックがあります。これら包括的なトピック名を識別されたサブトピック名として使用しないでください：{otherTopicNames}
 
