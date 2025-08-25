@@ -150,7 +150,6 @@ Voici les sujets :
 {topicNames}`,
 
 
-
   "es": `Su trabajo es componer un resumen de los hallazgos clave de una discusión pública, basado en resúmenes ya compuestos que corresponden a temas y subtemas identificados en dicha discusión. Estos resúmenes de temas y subtemas se basan en comentarios y patrones de votación que los participantes enviaron como parte de la discusión. Debe formatear los resultados como una lista markdown, para ser incluida cerca de la parte superior del informe final, que incluirá los resúmenes completos de temas y subtemas. No pretenda que sostiene alguna de estas opiniones. Usted no es un participante en esta discusión. No incluya números específicos sobre cuántos comentarios se incluyeron en cada tema o subtema, ya que estos se incluirán más tarde en la salida del informe final. Tampoco necesita recapitular el contexto de la conversación, ya que esto se habrá establecido anteriormente en el informe. Cuando sea posible, prefiera describir los resultados en términos de las "declaraciones" enviadas o la "conversación" general, en lugar de en términos de las perspectivas de los participantes (Nota: "comentarios" y "declaraciones" son lo mismo, pero por el bien de esta parte del resumen, solo use el término "declaraciones"). Recuerde: esto es solo un componente de un informe más grande, y debe componerlo para que fluya naturalmente en el contexto del resto del informe. Sea claro y conciso en su escritura, y no use la voz pasiva o pronombres ambiguos.
 
 La estructura de la lista que produce debe estar en términos de nombres de temas, en el orden que sigue. Cada elemento de la lista debe comenzar en negrita con el nombre del tema (incluyendo el porcentaje, exactamente como se lista a continuación), luego dos puntos, luego un resumen corto de una o dos oraciones para el tema correspondiente. La respuesta completa debe ser únicamente la lista markdown, sin otro texto. Por ejemplo, un elemento de la lista podría verse así:
@@ -935,4 +934,43 @@ export function getTopSubtopicsThemesPrompt(language: SupportedLanguage, topicNa
   console.log(`[DEBUG] getTopSubtopicsThemesPrompt() language: ${language}`);
   const prompt = TOP_SUBTOPICS_THEMES_PROMPT[language] || TOP_SUBTOPICS_THEMES_PROMPT["en"];
   return prompt.replace("{topicName}", topicName);
+}
+
+/**
+ * Multi-language template for top subtopics title
+ */
+export const TOP_SUBTOPICS_TITLE_TEMPLATE: Record<SupportedLanguage, string> = {
+  "en": "### {index}. {topicName} ({commentCount} statements)",
+  
+  "zh-TW": "### {index}. {topicName} ({commentCount} 個陳述)",
+  
+  "zh-CN": "### {index}. {topicName} ({commentCount} 个陈述)",
+  
+  "fr": "### {index}. {topicName} ({commentCount} déclarations)",
+  
+  "es": "### {index}. {topicName} ({commentCount} declaraciones)",
+  
+  "ja": "### {index}. {topicName} ({commentCount} 個の声明文)"
+};
+
+/**
+ * Get the localized title template for top subtopics
+ * @param language The target language
+ * @param index The index number
+ * @param topicName The name of the topic
+ * @param commentCount The number of comments
+ * @returns The localized title with placeholders replaced
+ */
+export function getTopSubtopicsTitleTemplate(
+  language: SupportedLanguage, 
+  index: number, 
+  topicName: string, 
+  commentCount: number
+): string {
+  console.log(`[DEBUG] getTopSubtopicsTitleTemplate() language: ${language}`);
+  const template = TOP_SUBTOPICS_TITLE_TEMPLATE[language] || TOP_SUBTOPICS_TITLE_TEMPLATE["en"];
+  return template
+    .replace("{index}", (index + 1).toString())
+    .replace("{topicName}", topicName)
+    .replace("{commentCount}", commentCount.toString());
 }

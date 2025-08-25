@@ -29,7 +29,7 @@ import {
 } from "../../../templates/l10n";
 
 // Import localized prompts
-import { getTopSubtopicsThemesPrompt } from "../../../templates/l10n/prompts";
+import { getTopSubtopicsThemesPrompt, getTopSubtopicsTitleTemplate } from "../../../templates/l10n/prompts";
 
 export class TopSubtopicsSummary extends RecursiveSummary<SummaryStats> {
   async getSummary(): Promise<SummaryContent> {
@@ -95,7 +95,7 @@ export class TopSubtopicsSummary extends RecursiveSummary<SummaryStats> {
     
     const themesSummary = { title: themesTitle, text: text };
     return Promise.resolve({
-      title: `### ${index + 1}. ${st.name} (${st.commentCount} statements)`,
+      title: getTopSubtopicsTitleTemplate(this.output_lang, index, st.name, st.commentCount),
       text: "",
       subContents: [themesSummary],
     });
