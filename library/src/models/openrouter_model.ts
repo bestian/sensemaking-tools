@@ -763,73 +763,39 @@ export class OpenRouterModel extends Model {
    * 找到完整的 JSON 結構
    */
   private findCompleteJsonStructure(response: string): string {
-    console.log('   🔍 Finding complete JSON structure...');
-    
-    // 如果開頭是方括號，表示這是一個陣列，必須保持陣列結構
-    if (response.trim().startsWith('[')) {
-      console.log('   🔍 Response starts with [ - maintaining array structure');
+    // 尋找最後一個完整的物件
+    const objectMatches = response.match(/\{[^{}]*\}/g);
+    if (objectMatches && objectMatches.length > 0) {
+      const lastObject = objectMatches[objectMatches.length - 1];
+      const lastObjectIndex = response.lastIndexOf(lastObject);
       
-      // 尋找最後一個完整的物件
-      const objectMatches = response.match(/\{[^{}]*\}/g);
-      if (objectMatches && objectMatches.length > 0) {
-        const lastObject = objectMatches[objectMatches.length - 1];
-        const lastObjectIndex = response.lastIndexOf(lastObject);
-        
-        // 檢查這個物件是否在陣列中
-        const beforeObject = response.substring(0, lastObjectIndex);
-        const openBrackets = (beforeObject.match(/\[/g) || []).length;
-        const closeBrackets = (beforeObject.match(/\]/g) || []).length;
-        
-        if (openBrackets > closeBrackets) {
-          // 物件在陣列中，需要補上陣列結尾
-          const result = response.substring(0, lastObjectIndex + lastObject.length) + ']';
-          console.log('   Found last complete object in array, truncating there');
-          return result;
-        }
-      }
+      // 檢查這個物件是否在陣列中
+      const beforeObject = response.substring(0, lastObjectIndex);
+      const openBrackets = (beforeObject.match(/\[/g) || []).length;
+      const closeBrackets = (beforeObject.match(/\]/g) || []).length;
       
-      // 如果沒有找到完整物件，檢查是否有部分物件結構
-      const partialObjectMatch = response.match(/\{[^{}]*$/);
-      if (partialObjectMatch) {
-        // 有部分物件結構，補上結尾並保持陣列格式
-        const partialObject = partialObjectMatch[0] + '}';
-        const result = '[' + partialObject + ']';
-        console.log('   Found partial object, completing array structure');
+      if (openBrackets > closeBrackets) {
+        // 物件在陣列中，需要補上陣列結尾
+        const result = response.substring(0, lastObjectIndex + lastObject.length) + ']';
+        console.log('   Found last complete object in array, truncating there');
         return result;
       }
-      
-      // 最後的嘗試：如果開頭是陣列，至少補上結尾
-      const result = response.trim() + ']';
-      console.log('   Array starts but never ends, adding closing bracket');
+    }
+    
+    // 如果沒有找到完整物件，嘗試找到最後一個完整的陣列
+    const arrayMatches = response.match(/\[[^\[\]]*\]/g);
+    if (arrayMatches && arrayMatches.length > 0) {
+      const lastArray = arrayMatches[arrayMatches.length - 1];
+      const lastArrayIndex = response.lastIndexOf(lastArray);
+      const result = response.substring(0, lastArrayIndex + lastArray.length);
+      console.log('   Found last complete array, truncating there');
       return result;
     }
     
-    // 如果開頭是大括號，表示這是一個物件
-    if (response.trim().startsWith('{')) {
-      console.log('   🔍 Response starts with { - maintaining object structure');
-      
-      // 尋找最後一個完整的物件
-      const objectMatches = response.match(/\{[^{}]*\}/g);
-      if (objectMatches && objectMatches.length > 0) {
-        const lastObject = objectMatches[objectMatches.length - 1];
-        const lastObjectIndex = response.lastIndexOf(lastObject);
-        const result = response.substring(0, lastObjectIndex + lastObject.length);
-        console.log('   Found last complete object, truncating there');
-        return result;
-      }
-      
-      // 如果沒有找到完整物件，檢查是否有部分物件結構
-      const partialObjectMatch = response.match(/\{[^{}]*$/);
-      if (partialObjectMatch) {
-        // 有部分物件結構，補上結尾
-        const result = partialObjectMatch[0] + '}';
-        console.log('   Found partial object, completing object structure');
-        return result;
-      }
-      
-      // 最後的嘗試：如果開頭是物件，至少補上結尾
-      const result = response.trim() + '}';
-      console.log('   Object starts but never ends, adding closing brace');
+    // 最後的嘗試：如果開頭是陣列，至少補上結尾
+    if (response.trim().startsWith('[')) {
+      const result = response.trim() + ']';
+      console.log('   Array starts but never ends, adding closing bracket');
       return result;
     }
     
@@ -846,10 +812,8 @@ export class OpenRouterModel extends Model {
     
     let completed = response;
     
-    // 如果是以方括號開頭，表示這是一個陣列，必須保持陣列結構
+    // 如果是以陣列開頭，確保陣列結構完整
     if (response.trim().startsWith('[')) {
-      console.log('   🔍 Response starts with [ - maintaining array structure');
-      
       // 找到最後一個完整的物件
       const objectMatches = response.match(/\{[^{}]*\}/g);
       if (objectMatches && objectMatches.length > 0) {
@@ -860,18 +824,9 @@ export class OpenRouterModel extends Model {
         completed = response.substring(0, lastObjectIndex + lastObject.length) + ']';
         console.log('   Completed array structure with last valid object');
       } else {
-        // 檢查是否有部分物件結構
-        const partialObjectMatch = response.match(/\{[^{}]*$/);
-        if (partialObjectMatch) {
-          // 有部分物件結構，補上結尾並保持陣列格式
-          const partialObject = partialObjectMatch[0] + '}';
-          completed = '[' + partialObject + ']';
-          console.log('   Completed array structure with partial object');
-        } else {
-          // 完全沒有物件結構，補上空陣列
-          completed = '[]';
-          console.log('   No valid objects found, returning empty array');
-        }
+        // 沒有完整物件，補上空陣列
+        completed = '[]';
+        console.log('   No valid objects found, returning empty array');
       }
     }
     // 如果是以物件開頭，確保物件結構完整
@@ -903,37 +858,22 @@ export class OpenRouterModel extends Model {
     
     const trimmed = response.trim();
     
-    // 如果開頭是方括號，表示這是一個陣列，必須保持陣列結構
+    // 如果開頭是陣列，強制補上結尾
     if (trimmed.startsWith('[')) {
-      console.log('   🔍 Response starts with [ - this is an array, must maintain array structure');
-      
       // 尋找最後一個看起來完整的物件
       const lastBraceIndex = trimmed.lastIndexOf('}');
       if (lastBraceIndex > 0) {
-        // 找到完整物件，截斷到那裡並補上陣列結尾
         const result = trimmed.substring(0, lastBraceIndex + 1) + ']';
-        console.log('   Force fixed array structure with last complete object');
+        console.log('   Force fixed array structure');
         return result;
       } else {
-        // 沒有找到完整物件，檢查是否有部分物件結構
-        const partialObjectMatch = trimmed.match(/\{[^{}]*$/);
-        if (partialObjectMatch) {
-          // 有部分物件結構，補上結尾並包裝成陣列
-          const partialObject = partialObjectMatch[0] + '}';
-          const result = '[' + partialObject + ']';
-          console.log('   Force fixed array structure with partial object');
-          return result;
-        } else {
-          // 完全沒有物件結構，返回空陣列
-          console.log('   Force returning empty array');
-          return '[]';
-        }
+        console.log('   Force returning empty array');
+        return '[]';
       }
     }
     
-    // 如果開頭是大括號，表示這是一個物件
+    // 如果開頭是物件，強制補上結尾
     if (trimmed.startsWith('{')) {
-      console.log('   🔍 Response starts with { - this is an object');
       const lastBraceIndex = trimmed.lastIndexOf('}');
       if (lastBraceIndex > 0) {
         const result = trimmed.substring(0, lastBraceIndex + 1);
@@ -945,9 +885,8 @@ export class OpenRouterModel extends Model {
       }
     }
     
-    // 如果都不符合，檢查是否應該包裝成陣列
-    // 根據 schema 類型決定包裝方式
-    console.log('   Force wrapping content - defaulting to array for safety');
+    // 如果都不符合，嘗試包裝成陣列
+    console.log('   Force wrapping in array');
     return `[${trimmed}]`;
   }
 
