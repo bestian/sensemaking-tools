@@ -2,6 +2,14 @@ import { SupportedLanguage } from "./languages";
 
 // Statistics-related messages that appear in reports
 export const STATISTICS_MESSAGES = {
+  statements: {
+    "en": "statements",
+    "zh-TW": "個意見",
+    "zh-CN": "个意见",
+    "fr": "déclarations",
+    "es": "declaraciones",
+    "ja": "個の声明"
+  },
   noCommonGround: {
     "en": `No statements met the thresholds necessary to be considered as a point of common ground (at least {minVoteCount} votes, and at least {minCommonGroundProb} agreement{acrossGroups}).`,
     "zh-TW": `沒有意見達到被視為共同點的必要門檻（至少需要 {minVoteCount} 個投票，且至少需要 {minCommonGroundProb} 的同意率{acrossGroups}）。`,

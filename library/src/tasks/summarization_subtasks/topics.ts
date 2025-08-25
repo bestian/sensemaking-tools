@@ -35,7 +35,8 @@ import {
   getSubsectionTitle,
   getTopicSummaryText,
   getPluralForm,
-  localizeTopicName
+  localizeTopicName,
+  getStatisticsMessage
 } from "../../../templates/l10n";
 // Import multi-language prompts
 import { 
@@ -191,7 +192,7 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
     // Debug: 檢查 localizeTopicName 的調用參數
     console.log(`[DEBUG] TopicSummary.getSectionTitle() calling localizeTopicName with: topicName="${this.topicStat.name}", output_lang="${this.output_lang}"`);
     
-    return `### ${localizeTopicName(this.topicStat.name, this.output_lang)} (${this.topicStat.commentCount} statements)`;
+    return `### ${localizeTopicName(this.topicStat.name, this.output_lang)} (${this.topicStat.commentCount} ${getStatisticsMessage("statements", this.output_lang, {})})`;
   }
 
   /**
@@ -489,7 +490,7 @@ export class SubtopicSummary extends TopicSummary {
     // Debug: 檢查 SubtopicSummary 中的 output_lang 值
     console.log(`[DEBUG] SubtopicSummary.getSectionTitle() output_lang: ${this.output_lang}`);
     
-    return `#### ${this.topicStat.name} (${this.topicStat.commentCount} statements)`;
+    return `#### ${this.topicStat.name} (${this.topicStat.commentCount} ${getStatisticsMessage("statements", this.output_lang, {})})`;
   }
 }
 

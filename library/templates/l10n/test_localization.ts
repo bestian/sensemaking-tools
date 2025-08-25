@@ -7,7 +7,7 @@ import {
   getPluralForm,
   getLanguagePrefix,
   isValidLanguage,
-  type SupportedLanguage 
+  getStatisticsMessage
 } from './index';
 
 // Test function
@@ -149,6 +149,15 @@ function testLocalization() {
   console.log(`   French: 1 sous-sujet${getPluralForm(1, "fr")}, 2 sous-sujet${getPluralForm(2, "fr")}`);
   console.log(`   Spanish: 1 subtema${getPluralForm(1, "es")}, 2 subtema${getPluralForm(2, "es")}`);
   console.log(`   Japanese: 1 サブトピック${getPluralForm(1, "ja")}, 2 サブトピック${getPluralForm(2, "ja")}\n`);
+
+  // Test 8: Statistics messages (new statements functionality)
+  console.log("8. Testing statistics messages:");
+  console.log(`   Statements (en): ${getStatisticsMessage("statements", "en", {})}`);
+  console.log(`   Statements (zh-TW): ${getStatisticsMessage("statements", "zh-TW", {})}`);
+  console.log(`   Statements (zh-CN): ${getStatisticsMessage("statements", "zh-CN", {})}`);
+  console.log(`   Statements (fr): ${getStatisticsMessage("statements", "fr", {})}`);
+  console.log(`   Statements (es): ${getStatisticsMessage("statements", "es", {})}`);
+  console.log(`   Statements (ja): ${getStatisticsMessage("statements", "ja", {})}\n`);
 
   console.log("✅ Localization system test completed!");
 }
