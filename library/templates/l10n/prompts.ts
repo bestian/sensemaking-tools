@@ -159,7 +159,6 @@ Aquí están los temas:
 {topicNames}`,
 
 
-
   "ja": `あなたの仕事は、既に作成された要約に基づいて公開討論の主要な発見の要約を作成することです。これらの要約は、討論で特定されたトピックとサブトピックに対応しています。これらのトピックとサブトピックの要約は、参加者が討論の一部として提出したコメントと投票パターンに基づいています。この要約はmarkdownリストとしてフォーマットされ、最終レポートの上部近くに含まれます。最終レポートには、完全なトピックとサブトピックの要約が含まれます。これらの意見のいずれかを保持しているふりをしないでください。あなたはこの討論の参加者ではありません。可能な限り、参加者の視点ではなく、提出された「声明」または全体的な「会話」の観点から結果を説明することを好んでください（注：「コメント」と「声明」は同じものですが、この要約の部分では、「声明」という用語のみを使用してください）。各トピックまたはサブトピックに含まれるコメントの数について具体的な数字を含めないでください。これらは最終レポートの出力で後ほど含まれるからです。また、会話の文脈を再説明する必要もありません。これはレポートの早い段階で既に述べられているからです。覚えておいてください：これはより大きなレポートの1つのコンポーネントにすぎず、レポートの残りの部分の文脈で自然に流れるようにこれを構成する必要があります。文章を明確で簡潔にし、受動態や曖昧な代名詞を使用しないでください。
 
 あなたが出力するリストの構造は、以下の順序でトピック名に基づいている必要があります。各リスト項目は、トピック名（以下に正確にリストされているパーセンテージを含む）を太字で開始し、次にコロン、次に対応するトピックの短い1つまたは2つの文の要約を記述する必要があります。完全な回答は、markdownリストのみで、他のテキストは含まれない必要があります。例えば、リスト項目は次のようになります：
@@ -192,9 +191,12 @@ D'autres sujets viendront plus tard, mais pour l'instant, votre travail consiste
 
 Otros temas vendrán más tarde, pero por ahora, su trabajo es componer un resumen muy corto de una o dos oraciones del siguiente tema: {topicName}. Este resumen se pondrá más tarde en una lista con otros resúmenes de este tipo.`,
 
-  "ja": `あなたの仕事は、既に作成された要約に基づいて公開討論の主要な発見の要約を作成することです。これらの要約は、討論で特定されたトピックとサブトピックに対応しています。これらのトピックとサブトピックの要約は、参加者が討論の一部として提出したコメントと投票パターンに基づいています。この要約はmarkdownリストとしてフォーマットされ、最終レポートの上部近くに含まれます。最終レポートには、完全なトピックとサブトピックの要約が含まれます。これらの意見のいずれかを保持しているふりをしないでください。あなたはこの討論の参加者ではありません。可能な限り、参加者の視点ではなく、提出された「声明」または全体的な「会話」の観点から結果を説明することを好んでください（注：「コメント」と「声明」は同じものですが、この要約の部分では、「声明」という用語のみを使用してください）。各トピックまたはサブトピックに含まれるコメントの数について具体的な数字を含めないでください。これらは最終レポートの出力で後ほど含まれるからです。また、会話の文脈を再説明する必要もありません。これはレポートの早い段階で既に述べられているからです。覚えておいてください：これはより大きなレポートの1つのコンポーネントにすぎず、レポートの残りの部分の文脈で自然に流れるようにこれを構成する必要があります。文章を明確で簡潔にし、受動態や曖昧な代名詞を使用しないでください。
+  "ja": `あなたの仕事は、既に作成された要約に基づいて公開討論の主要な発見の要約を作成することです。これらの要約は、討論で特定されたトピックとサブトピックに対応しています。これらのトピックとサブトピックの要約は、参加者が討論の一部として提出したコメントと投票パターンに基づいています。この要約はmarkdownリストとしてフォーマットされ、最終レポートの上部近くに含まれます。最終レポートには、完全なトピックとサブトピックの要約が含まれます。これらの意見のいずれかを保持しているふりをしないでください。あなたはこの討論の参加者ではありません。可能な限り、参加者の視点ではなく、提出された「声明」または全体的な「会話」の観点から結果を説明することを好んでください（注：「コメント」と「声明」は同じものですが、この要約の部分では、「声明」という用語のみを使用してください）。各トピックまたはサブトピックに含まれるコメントの数について具体的な数字を含めないでください。これらは最終レポートの出力で後ほど含まれるからです。また、会話の文脈を再説明する必要もありません。これはレポートの早い段階で既に述べられているからです。覚えておいてください：これはより大きなレポートの1つのコンポーネントにすぎず、レポートの残りの部分の文脈で自然に流れるようにこれを構成する必要があります。受動態を使用しないでください。曖昧な代名詞を使用しないでください。明確にしてください。箇条書きや特別なフォーマットを生成しないでください。無駄話をしないでください。
 
-他のトピックは後で来ますが、今のところ、あなたの仕事は以下のトピックの非常に短い1つまたは2つの文の要約を作成することです：{topicName}。この要約は後で他のそのような要約と一緒にリストにまとめられます。`
+あなたが出力するリストの構造は、以下の順序でトピック名に基づいている必要があります。各リスト項目は、トピック名（以下に正確にリストされているパーセンテージを含む）を太字で開始し、次にコロン、次に対応するトピックの短い1つまたは2つの文の要約を記述する必要があります。完全な回答は、markdownリストのみで、他のテキストは含まれない必要があります。例えば、リスト項目は次のようになります：
+<output_format format="markdown">* **トピック名 (45%):** トピックの要約。</output_format>
+以下がトピックです：
+{topicNames}`
 };
 
 /**
@@ -843,7 +845,7 @@ export const RECURSIVE_TOPIC_SUMMARY_INSTRUCTIONS: Record<SupportedLanguage, str
 
   "zh-TW": `您的工作是撰寫一個摘要段落，該段落將包含在關於參與者討論結果的報告中。您的具體任務是撰寫關於以下討論主題的段落：{topicName}。您將基於對應於該主題子主題的若干已撰寫摘要來撰寫此摘要。這些摘要基於參與者作為討論一部分提交的評論。請勿假裝您持有這些意見中的任何一個。您不是此討論的參與者。撰寫這些摘要的簡潔摘要，至少一個句子，最多三到五個句子。摘要應該有根據、詳細且信息豐富。但是，請勿提供關於您任務的任何元評論，或您的摘要基於其他摘要的事實。也不要包含關於每個子主題包含多少評論的具體數字，因為這些將在最終報告輸出中稍後包含。也要避免描述具體的同意或不同意領域，而是專注於討論的主題。您也不需要重述對話的上下文，因為這將在報告的早期已經說明。記住：這只是更大摘要中的一個段落，您應該撰寫此段落，使其在報告其餘部分的上下文中自然流動。不要使用被動語態。不要使用模糊的代詞。要清晰。不要生成項目符號或特殊格式。不要廢話。`,
 
-  "zh-CN": `您的工作是撰写一个摘要段落，该段落将包含在关于参与者讨论结果的报告中。您的具体任务是撰写关于以下讨论主题的段落：{topicName}。您将基于对应于该主题子主题的若干已撰写摘要来撰写此摘要。这些摘要基于参与者作为讨论一部分提交的评论。请勿假装您持有这些意见中的任何一个。您不是此讨论的参与者。撰写这些摘要的简洁摘要，至少一个句子，最多三到五个句子。摘要应该有根据、详细且信息丰富。但是，请勿提供关于您任务的任何元评论，或您的摘要基于其他摘要的事实。也不要包含关于每个子主题包含多少评论的具体数字，因为这些将在最终报告输出中稍后包含。也要避免描述具体的同意或不同意领域，而是专注于讨论的主题。您也不需要重述对话的上下文，因为这将在报告的早期已经说明。记住：这只是更大摘要中的一个段落，您应该撰写此段落，使其在报告其余部分的上下文中自然流动。在写作中要清晰简洁，不要使用被动语态或模糊的代词。不要生成项目符号或特殊格式。不要废话。`,
+  "zh-CN": `您的工作是撰写一个摘要段落，该段落将包含在关于参与者讨论结果的报告中。您的具体任务是撰写关于以下讨论主题的段落：{topicName}。您将基于对应于该主题子主题的若干已撰写摘要来撰写此摘要。这些摘要基于参与者作为讨论一部分提交的评论。请勿假装您持有这些意见中的任何一个。您不是此讨论的参与者。撰写这些摘要的简洁摘要，至少一个句子，最多三到五个句子。摘要应该有根据、详细且信息丰富。但是，请勿提供关于您任务的任何元评论，或您的摘要基于其他摘要的事实。也不要包含关于每个子主题包含多少评论的具体数字，因为这些将在最终报告输出中稍后包含。也要避免描述具体的同意或不同意领域，而是专注于讨论的主题。您也不需要重述对话的上下文，因为这将在报告的早期已经说明。记住：这只是更大摘要中的一个段落，您应该撰写此段落，使其在报告其余部分的上下文中自然流動。在寫作中要清晰簡潔，不要使用被動語態或模糊的代詞。不要生成项目符号或特殊格式。不要废话。`,
 
   "fr": `Votre travail consiste à composer un paragraphe de résumé à inclure dans un rapport sur les résultats d'une ` +
   `discussion entre un certain nombre de participants. Vous êtes spécifiquement chargé de produire ` +
@@ -903,5 +905,34 @@ export function getRecursiveTopicSummaryInstructions(
   const prompt = RECURSIVE_TOPIC_SUMMARY_INSTRUCTIONS[language] || RECURSIVE_TOPIC_SUMMARY_INSTRUCTIONS["en"];
   
   // Replace the placeholder with the actual topic name
+  return prompt.replace("{topicName}", topicName);
+}
+
+/**
+ * Multi-language prompt for generating prominent themes for top subtopics
+ */
+export const TOP_SUBTOPICS_THEMES_PROMPT: Record<SupportedLanguage, string> = {
+  "en": `Please generate a concise bulleted list identifying up to 5 prominent themes across all statements. Each theme should be less than 10 words long. Do not use bold text. Do not preface the bulleted list with any text. These statements are all about {topicName}`,
+
+  "zh-TW": `請生成一個簡潔的項目符號清單，識別所有陳述中最多5個突出主題。每個主題應該少於10個字。請勿使用粗體文字。請勿在項目符號清單前添加任何文字。這些陳述都是關於{topicName}的`,
+
+  "zh-CN": `请生成一个简洁的项目符号清单，识别所有陈述中最多5个突出主题。每个主题应该少于10个字。请勿使用粗体文字。请勿在项目符号清单前添加任何文字。这些陈述都是关于{topicName}的`,
+
+  "fr": `Veuillez générer une liste concise à puces identifiant jusqu'à 5 thèmes prédominants à travers toutes les déclarations. Chaque thème doit faire moins de 10 mots. N'utilisez pas de texte en gras. N'introduisez pas la liste à puces par aucun texte. Ces déclarations concernent toutes {topicName}`,
+
+  "es": `Por favor, genere una lista concisa con viñetas que identifique hasta 5 temas prominentes en todas las declaraciones. Cada tema debe tener menos de 10 palabras. No use texto en negrita. No introduzca la lista con viñetas con ningún texto. Estas declaraciones son todas sobre {topicName}`,
+
+  "ja": `すべての声明文から最大5つの顕著なテーマを特定する簡潔な箇条書きリストを生成してください。各テーマは10語未満である必要があります。太字を使用しないでください。箇条書きリストの前にテキストを付けないでください。これらの声明文はすべて{topicName}に関するものです`
+};
+
+/**
+ * Get the localized prompt for top subtopics themes generation
+ * @param language The target language
+ * @param topicName The name of the topic to replace in the prompt
+ * @returns The localized prompt with topic name replaced
+ */
+export function getTopSubtopicsThemesPrompt(language: SupportedLanguage, topicName: string): string {
+  console.log(`[DEBUG] getTopSubtopicsThemesPrompt() language: ${language}`);
+  const prompt = TOP_SUBTOPICS_THEMES_PROMPT[language] || TOP_SUBTOPICS_THEMES_PROMPT["en"];
   return prompt.replace("{topicName}", topicName);
 }

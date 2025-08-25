@@ -21,13 +21,15 @@ import { getPrompt } from "../../sensemaker_utils";
 
 // Import localization system
 import { 
-  getLanguageName,
   getReportSectionTitle, 
   getReportContent, 
   getSubsectionTitle,
   getTopicName,
   type SupportedLanguage
 } from "../../../templates/l10n";
+
+// Import localized prompts
+import { getTopSubtopicsThemesPrompt } from "../../../templates/l10n/prompts";
 
 export class TopSubtopicsSummary extends RecursiveSummary<SummaryStats> {
   async getSummary(): Promise<SummaryContent> {
@@ -76,7 +78,7 @@ export class TopSubtopicsSummary extends RecursiveSummary<SummaryStats> {
     
     const text = await this.model.generateText(
       getPrompt(
-        `Please use ${getLanguageName(this.output_lang)} language to generate a concise bulleted list identifying up to 5 prominent themes across all statements. Each theme should be less than 10 words long.  Do not use bold text. Do not preface the bulleted list with any text. These statements are all about ${st.name}`,
+        getTopSubtopicsThemesPrompt(this.output_lang, st.name),
         subtopicComments.map((comment: Comment): string => comment.text),
         this.additionalContext,
         this.output_lang
