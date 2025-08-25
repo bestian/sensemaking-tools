@@ -19,7 +19,7 @@ import { categorizeCommentsRecursive } from "./tasks/categorization";
 import { summarizeByType } from "./tasks/summarization";
 import { ModelSettings, Model } from "./models/model";
 import { getUniqueTopics } from "./sensemaker_utils";
-import { SupportedLanguage } from "../templates/l10n";
+import { SupportedLanguage, translateSummary } from "../templates/l10n";
 
 // Class to make sense of conversation data. Uses LLMs to learn what topics were discussed and
 // categorize comments. Then these categorized comments can be used with optional Vote data to
@@ -98,8 +98,13 @@ export class Sensemaker {
       output_lang
     );
 
+    console.log(`[DEBUG] summary: ${JSON.stringify(summary)}`);
+
+    // TODO: translate the summary's "Other" to the output language
+    const translatedSummary = translateSummary(summary, output_lang);
+    
     console.log(`Summarization took ${(performance.now() - startTime) / (1000 * 60)} minutes.`);
-    return summary;
+    return translatedSummary;
   }
 
   /**

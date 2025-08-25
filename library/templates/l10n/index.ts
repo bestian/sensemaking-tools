@@ -14,3 +14,4 @@ export { getReportSectionTitle } from "./report_sections";
 export { getReportContent } from "./report_content";
 export { getSubsectionTitle } from "./subsection_titles";
 export { getTopicSummaryText, getPluralForm } from "./topic_summaries";
+export { translateSummary } from "./translate_summary";
