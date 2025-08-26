@@ -1,0 +1,99 @@
+name: Build Library Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本號 (例如: 1.0.0)'
+        required: true
+        default: '1.0.0'
+      create_release:
+        description: '是否創建 GitHub Release'
+        required: false
+        default: true
+        type: boolean
+
+jobs:
+  build-package:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: library/package-lock.json
+          
+      - name: Install dependencies
+        working-directory: ./library
+        run: npm ci
+        
+      - name: Run tests
+        working-directory: ./library
+        run: npm test
+        
+      - name: Build package
+        working-directory: ./library
+        run: npm run build:worker-bundle
+        
+      - name: Create package
+        working-directory: ./library
+        run: npm pack
+        
+      - name: Get package filename
+        working-directory: ./library
+        id: package_name
+        run: |
+          PACKAGE_NAME=$(ls *.tgz | head -1)
+          echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
+          echo "Package created: $PACKAGE_NAME"
+          
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: library-package-${{ github.event.inputs.version }}
+          path: library/*.tgz
+          retention-days: 30
+          
+      - name: Create Release (可選)
+        if: ${{ github.event.inputs.create_release }}
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.event.inputs.version }}
+          release_name: Library Package v${{ github.event.inputs.version }}
+          body: |
+            ## Library Package v${{ github.event.inputs.version }}
+            
+            ### 自動打包的版本
+            此版本包含以下內容：
+            - 編譯後的 TypeScript 代碼
+            - 類型定義文件
+            - 打包後的 Cloudflare Workers 兼容版本
+            
+            ### 下載
+            附件包含打包好的 library 套件。
+            
+            ### 安裝方式
+            ```bash
+            npm install sensemaking-tools@${{ github.event.inputs.version }}
+            ```
+          draft: false
+          prerelease: false
+          
+      - name: Upload Release Assets (可選)
+        if: ${{ github.event.inputs.create_release }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: library/*.tgz
+          asset_name: ${{ steps.package_name.outputs.package_name }}
+          asset_content_type: application/gzip
