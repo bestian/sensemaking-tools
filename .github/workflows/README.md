@@ -2,6 +2,8 @@
 
 本目錄包含用於自動化打包和發布 sensemaking-tools library 的 GitHub Actions 工作流程。
 
+**⚠️ 重要：這些工作流程專門設計用於 `new-feature-npm-pack` 分支**
+
 ## 工作流程文件
 
 ### 1. `build-library.yml` - 手動打包工作流程
@@ -56,13 +58,19 @@
 
 ### 自動發布 (用於正式版本)
 
-1. **創建標籤：**
+1. **確保在正確分支：**
+   ```bash
+   git checkout new-feature-npm-pack
+   git pull origin new-feature-npm-pack
+   ```
+
+2. **創建標籤：**
    ```bash
    git tag v1.0.0
    git push origin v1.0.0
    ```
 
-2. **工作流程會自動執行：**
+3. **工作流程會自動執行：**
    - 構建和測試
    - 創建 Release
    - 上傳資產
@@ -78,10 +86,11 @@
 
 ## 注意事項
 
-1. **Node.js 版本：** 使用 Node.js 18
-2. **依賴緩存：** 會緩存 `node_modules` 以加速構建
-3. **測試要求：** 構建前會運行測試，確保代碼品質
-4. **權限要求：** 需要 `GITHUB_TOKEN` 權限來創建 Release
+1. **分支要求：** 工作流程只會在 `new-feature-npm-pack` 分支上觸發
+2. **Node.js 版本：** 使用 Node.js 18
+3. **依賴緩存：** 會緩存 `node_modules` 以加速構建
+4. **測試要求：** 構建前會運行測試，確保代碼品質
+5. **權限要求：** 需要 `GITHUB_TOKEN` 權限來創建 Release
 
 ## 故障排除
 

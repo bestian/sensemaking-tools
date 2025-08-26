@@ -12,6 +12,9 @@ on:
         required: false
         default: true
         type: boolean
+  push:
+    branches:
+      - new-feature-npm-pack
 
 jobs:
   build-package:

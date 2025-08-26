@@ -5,8 +5,7 @@ on:
     tags:
       - 'v*'
     branches:
-      - main
-      - master
+      - new-feature-npm-pack
   workflow_dispatch:
     inputs:
       version:
