@@ -29,12 +29,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: library/package-lock.json
           
       - name: Install dependencies
         working-directory: ./library
-        run: npm ci
+        run: npm install
         
       - name: Run tests
         working-directory: ./library
