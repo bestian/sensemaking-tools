@@ -81,11 +81,6 @@ jobs:
             npm install ./sensemaking-tools-${{ github.ref_name }}.tgz
             ```
             
-            #### 從 GitHub Branch 安裝
-            ```bash
-            npm install github:bestian/sensemaking-tools#new-feature-npm-pack${{ github.ref_name }}
-            ```
-            
             ### 下載
             附件包含打包好的 library 套件。
           draft: false
