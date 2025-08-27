@@ -4,8 +4,8 @@ on:
   push:
     tags:
       - 'v*'
-    branches:
-      - new-feature-npm-pack
+    # branches:
+    #  - new-feature-npm-pack
   workflow_dispatch:
     inputs:
       version:
