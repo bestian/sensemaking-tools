@@ -12,5 +12,4 @@ todo.md
 /files
 .vscode
 
-# 允許 library 目錄下的 .tgz 文件（用於 release）
-!library/*.tgz
+# *.tgz 
