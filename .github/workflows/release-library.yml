@@ -81,6 +81,14 @@ jobs:
             npm install ./sensemaking-tools-${{ github.ref_name }}.tgz
             ```
             
+
+            #### 從 GitHub  Release 的網路連結安裝
+
+            ```
+            # 從Github 上安裝
+            npm install https://github.com/bestian/sensemaking-tools/releases/download/v${{ github.ref_name }}/sensemaking-tools-${{ github.ref_name }}.tgz
+            ```
+
             ### 下載
             附件包含打包好的 library 套件。
           draft: false
