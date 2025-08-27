@@ -375,6 +375,11 @@ export function checkDataSchema(schema: TSchema, response: any): boolean {
   // 在 Cloudflare Workers 環境中，避免使用 TypeBox 編譯器
   // 改用簡單的類型檢查來避免 EvalError
   try {
+    // 首先檢查 response 的基本有效性
+    if (response === null || response === undefined) {
+      return false;
+    }
+    
     // 檢查基本類型
     if (schema && typeof schema === 'object' && 'type' in schema) {
       const schemaType = (schema as any).type;
@@ -384,7 +389,7 @@ export function checkDataSchema(schema: TSchema, response: any): boolean {
       }
       
       if (schemaType === 'object') {
-        return typeof response === 'object' && response !== null && !Array.isArray(response);
+        return typeof response === 'object' && response !== null && !Array.isArray(response) && JSON.stringify(response) !== JSON.stringify({});
       }
       
       if (schemaType === 'string') {
@@ -403,6 +408,14 @@ export function checkDataSchema(schema: TSchema, response: any): boolean {
     // 如果是聯合類型，檢查是否匹配其中一個
     if (schema && Array.isArray(schema)) {
       return schema.some(s => checkDataSchema(s, response));
+    }
+    
+    // 如果是 TypeBox 的 Union 類型，檢查是否匹配其中一個
+    if (schema && typeof schema === 'object' && 'anyOf' in schema) {
+      const anyOf = (schema as any).anyOf;
+      if (Array.isArray(anyOf)) {
+        return anyOf.some(s => checkDataSchema(s, response));
+      }
     }
     
     // 對於複雜的 schema，進行基本的結構檢查
@@ -432,13 +445,73 @@ export function checkDataSchema(schema: TSchema, response: any): boolean {
       return true;
     }
     
-    // 如果無法進行詳細檢查，返回 true 以避免阻塞
-    console.warn('Schema validation fallback: unable to perform detailed validation, allowing response');
-    return true;
+
+    
+    // 如果無法進行詳細檢查，進行基本的合理性檢查
+    if (schema && typeof schema === 'object') {
+      // 對於對象類型的 schema，檢查 response 是否為對象
+      if (typeof response !== 'object' || response === null || Array.isArray(response)) {
+        return false;
+      }
+      
+      // 嘗試檢查 schema 是否有 properties 和 required 信息
+      if ('properties' in schema && 'required' in schema) {
+        const properties = (schema as any).properties;
+        const required = (schema as any).required || [];
+        
+        // 檢查必需屬性
+        for (const prop of required) {
+          if (!(prop in response)) {
+            return false;
+          }
+        }
+        
+        // 檢查屬性類型（如果可能）
+        for (const [propName, propSchema] of Object.entries(properties)) {
+          if (propName in response) {
+            if (!checkDataSchema(propSchema as TSchema, response[propName])) {
+              return false;
+            }
+          }
+        }
+        
+        return true;
+      }
+      
+      // 如果沒有詳細的 schema 信息，但 schema 是 TypeBox 的 schema 對象
+      // 嘗試從 schema 中提取類型信息
+      if ('type' in schema) {
+        const schemaType = (schema as any).type;
+        if (schemaType === 'object') {
+          // 對於對象類型，檢查必需屬性（如果有的話）
+          if ('required' in schema) {
+            const required = (schema as any).required || [];
+            for (const prop of required) {
+              if (!(prop in response)) {
+                return false;
+              }
+            }
+          }
+          return true;
+        }
+      }
+      
+      // 如果完全無法進行檢查，返回 false 以保持嚴格性
+      return false;
+    }
+    
+    // 最後的 fallback：如果 schema 是基本類型，進行基本檢查
+    if (typeof schema === 'string' || typeof schema === 'number' || typeof schema === 'boolean') {
+      return typeof response === typeof schema;
+    }
+    
+    // 如果完全無法進行檢查，記錄警告但返回 false 以保持嚴格性
+    console.warn('Schema validation fallback: unable to perform validation, rejecting response for safety');
+    return false;
     
   } catch (error) {
-    console.warn('Schema validation error:', error, 'allowing response to continue');
-    return true;
+    console.warn('Schema validation error:', error, 'rejecting response for safety');
+    return false;
   }
 }
 
@@ -468,6 +541,12 @@ export function isTopicType(data: any): data is Topic {
   // This shouldn't be necessary, but checking directly against the union type seems to be ignoring
   // empty subtopic objects. This fixes it, but should maybe be reported as a bug?
   // TODO: Figure out why this is happening, and fix more optimally
+  
+  // 首先檢查 data 的基本有效性
+  if (data === null || data === undefined || typeof data !== 'object') {
+    return false;
+  }
+  
   if ("subtopics" in data) {
     return checkDataSchema(NestedTopic, data);
   } else {
