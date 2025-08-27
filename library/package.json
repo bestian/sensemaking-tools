@@ -1,6 +1,6 @@
 {
   "name": "sensemaking-tools",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "AI-powered conversation analysis and summarization tools for Cloudflare Workers",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
