@@ -9,9 +9,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: '版本號 (例如: 1.0.0)'
+        description: '版本號 (例如: 1.0.2)'
         required: true
-        default: '1.0.0'
+        default: '1.0.2'
       release_notes:
         description: 'Release 說明'
         required: false
