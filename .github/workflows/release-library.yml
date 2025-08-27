@@ -75,8 +75,15 @@ jobs:
             ${{ github.event.inputs.release_notes || '自動發布的版本' }}
             
             ### 安裝方式
+            #### 從 GitHub Release 安裝
             ```bash
-            npm install sensemaking-tools@${{ github.ref_name }}
+            # 下載 .tgz 檔案後本地安裝
+            npm install ./sensemaking-tools-${{ github.ref_name }}.tgz
+            ```
+            
+            #### 從 GitHub Branch 安裝
+            ```bash
+            npm install github:bestian/sensemaking-tools#new-feature-npm-pack${{ github.ref_name }}
             ```
             
             ### 下載
