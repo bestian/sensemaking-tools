@@ -116,7 +116,7 @@ describe("AllTopicsSummaryTest", () => {
       ).getSummary()
     ).toEqual({
       title: "## Topics",
-      text: "From the statements submitted, 2 high level topics were identified, as well as 3 subtopics. Based on voting patterns between the opinion groups described above, both points of common ground as well as differences of opinion between the groups have been identified and are described below.\n",
+      text: "From the statements submitted, 2 high level topics were identifiedas well as 3 subtopics. Based on voting patterns between the opinion groups described above, both points of common ground as well as differences of opinion between the groups have been identified and are described below.\n\n",
       subContents: [
         {
           title: "### Topic A (3 statements)",

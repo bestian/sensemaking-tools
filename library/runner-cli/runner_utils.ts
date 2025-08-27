@@ -27,13 +27,14 @@ import {
   Topic,
   SummaryContent,
   VoteInfo,
-  SupportedLanguage,
 } from "../src/types";
 import * as path from "path";
 import * as fs from "fs";
 import { parse } from "csv-parse";
 import { marked } from "marked";
 import { createObjectCsvWriter } from "csv-writer";
+import { SupportedLanguage } from "../templates/l10n/languages";
+
 
 /**
  * Core comment columns, sans any vote tally rows
