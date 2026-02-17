@@ -13,3 +13,4 @@ todo.md
 .vscode
 *.pkl
 **/.logs
+.gemini/**/*
