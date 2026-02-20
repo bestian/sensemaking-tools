@@ -255,7 +255,7 @@ export class OpenRouterModel extends Model {
       chunks: [],
       chunkCount: 0,
       startTime: Date.now(),
-      timeoutMs: 300000, // 5 分鐘超時
+      timeoutMs: 900000, // 15 分鐘超時
     };
   }
 
