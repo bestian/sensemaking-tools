@@ -112,7 +112,27 @@ export class OpenRouterModel extends Model {
     // Get language prefix from localization system
     const languagePrefix = getLanguagePrefix(output_lang);
     
-    const requestBody = {
+    const requestBody: {
+      model: string;
+      messages: Array<{ role: "system" | "user"; content: string }>;
+      max_tokens: number;
+      temperature: number;
+      stream: boolean;
+      n: number;
+      stop: null;
+      presence_penalty: number;
+      frequency_penalty: number;
+      response_format?: {
+        type: "json_object";
+      } | {
+        type: "json_schema";
+        json_schema: {
+          name: string;
+          strict: boolean;
+          schema: TSchema;
+        };
+      };
+    } = {
       model: this.modelName,
       messages: [
         { role: "system" as const, content: languagePrefix },
@@ -130,18 +150,18 @@ export class OpenRouterModel extends Model {
           // 如果有 schema，設定結構化輸出
       if (schema) {
         // OpenRouter 支援 json_schema 格式，格式與官方文檔一致
-        // Anthropic 模型不支援 strict 參數，所以對 Anthropic 模型使用不同的設定
+        // Anthropic 模型採用較廣泛相容的 JSON object mode，避免 strict schema 造成相容性問題
         const isAnthropicModel = this.modelName.startsWith('anthropic/');
+        /* const isMiniMaxModel = this.modelName.startsWith('minimax/'); */
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        if (isAnthropicModel) {
-          // Anthropic 模型使用簡化的 JSON mode
-          (requestBody as any).response_format = {
+        if (isAnthropicModel /* || isMiniMaxModel */) {
+          // Anthropic / MiniMax 模型使用簡化的 JSON mode
+          requestBody.response_format = {
             type: "json_object"
           };
         } else {
           // 其他模型使用完整的 json_schema 格式
-          (requestBody as any).response_format = {
+          requestBody.response_format = {
             type: "json_schema",
             json_schema: {
               name: "response",

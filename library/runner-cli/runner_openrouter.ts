@@ -54,6 +54,10 @@ async function main(): Promise<void> {
       "A short description of the conversation to add context."
     )
     .option(
+      "-m, --model <model>",
+      "OpenRouter model to use (e.g., 'openai/gpt-oss-120b', 'anthropic/claude-3.5-sonnet', 'minimax/minimax-m2.5'). Defaults to OPENROUTER_MODEL or 'openai/gpt-oss-120b'."
+    )
+    .option(
       "--output_lang <language>",
       "Output language for the report (default: en, supported: en, zh-TW)",
       "en"
@@ -67,7 +71,8 @@ async function main(): Promise<void> {
     comments,
     undefined,
     options.additionalContext,
-    options.output_lang
+    options.output_lang,
+    options.model
   );
 
   const markdownContent = summary.getText("MARKDOWN");

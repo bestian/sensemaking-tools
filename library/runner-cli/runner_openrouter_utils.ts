@@ -131,13 +131,14 @@ export function writeSummaryToGroundedCSV(summary: Summary, outputFilePath: stri
  */
 export async function getTopicsAndSubtopics(
   comments: Comment[],
-  output_lang: SupportedLanguage = "en"
+  output_lang: SupportedLanguage = "en",
+  modelName?: string
 ): Promise<Topic[]> {
   const apiKey = getRequiredEnvVar("OPENROUTER_API_KEY");
-  const modelName = getEnvVar("OPENROUTER_MODEL", "openai/gpt-oss-120b");
+  const selectedModelName = modelName || getEnvVar("OPENROUTER_MODEL", "openai/gpt-oss-120b");
   
   const sensemaker = new Sensemaker({
-    defaultModel: new OpenRouterModel(apiKey, modelName),
+    defaultModel: new OpenRouterModel(apiKey, selectedModelName),
   });
   return await sensemaker.learnTopics(comments, true, undefined, undefined, 2, output_lang);
 }
@@ -153,13 +154,14 @@ export async function getSummary(
   comments: Comment[],
   topics?: Topic[],
   additionalContext?: string,
-  output_lang: SupportedLanguage = "en"
+  output_lang: SupportedLanguage = "en",
+  modelName?: string
 ): Promise<Summary> {
   const apiKey = getRequiredEnvVar("OPENROUTER_API_KEY");
-  const modelName = getEnvVar("OPENROUTER_MODEL", "openai/gpt-oss-120b");
+  const selectedModelName = modelName || getEnvVar("OPENROUTER_MODEL", "openai/gpt-oss-120b");
   
   const sensemaker = new Sensemaker({
-    defaultModel: new OpenRouterModel(apiKey, modelName),
+    defaultModel: new OpenRouterModel(apiKey, selectedModelName),
   });
   // TODO: Make the summariation type an argument and add it as a flag in runner.ts. The data
   // requirements (like requiring votes) would also need updated.

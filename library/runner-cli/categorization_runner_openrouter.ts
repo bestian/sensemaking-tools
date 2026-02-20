@@ -64,7 +64,7 @@ async function main(): Promise<void> {
     )
     .option(
       "-m, --model <model>",
-      "OpenRouter model to use (e.g., 'openai/gpt-4o', 'anthropic/claude-3.5-sonnet'). Defaults to OPENROUTER_MODEL env var or 'openai/gpt-4o'."
+      "OpenRouter model to use (e.g., 'openai/gpt-4o', 'anthropic/claude-3.5-sonnet', 'minimax/minimax-m2.5'). Defaults to OPENROUTER_MODEL env var or 'openai/gpt-4o'."
     )
     .option(
       "-f, --forceRerun",
