@@ -24,3 +24,11 @@ npx ts-node ./library/runner-cli/runner_openrouter.ts \
   --additionalContext "Smoke test for model compatibility" \
   --model minimax/minimax-m2.5 \
   --output_lang en
+
+# 4) Z.AI GLM-5
+npx ts-node ./library/runner-cli/runner_openrouter.ts \
+  --outputBasename out-glm5 \
+  --inputFile "./files/comments.csv" \
+  --additionalContext "Smoke test for model compatibility" \
+  --model z-ai/glm-5 \
+  --output_lang en

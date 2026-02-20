@@ -55,7 +55,7 @@ async function main(): Promise<void> {
     )
     .option(
       "-m, --model <model>",
-      "OpenRouter model to use (e.g., 'openai/gpt-oss-120b', 'anthropic/claude-3.5-sonnet', 'minimax/minimax-m2.5'). Defaults to OPENROUTER_MODEL or 'openai/gpt-oss-120b'."
+      "OpenRouter model to use (e.g., 'openai/gpt-oss-120b', 'anthropic/claude-3.5-sonnet', 'minimax/minimax-m2.5', 'z-ai/glm-5'). Defaults to OPENROUTER_MODEL or 'openai/gpt-oss-120b'."
     )
     .option(
       "--output_lang <language>",

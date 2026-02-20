@@ -149,25 +149,21 @@ export class OpenRouterModel extends Model {
     
           // 如果有 schema，設定結構化輸出
       if (schema) {
-        // OpenRouter 支援 json_schema 格式，格式與官方文檔一致
-        // Anthropic 模型採用較廣泛相容的 JSON object mode，避免 strict schema 造成相容性問題
-        const isAnthropicModel = this.modelName.startsWith('anthropic/');
-        /* const isMiniMaxModel = this.modelName.startsWith('minimax/'); */
-
-        if (isAnthropicModel /* || isMiniMaxModel */) {
-          // Anthropic / MiniMax 模型使用簡化的 JSON mode
+        // Anthropic 模型維持較廣泛相容的 JSON object mode，
+        // 其餘模型（包含 GPT-OSS-120b、MiniMax M2.5、Z.AI GLM-5）使用 json_schema。
+        const isAnthropicModel = this.modelName.startsWith("anthropic/");
+        if (isAnthropicModel) {
           requestBody.response_format = {
-            type: "json_object"
+            type: "json_object",
           };
         } else {
-          // 其他模型使用完整的 json_schema 格式
           requestBody.response_format = {
             type: "json_schema",
             json_schema: {
               name: "response",
               strict: true,
-              schema: schema
-            }
+              schema: schema,
+            },
           };
         }
       }
@@ -196,7 +192,8 @@ export class OpenRouterModel extends Model {
         }
 
         // 處理 streaming 回應
-        const streamedResponse = await this.processStreamingResponse(response);
+        const expectsJson = Boolean(schema);
+        const streamedResponse = await this.processStreamingResponse(response, expectsJson);
         
         // 在驗證前記錄詳細資訊
         console.log('🔍 Streaming Response Debug Info:');
@@ -266,38 +263,38 @@ export class OpenRouterModel extends Model {
    * 處理 streaming 回應 - 支援 OpenRouter 的 SSE 格式
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private async processStreamingResponse(stream: any): Promise<string> {
+  private async processStreamingResponse(stream: any, expectsJson: boolean = true): Promise<string> {
     try {
       // 檢查是否是 Response 物件 (fetch API 回應)
       if (stream && stream.body && typeof stream.body.getReader === 'function') {
-        return await this.handleFetchResponse(stream);
+        return await this.handleFetchResponse(stream, expectsJson);
       }
       
       // 檢查是否是 AsyncIterable (OpenAI SDK streaming 格式)
       if (stream && typeof stream[Symbol.asyncIterator] === 'function') {
-        return await this.handleAsyncIterable(stream);
+        return await this.handleAsyncIterable(stream, expectsJson);
       }
       
       // 檢查是否是陣列格式的 chunks
       if (Array.isArray(stream)) {
-        return this.handleChunkArray(stream);
+        return this.handleChunkArray(stream, expectsJson);
       }
       
       // 檢查是否是單一回應物件
       if (stream && stream.choices && stream.choices[0]) {
         const choice = stream.choices[0];
         if (choice.message && choice.message.content) {
-          return this.processStreamedResponse(choice.message.content);
+          return this.processStreamedResponse(choice.message.content, expectsJson);
         }
         if (choice.delta && choice.delta.content) {
-          return this.processStreamedResponse(choice.delta.content);
+          return this.processStreamedResponse(choice.delta.content, expectsJson);
         }
       }
       
       // 如果都無法處理，嘗試直接提取內容
       const response = JSON.stringify(stream);
       console.warn("Unable to parse streaming response, using raw content:", response);
-      return this.processStreamedResponse(response);
+      return this.processStreamedResponse(response, expectsJson);
       
     } catch (error) {
       console.error('Error processing streaming response:', error);
@@ -309,7 +306,7 @@ export class OpenRouterModel extends Model {
    * 處理 AsyncIterable (OpenAI SDK streaming 格式)
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private async handleAsyncIterable(stream: AsyncIterable<any>): Promise<string> {
+  private async handleAsyncIterable(stream: AsyncIterable<any>, expectsJson: boolean = true): Promise<string> {
     const context = this.createBufferContext();
     
     try {
@@ -327,13 +324,13 @@ export class OpenRouterModel extends Model {
     }
     
     const fullResponse = context.chunks.join('');
-    return this.processStreamedResponse(fullResponse);
+    return this.processStreamedResponse(fullResponse, expectsJson);
   }
 
   /**
    * 處理 fetch API 回應 (OpenRouter 官網推薦方式)
    */
-  private async handleFetchResponse(response: Response): Promise<string> {
+  private async handleFetchResponse(response: Response, expectsJson: boolean = true): Promise<string> {
     console.log('📡 Starting fetch API streaming response processing...');
     
     const reader = response.body?.getReader();
@@ -447,15 +444,15 @@ export class OpenRouterModel extends Model {
     console.log('   Total content length:', fullResponse.length);
     console.log('   Number of content chunks:', context.chunkCount);
     
-    return this.processStreamedResponse(fullResponse);
+    return this.processStreamedResponse(fullResponse, expectsJson);
   }
 
   /**
    * 處理陣列格式的 chunks
    */
-  private handleChunkArray(chunks: string[]): string {
+  private handleChunkArray(chunks: string[], expectsJson: boolean = true): string {
     const fullResponse = chunks.join('');
-    return this.processStreamedResponse(fullResponse);
+    return this.processStreamedResponse(fullResponse, expectsJson);
   }
 
   /**
@@ -492,7 +489,7 @@ export class OpenRouterModel extends Model {
   /**
    * 處理可能的 streaming 回應，嘗試修復不完整的回應
    */
-  private processStreamedResponse(response: string): string {
+  private processStreamedResponse(response: string, expectsJson: boolean = true): string {
     console.log('🔧 Processing streamed response...');
     console.log('   Original length:', response.length);
     console.log('   Original content:', response);
@@ -508,6 +505,17 @@ export class OpenRouterModel extends Model {
     
     // 移除多餘的空白行
     processedResponse = processedResponse.replace(/\n\s*\n/g, '\n');
+
+    // GLM-5 在純文字任務（如 PROMINENT THEMES）常直接回傳條列文字；
+    // 此時不嘗試 JSON 修復，避免把合法純文字當成壞 JSON 處理。
+    const isGlm5Model = this.modelName.startsWith("z-ai/glm-5");
+    if (isGlm5Model && !expectsJson) {
+      const plainTextResponse = processedResponse.trim();
+      console.log('   GLM-5 text mode: skip JSON repair for non-schema request');
+      console.log('   Final processed length:', plainTextResponse.length);
+      console.log('   Final processed content:', plainTextResponse);
+      return plainTextResponse;
+    }
     
     // 智能格式檢測：檢查是否為混合格式（文本 + JSON）
     if (this.isMixedFormat(processedResponse)) {

@@ -220,6 +220,7 @@ npx ts-node ./library/runner-cli/categorization_runner_openrouter.ts \
 ```
 
 Set the `OPENROUTER_API_KEY` environment variable before running these tools. The model can be specified via `OPENROUTER_MODEL` environment variable.
+Examples of compatible OpenRouter models include `openai/gpt-oss-120b`, `anthropic/claude-3.5-sonnet`, `minimax/minimax-m2.5`, and `z-ai/glm-5`.
 
 These tools process CSV input files.  These must contain the columns `comment_text` and `comment-id`.  For deliberations without group information, vote counts should be set in columns titled `agrees`, `disagrees` and `passes`.  If you do not have vote information, these can be set to 0. For deliberations with group breakdowns, you can set the columns `{group_name}-agree-count`, `{group_name}-disagree-count`, `{group_name}-pass-count`.
 
