@@ -150,11 +150,11 @@ export class OpenRouterModel extends Model {
           // 如果有 schema，設定結構化輸出
       if (schema) {
         // OpenRouter 支援 json_schema 格式，格式與官方文檔一致
-        // Anthropic 與 MiniMax 模型採用較廣泛相容的 JSON object mode，避免 strict schema 造成相容性問題
+        // Anthropic 模型採用較廣泛相容的 JSON object mode，避免 strict schema 造成相容性問題
         const isAnthropicModel = this.modelName.startsWith('anthropic/');
-        const isMiniMaxModel = this.modelName.startsWith('minimax/');
+        /* const isMiniMaxModel = this.modelName.startsWith('minimax/'); */
 
-        if (isAnthropicModel || isMiniMaxModel) {
+        if (isAnthropicModel /* || isMiniMaxModel */) {
           // Anthropic / MiniMax 模型使用簡化的 JSON mode
           requestBody.response_format = {
             type: "json_object"
