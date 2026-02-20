@@ -283,6 +283,12 @@ export OPENROUTER_BASE_URL="https://openrouter.ai/api/v1"
 export DEFAULT_OPENROUTER_PARALLELISM="5"
 ```
 
+You can also set:
+
+```bash
+export OPENROUTER_MODEL="minimax/minimax-m2.5"
+```
+
 #### **Method 2: .env File (Development Only)**
 
 Create a `.env` file in the `library` directory:
@@ -292,6 +298,12 @@ OPENROUTER_API_KEY=your-api-key
 OPENROUTER_MODEL=openai/gpt-oss-120b
 OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
 DEFAULT_OPENROUTER_PARALLELISM=5
+```
+
+Example with MiniMax M2.5:
+
+```bash
+OPENROUTER_MODEL=minimax/minimax-m2.5
 ```
 
 **Note**: The `.env` file is only loaded when `NODE_ENV !== 'production'` to ensure production security.
@@ -377,7 +389,7 @@ This package is designed to be browser-friendly:
 
 2. **Incorrect Model Name**
    - Use the correct OpenRouter model name format
-   - Examples: `openai/gpt-oss-120b`, `anthropic/claude-3-sonnet`
+   - Examples: `openai/gpt-oss-120b`, `anthropic/claude-3-sonnet`, `minimax/minimax-m2.5`
 
 3. **Concurrency Limit Issues**
    - Adjust the `DEFAULT_OPENROUTER_PARALLELISM` value
@@ -473,6 +485,7 @@ npx ts-node ./library/runner-cli/runner_openrouter.ts \
   --outputBasename out \
   --inputFile "./files/comments.csv" \
   --additionalContext "Description of the conversation" \
+  --model minimax/minimax-m2.5 \
   --output_lang zh-TW
 ```
 
