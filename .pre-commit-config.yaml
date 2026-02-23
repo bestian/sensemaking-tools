@@ -14,7 +14,7 @@ repos:
     hooks:
       - id: pytest
         name: pytest
-        entry: bash -c 'python -m ensurepip && pip install -r requirements-dev.txt && python -m pytest'
+        entry: bash -c 'python -m ensurepip && pip install -r requirements.txt && python -m pytest'
         language: python
         types: [python]
         pass_filenames: false
