@@ -54,21 +54,12 @@ export interface OverviewInput {
  */
 export class OverviewSummary extends RecursiveSummary<OverviewInput> {
   async getSummary(): Promise<SummaryContent> {
-    // Debug: 檢查 output_lang 值
-    console.log(`[DEBUG] OverviewSummary.getSummary() output_lang: ${this.output_lang}`);
-    
     const method = this.input.method || "one-shot";
     const result = await (method == "one-shot" ? this.oneShotSummary() : this.perTopicSummary());
 
     // Get localized title and preamble from localization system
     const title = getReportSectionTitle("overview", this.output_lang);
     const preamble = getReportContent("overview", "preamble", this.output_lang);
-    
-    // Debug: 檢查本地化函式的調用參數和結果
-    console.log(`[DEBUG] OverviewSummary.getSummary() calling getReportSectionTitle with: section="overview", output_lang="${this.output_lang}"`);
-    console.log(`[DEBUG] OverviewSummary.getSummary() calling getReportContent with: section="overview", content="preamble", output_lang="${this.output_lang}"`);
-    console.log(`[DEBUG] OverviewSummary.getSummary() title result: "${title}"`);
-    console.log(`[DEBUG] OverviewSummary.getSummary() preamble result: "${preamble}"`);
     
     return { title, text: preamble + result };
   }
@@ -81,10 +72,6 @@ export class OverviewSummary extends RecursiveSummary<OverviewInput> {
   async oneShotSummary(): Promise<string> {
     const topicNames = this.topicNames();
     const output_lang = this.output_lang;
-    
-    // Debug: 檢查 oneShotSummary 中的 output_lang 值
-    console.log(`[DEBUG] OverviewSummary.oneShotSummary() output_lang: ${output_lang}`);
-    
     const prompt = getAbstractPrompt(
       oneShotInstructions(topicNames, output_lang),
       [filterSectionsForOverview(this.input.topicsSummary)],
@@ -95,14 +82,9 @@ export class OverviewSummary extends RecursiveSummary<OverviewInput> {
       this.additionalContext,
       this.output_lang  // ← 加入 output_lang 參數
     );
-    
-    // Debug: 檢查 getAbstractPrompt 的調用參數
-    console.log(`[DEBUG] OverviewSummary.oneShotSummary() calling getAbstractPrompt with: output_lang="${this.output_lang}"`);
-    
     return await retryCall(
       async function (model, prompt, output_lang) {
         console.log(`Generating OVERVIEW SUMMARY in one shot`);
-        console.log(`[DEBUG] retryCall function received output_lang: ${output_lang}`);
         let result = await model.generateText(prompt, output_lang);
         result = removeEmptyLines(result);
         if (!result) {
@@ -125,9 +107,6 @@ export class OverviewSummary extends RecursiveSummary<OverviewInput> {
    * @returns A promise of the resulting summary string
    */
   async perTopicSummary(): Promise<string> {
-    // Debug: 檢查 perTopicSummary 中的 output_lang 值
-    console.log(`[DEBUG] OverviewSummary.perTopicSummary() output_lang: ${this.output_lang}`);
-    
     let text = "";
     for (const topicStats of this.input.summaryStats.getStatsByTopic()) {
       text += `* __${this.getTopicNameAndCommentPercentage(topicStats)}__: `;
@@ -141,12 +120,7 @@ export class OverviewSummary extends RecursiveSummary<OverviewInput> {
         this.additionalContext,
         this.output_lang  // ← 加入 output_lang 參數
       );
-      
-      // Debug: 檢查 getAbstractPrompt 的調用參數
-      console.log(`[DEBUG] OverviewSummary.perTopicSummary() calling getAbstractPrompt with: output_lang="${this.output_lang}"`);
-      
       console.log(`Generating OVERVIEW SUMMARY for topic: "${topicStats.name}"`);
-      console.log(`[DEBUG] Calling model.generateText with output_lang: ${this.output_lang}`);
       text += (await this.model.generateText(prompt, this.output_lang)).trim() + "\n";
     }
     return text;

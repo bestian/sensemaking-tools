@@ -53,7 +53,8 @@ async function main(): Promise<void> {
       "-a, --additionalContext <context>",
       "A short description of the conversation to add context."
     )
-    .option("-v, --vertexProject <project>", "The Vertex Project name.");
+    .option("-v, --vertexProject <project>", "The Vertex Project name.")
+    .option("-l, --language <language>", "The output language code (e.g., en, fr, es).", "en");
   program.parse(process.argv);
   const options = program.opts();
 
@@ -63,7 +64,8 @@ async function main(): Promise<void> {
     options.vertexProject,
     comments,
     undefined,
-    options.additionalContext
+    options.additionalContext,
+    options.language
   );
 
   const markdownContent = summary.getText("MARKDOWN");

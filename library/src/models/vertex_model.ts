@@ -18,6 +18,7 @@
 import pLimit from "p-limit";
 import {
   GenerativeModel,
+  GenerateContentRequest,
   HarmBlockThreshold,
   HarmCategory,
   ModelParams,
@@ -49,11 +50,7 @@ export class VertexModel extends Model {
    * @param modelName - the name of the model from Vertex AI's Model Garden to connect with, see
    * the full list here: https://cloud.google.com/model-garden
    */
-  constructor(
-    project: string,
-    location: string,
-    modelName: string = "gemini-2.5-pro"
-  ) {
+  constructor(project: string, location: string, modelName: string = "gemini-2.5-pro") {
     super();
     if (modelName === "gemini-2.5-pro" && location != "global") {
       throw Error(
@@ -97,7 +94,11 @@ export class VertexModel extends Model {
    * @param output_lang the output language for the response
    * @returns the model response as data structured according to the JSON Schema specification
    */
-  async generateData(prompt: string, schema: TSchema, output_lang: SupportedLanguage = "en"): Promise<Static<typeof schema>> {
+  async generateData(
+    prompt: string,
+    schema: TSchema,
+    output_lang: SupportedLanguage = "en"
+  ): Promise<Static<typeof schema>> {
     const validateResponse = (response: string): boolean => {
       let parsedResponse;
       try {
@@ -113,7 +114,7 @@ export class VertexModel extends Model {
 
       return true;
     };
-    
+
     return JSON.parse(
       await this.callLLM(prompt, this.getGenerativeModel(schema), validateResponse, output_lang)
     );
@@ -140,7 +141,7 @@ export class VertexModel extends Model {
   ): Promise<string> {
     // Get language prefix from localization system
     const languagePrefix = getLanguagePrefix(output_lang);
-    
+
     const req = getRequest(languagePrefix, prompt);
 
     // Wrap the entire retryCall sequence with the `p-limit` limiter,
@@ -232,18 +233,15 @@ function getModelParams(modelName: string, schema?: Schema): ModelParams {
   return modelParams;
 }
 
-type Request = {
-  contents: {
-    role: string;
-    parts: { text: string }[];
-  }[];
-};
-function getRequest(languagePrefix: string, prompt: string): Request {
-  return {
-    contents: [{
-      role: "system",
-        parts: [{ text: languagePrefix }],
-      }, {
-       role: "user", parts: [{ text: prompt }] }],
+function getRequest(languagePrefix: string, prompt: string): GenerateContentRequest {
+  const req: GenerateContentRequest = {
+    contents: [{ role: "user", parts: [{ text: prompt }] }],
   };
+  if (languagePrefix) {
+    req.systemInstruction = {
+      role: "system",
+      parts: [{ text: languagePrefix }],
+    };
+  }
+  return req;
 }

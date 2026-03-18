@@ -457,7 +457,6 @@ Ejemplo de salida incorrecta:
  * @returns The localized prompt for learning topics
  */
 export function getLearnTopicsPrompt(language: SupportedLanguage): string {
-  console.log(`[DEBUG] getLearnTopicsPrompt() language: ${language}`);
   return LEARN_TOPICS_PROMPT[language] || LEARN_TOPICS_PROMPT["en"];
 }
 
@@ -473,7 +472,6 @@ export function getLearnSubtopicsPrompt(
   parentTopicName: string, 
   otherTopicNames: string
 ): string {
-  console.log(`[DEBUG] getLearnSubtopicsPrompt() language: ${language}`);
   const prompt = LEARN_SUBTOPICS_PROMPT[language] || LEARN_SUBTOPICS_PROMPT["en"];
   return prompt
     .replace("{parentTopicName}", parentTopicName)
@@ -487,7 +485,6 @@ export function getLearnSubtopicsPrompt(
  * @returns The localized prompt with topic name replaced
  */
 export function getThemesPrompt(language: SupportedLanguage, topicName: string): string {
-  console.log(`[DEBUG] getThemesPrompt() language: ${language}`);
   const prompt = THEMES_PROMPT[language] || THEMES_PROMPT["en"];
   return prompt.replace("{topicName}", topicName);
 }
@@ -499,7 +496,6 @@ export function getThemesPrompt(language: SupportedLanguage, topicName: string):
  * @returns The localized prompt with topic names replaced
  */
 export function getOverviewOneShotPrompt(language: SupportedLanguage, topicNames: string[]): string {
-  console.log(`[DEBUG] getOverviewOneShotPrompt() language: ${language}`);
   const prompt = OVERVIEW_ONE_SHOT_PROMPT[language] || OVERVIEW_ONE_SHOT_PROMPT["en"];
   return prompt.replace("{topicNames}", topicNames.map((s) => "* " + s).join("\n"));
 }
@@ -511,7 +507,6 @@ export function getOverviewOneShotPrompt(language: SupportedLanguage, topicNames
  * @returns The localized prompt with topic name replaced
  */
 export function getOverviewPerTopicPrompt(language: SupportedLanguage, topicName: string): string {
-  console.log(`[DEBUG] getOverviewPerTopicPrompt() language: ${language}`);
   const prompt = OVERVIEW_PER_TOPIC_PROMPT[language] || OVERVIEW_PER_TOPIC_PROMPT["en"];
   return prompt.replace("{topicName}", topicName);
 }
@@ -648,7 +643,6 @@ Donde los comentarios de diferencia de opinión se refieren a temas que también
  * @returns The localized prompt for differences of opinion instructions
  */
 export function getDifferencesOfOpinionInstructions(language: SupportedLanguage): string {
-  console.log(`[DEBUG] getDifferencesOfOpinionInstructions() language: ${language}`);
   return DIFFERENCES_OF_OPINION_INSTRUCTIONS[language] || DIFFERENCES_OF_OPINION_INSTRUCTIONS["en"];
 }
 
@@ -662,8 +656,6 @@ export function getDifferencesOfOpinionSingleCommentInstructions(
   language: SupportedLanguage, 
   containsGroups: boolean
 ): string {
-  console.log(`[DEBUG] getDifferencesOfOpinionSingleCommentInstructions() language: ${language}, containsGroups: ${containsGroups}`);
-  
   let prompt = DIFFERENCES_OF_OPINION_SINGLE_COMMENT_INSTRUCTIONS[language] || DIFFERENCES_OF_OPINION_SINGLE_COMMENT_INSTRUCTIONS["en"];
   
   // Add group-specific instructions if needed
@@ -769,8 +761,6 @@ export function getCommonGroundInstructions(
   language: SupportedLanguage, 
   containsGroups: boolean
 ): string {
-  console.log(`[DEBUG] getCommonGroundInstructions() language: ${language}, containsGroups: ${containsGroups}`);
-  
   let prompt = COMMON_GROUND_INSTRUCTIONS[language] || COMMON_GROUND_INSTRUCTIONS["en"];
   
   // Add group-specific instructions if needed
@@ -803,8 +793,6 @@ export function getCommonGroundSingleCommentInstructions(
   language: SupportedLanguage, 
   containsGroups: boolean
 ): string {
-  console.log(`[DEBUG] getCommonGroundSingleCommentInstructions() language: ${language}, containsGroups: ${containsGroups}`);
-  
   let prompt = COMMON_GROUND_SINGLE_COMMENT_INSTRUCTIONS[language] || COMMON_GROUND_SINGLE_COMMENT_INSTRUCTIONS["en"];
   
   // Add group-specific instructions if needed
@@ -908,8 +896,6 @@ export function getRecursiveTopicSummaryInstructions(
   language: SupportedLanguage, 
   topicName: string
 ): string {
-  console.log(`[DEBUG] getRecursiveTopicSummaryInstructions() language: ${language}, topicName: ${topicName}`);
-  
   const prompt = RECURSIVE_TOPIC_SUMMARY_INSTRUCTIONS[language] || RECURSIVE_TOPIC_SUMMARY_INSTRUCTIONS["en"];
   
   // Replace the placeholder with the actual topic name
@@ -940,7 +926,6 @@ export const TOP_SUBTOPICS_THEMES_PROMPT: Record<SupportedLanguage, string> = {
  * @returns The localized prompt with topic name replaced
  */
 export function getTopSubtopicsThemesPrompt(language: SupportedLanguage, topicName: string): string {
-  console.log(`[DEBUG] getTopSubtopicsThemesPrompt() language: ${language}`);
   const prompt = TOP_SUBTOPICS_THEMES_PROMPT[language] || TOP_SUBTOPICS_THEMES_PROMPT["en"];
   return prompt.replace("{topicName}", topicName);
 }
@@ -976,7 +961,6 @@ export function getTopSubtopicsTitleTemplate(
   topicName: string, 
   commentCount: number
 ): string {
-  console.log(`[DEBUG] getTopSubtopicsTitleTemplate() language: ${language}`);
   const template = TOP_SUBTOPICS_TITLE_TEMPLATE[language] || TOP_SUBTOPICS_TITLE_TEMPLATE["en"];
   return template
     .replace("{index}", (index + 1).toString())
@@ -1075,7 +1059,6 @@ export const RELATIVE_ENGAGEMENT_LABELS: Record<SupportedLanguage, Record<string
  * @returns The localized label for relative agreement
  */
 export function getRelativeAgreementLabel(language: SupportedLanguage, labelKey: string): string {
-  console.log(`[DEBUG] getRelativeAgreementLabel() language: ${language}, labelKey: ${labelKey}`);
   const labels = RELATIVE_AGREEMENT_LABELS[language] || RELATIVE_AGREEMENT_LABELS["en"];
   return labels[labelKey] || labels["lowAlignment"];
 }
@@ -1087,7 +1070,6 @@ export function getRelativeAgreementLabel(language: SupportedLanguage, labelKey:
  * @returns The localized label for relative engagement
  */
 export function getRelativeEngagementLabel(language: SupportedLanguage, labelKey: string): string {
-  console.log(`[DEBUG] getRelativeEngagementLabel() language: ${language}, labelKey: ${labelKey}`);
   const labels = RELATIVE_ENGAGEMENT_LABELS[language] || RELATIVE_ENGAGEMENT_LABELS["en"];
   return labels[labelKey] || labels["lowEngagement"];
 }
