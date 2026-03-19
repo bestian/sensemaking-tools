@@ -92,9 +92,6 @@ import {
  */
 export class AllTopicsSummary extends RecursiveSummary<SummaryStats> {
   async getSummary(): Promise<SummaryContent> {
-    // Debug: 檢查 output_lang 值
-    console.log(`[DEBUG] AllTopicsSummary.output_lang: ${this.output_lang}`);
-    
     // First construct the introductory description for the entire section
     const topicStats: TopicStats[] = this.input.getStatsByTopic();
     const nTopics: number = topicStats.length;
@@ -103,12 +100,6 @@ export class AllTopicsSummary extends RecursiveSummary<SummaryStats> {
       .reduce((n, m) => n + m, 0);
     const hasSubtopics: boolean = nSubtopics > 0;
     const subtopicsCountText: string = hasSubtopics ? getReportContent("subtopics", "text", this.output_lang, { count: nSubtopics }) : "";
-    
-    // Debug: 檢查 getReportContent 的調用參數
-    if (hasSubtopics) {
-      console.log(`[DEBUG] AllTopicsSummary.getSummary() calling getReportContent with: section="subtopics", content="text", output_lang="${this.output_lang}", count=${nSubtopics}`);
-      console.log(`[DEBUG] AllTopicsSummary.getSummary() subtopicsCountText result: "${subtopicsCountText}"`);
-    }
     
     const usesGroups = topicStats.some((t) => t.summaryStats.groupBasedSummarization);
     
@@ -121,12 +112,6 @@ export class AllTopicsSummary extends RecursiveSummary<SummaryStats> {
       groupsBetweenText: usesGroups ? "between the groups " : ""
     });
     
-    // Debug: 檢查本地化函式的調用參數
-    console.log(`[DEBUG] AllTopicsSummary.getSummary() calling getReportSectionTitle with: section="topics", output_lang="${this.output_lang}"`);
-    console.log(`[DEBUG] AllTopicsSummary.getSummary() calling getReportContent with: section="topics", content="overview", output_lang="${this.output_lang}"`);
-    console.log(`[DEBUG] AllTopicsSummary.getSummary() title result: "${title}"`);
-    console.log(`[DEBUG] AllTopicsSummary.getSummary() overviewText result: "${overviewText}"`);
-
     // Now construct the individual Topic summaries
     const relativeContext = new RelativeContext(topicStats, this.output_lang);
     const topicSummaries: (() => Promise<SummaryContent>)[] = topicStats.map(
@@ -168,15 +153,9 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
     super(topicStat.summaryStats, model, additionalContext, output_lang);
     this.topicStat = topicStat;
     this.relativeContext = relativeContext;
-    
-    // Debug: 檢查建構函數中的 output_lang 值
-    // console.log(`[DEBUG] TopicSummary constructor output_lang: ${this.output_lang}`);
   }
 
   async getSummary(): Promise<SummaryContent> {
-    // Debug: 檢查 getSummary 中的 output_lang 值
-    // console.log(`[DEBUG] TopicSummary.getSummary() output_lang: ${this.output_lang}`);
-    
     const nSubtopics: number = this.topicStat.subtopicStats?.length || 0;
     if (nSubtopics == 0) {
       return this.getCommentSummary();
@@ -189,9 +168,6 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
    * Returns the section title for this topics summary section of the final report
    */
   getSectionTitle(): string {
-    // Debug: 檢查 localizeTopicName 的調用參數
-    console.log(`[DEBUG] TopicSummary.getSectionTitle() calling localizeTopicName with: topicName="${this.topicStat.name}", output_lang="${this.output_lang}"`);
-    
     return `### ${localizeTopicName(this.topicStat.name, this.output_lang)} (${this.topicStat.commentCount} ${getStatisticsMessage("statements", this.output_lang, {})})`;
   }
 
@@ -200,9 +176,6 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
    * @returns a promise of the summary string
    */
   async getAllSubTopicSummaries(): Promise<SummaryContent> {
-    // Debug: 檢查 getAllSubTopicSummaries 中的 output_lang 值
-    console.log(`[DEBUG] TopicSummary.getAllSubTopicSummaries() output_lang: ${this.output_lang}`);
-    
     // Create subtopic summaries for all subtopics with > 1 statement.
     const subtopicSummaries: (() => Promise<SummaryContent>)[] = (
       this.topicStat.subtopicStats || []
@@ -233,11 +206,6 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
         statementPlural: getPluralForm(this.topicStat.commentCount, this.output_lang)
       });
       
-      // Debug: 檢查本地化函式的調用參數
-      console.log(`[DEBUG] TopicSummary.getAllSubTopicSummaries() calling getTopicSummaryText with: content="topicSummary", output_lang="${this.output_lang}"`);
-      console.log(`[DEBUG] TopicSummary.getAllSubTopicSummaries() calling getPluralForm with: count=${nSubtopics}, output_lang="${this.output_lang}"`);
-      console.log(`[DEBUG] TopicSummary.getAllSubTopicSummaries() topicSummary result: "${topicSummary}"`);
-      
       const subtopicSummaryPrompt = getAbstractPrompt(
         getRecursiveTopicSummaryInstructions(this.output_lang, this.topicStat.name),
         subtopicSummaryContents,
@@ -250,7 +218,6 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
         this.output_lang
       );
       console.log(`Generating TOPIC SUMMARY for: "${this.topicStat.name}"`);
-      console.log(`[DEBUG] Calling model.generateText with output_lang: ${this.output_lang}`);
       subtopicSummaryContents.unshift({
         type: "TopicSummary",
         text: await this.model.generateText(subtopicSummaryPrompt, this.output_lang),
@@ -277,10 +244,6 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
     const agreementDescription = getTopicSummaryText("relativeAgreement", this.output_lang, {
       level: relativeAgreement
     });
-    
-    // Debug: 檢查本地化函式的調用參數
-    console.log(`[DEBUG] TopicSummary.getCommentSummary() calling getTopicSummaryText with: content="relativeAgreement", output_lang="${this.output_lang}", level="${relativeAgreement}"`);
-    console.log(`[DEBUG] TopicSummary.getCommentSummary() agreementDescription result: "${agreementDescription}"`);
     
     const subContents = [await this.getThemesSummary()];
     // check env variable to decide whether to compute common ground and difference of opinion summaries
@@ -353,13 +316,9 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
    * @returns a single sentence describing the themes, without citations.
    */
   async getThemesSummary(): Promise<SummaryContent> {
-    // Debug: 檢查 getThemesSummary 中的 output_lang 值
-    console.log(`[DEBUG] TopicSummary.getThemesSummary() output_lang: ${this.output_lang}`);
-    
     const allComments = this.input.comments;
     // TODO: add some edge case handling in case there is only 1 comment, etc
     console.log(`Generating PROMINENT THEMES for subtopic: "${this.topicStat.name}"`);
-    console.log(`[DEBUG] Calling model.generateText with output_lang: ${this.output_lang}`);
     const text = await this.model.generateText(
       getPrompt(
         getThemesPrompt(this.output_lang, this.topicStat.name),
@@ -373,10 +332,6 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
     // Get localized themes title from localization system
     const title = getSubsectionTitle("prominentThemes", this.output_lang);
     
-    // Debug: 檢查本地化函式的調用參數
-    console.log(`[DEBUG] TopicSummary.getThemesSummary() calling getSubsectionTitle with: section="prominentThemes", output_lang="${this.output_lang}"`);
-    console.log(`[DEBUG] TopicSummary.getThemesSummary() title result: "${title}"`);
-    
     return { title, text };
   }
 
@@ -385,9 +340,6 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
    * @returns a short paragraph describing the similarities, including comment citations.
    */
   async getCommonGroundSummary(topic: string): Promise<SummaryContent> {
-    // Debug: 檢查 getCommonGroundSummary 中的 output_lang 值
-    console.log(`[DEBUG] TopicSummary.getCommonGroundSummary() output_lang: ${this.output_lang}`);
-    
     // TODO: Should also include common ground disagree comments (aka what everyone agrees they
     // don't like)
     const commonGroundComments = this.input.getCommonGroundAgreeComments();
@@ -397,7 +349,6 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
       text = this.input.getCommonGroundNoCommentsMessage();
     } else {
       console.log(`Generating COMMON GROUND for "${topic}"`);
-      console.log(`[DEBUG] Calling model.generateText with output_lang: ${this.output_lang}`);
       const summary = this.model.generateText(
         getPrompt(
           nComments === 1
@@ -417,10 +368,6 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
       ? getSubsectionTitle("commonGroundBetweenGroups", this.output_lang)
       : getSubsectionTitle("commonGround", this.output_lang);
     
-    // Debug: 檢查本地化函式的調用參數
-    console.log(`[DEBUG] TopicSummary.getCommonGroundSummary() calling getSubsectionTitle with: section="${this.input.groupBasedSummarization ? 'commonGroundBetweenGroups' : 'commonGround'}", output_lang="${this.output_lang}"`);
-    console.log(`[DEBUG] TopicSummary.getCommonGroundSummary() title result: "${title}"`);
-    
     return {
       title,
       text: text,
@@ -436,9 +383,6 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
     commonGroundSummary: SummaryContent,
     topic: string
   ): Promise<SummaryContent> {
-    // Debug: 檢查 getDifferencesOfOpinionSummary 中的 output_lang 值
-    console.log(`[DEBUG] TopicSummary.getDifferencesOfOpinionSummary() output_lang: ${this.output_lang}`);
-    
     const topDisagreeCommentsAcrossGroups = this.input.getDifferenceOfOpinionComments();
     const nComments = topDisagreeCommentsAcrossGroups.length;
     let text = "";
@@ -455,17 +399,12 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
         this.output_lang
       );
       console.log(`Generating DIFFERENCES OF OPINION for "${topic}"`);
-      console.log(`[DEBUG] Calling model.generateText with output_lang: ${this.output_lang}`);
       const summary = this.model.generateText(prompt, this.output_lang);
       text = await summary;
     }
     
     // Get localized differences of opinion title from localization system
     const title = getSubsectionTitle("differencesOfOpinion", this.output_lang);
-    
-    // Debug: 檢查本地化函式的調用參數
-    console.log(`[DEBUG] TopicSummary.getDifferencesOfOpinionSummary() calling getSubsectionTitle with: section="differencesOfOpinion", output_lang="${this.output_lang}"`);
-    console.log(`[DEBUG] TopicSummary.getDifferencesOfOpinionSummary() title result: "${title}"`);
     
     const resp = {
       title,
@@ -487,9 +426,6 @@ export class TopicSummary extends RecursiveSummary<SummaryStats> {
  */
 export class SubtopicSummary extends TopicSummary {
   override getSectionTitle(): string {
-    // Debug: 檢查 SubtopicSummary 中的 output_lang 值
-    console.log(`[DEBUG] SubtopicSummary.getSectionTitle() output_lang: ${this.output_lang}`);
-    
     return `#### ${this.topicStat.name} (${this.topicStat.commentCount} ${getStatisticsMessage("statements", this.output_lang, {})})`;
   }
 }

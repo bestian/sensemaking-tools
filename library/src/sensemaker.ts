@@ -98,8 +98,6 @@ export class Sensemaker {
       output_lang
     );
 
-    console.log(`[DEBUG] summary: ${JSON.stringify(summary)}`);
-
     // TODO: translate the summary's "Other" to the output language
     const translatedSummary = translateSummary(summary, output_lang);
     

@@ -26,7 +26,6 @@ export function getLanguageName(lang: SupportedLanguage): string {
 }
 
 export function getLanguagePrefix(lang: SupportedLanguage): string {
-  console.log(`[DEBUG] getLanguagePrefix() lang: ${lang}`);
   return LANGUAGE_PREFIXES[lang] || "";
 }
 
