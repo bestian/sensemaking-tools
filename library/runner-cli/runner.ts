@@ -30,6 +30,7 @@
 //  npx ts-node ./library/runner-cli/runner.ts --outputBasename out \
 // --vertexProject "{CLOUD_PROJECT_ID}" \
 // --inputFile "data.csv"
+// -- language fr    (default: en)
 
 import { Command } from "commander";
 import { writeFileSync } from "fs";
