@@ -10,6 +10,11 @@ async function main(): Promise<void> {
   program.option("-s, --summary <file>", "The summary file location.");
   program.option("-c, --comments <file>", "The comments file location.");
   program.option("-r, --reportTitle <title>", "The title of the report.");
+  program.option("--reportSubtitle <subtitle>", "Optional report subtitle.");
+  program.option("--reportQuestion <question>", "Optional report question or prompt.");
+  program.option("--sourceUrl <url>", "Optional source URL for the report data.");
+  program.option("--modelName <name>", "Optional model label to display in the report.");
+  program.option("--generatedAt <timestamp>", "Optional generated-at timestamp for the report.");
   program.parse(process.argv);
   const options = program.opts();
 
@@ -28,6 +33,11 @@ async function main(): Promise<void> {
 
   const reportMetadata = {
     title: options["reportTitle"],
+    subtitle: options["reportSubtitle"],
+    question: options["reportQuestion"],
+    sourceUrl: options["sourceUrl"],
+    modelName: options["modelName"],
+    generatedAt: options["generatedAt"],
   };
 
   // path to "data" folder

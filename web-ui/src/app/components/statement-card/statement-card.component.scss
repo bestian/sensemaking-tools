@@ -1,25 +1,33 @@
 @import "../../../style-vars";
 
 @mixin card-shape {
-  border-radius: 16px 16px 16px 0;
+  border-radius: 18px;
 }
 
 .inline-card {
   @include card-shape;
-  background-color: $white;
-  border: 1px solid $mystic;
+  background: linear-gradient(180deg, rgba($white, 0.96), rgba($warm, 0.82));
+  border: 1px solid rgba($border, 0.95);
+  box-shadow: 0 8px 20px rgba($oxford-blue, 0.08);
   height: 100%; // needed for usage of element in grid to ensure it takes up any empty space in the grid row
-  padding: 12px;
+  padding: 0.95rem;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 
   &:hover {
-    background-color: $mystic-2;
+    border-color: rgba($gold-light, 0.55);
+    box-shadow: 0 16px 28px rgba($oxford-blue, 0.1);
+    transform: translateY(-1px);
   }
 }
 
 p {
-  font-size: 12px;
-  line-height: 1.33;
-  letter-spacing: 0.1px;
+  color: $text;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  letter-spacing: 0.01em;
 
   &.truncated {
     @include truncateText(3);
@@ -28,29 +36,30 @@ p {
 
 .pill {
   border-radius: 500px;
-  color: $mine-shaft;
-  font-size: 10px;
-  letter-spacing: 0.1px;
+  color: $oxford-blue;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   line-height: 1.2;
-  padding: 3px 8px;
+  padding: 0.28rem 0.65rem;
   width: fit-content;
 
   &.blank {
-    background-color: $white;
-    border: 1px solid $silver;
-    padding: 2px 7px;
+    background-color: rgba($white, 0.92);
+    border: 1px solid rgba($border, 0.95);
   }
 
   &.neg {
-    background-color: $your-pink;
+    background-color: $danger-soft;
   }
 
   &.neutral {
-    background-color: $alto;
+    background-color: $neutral-soft;
   }
 
   &.pos {
-    background-color: $magic-mint;
+    background-color: $success-soft;
   }
 }
 
@@ -64,46 +73,50 @@ p {
 
 .popup-card {
   @include card-shape;
-  background-color: $white;
-  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.15), 0px 1px 2px rgba(0, 0, 0, 0.30);
-  max-width: 250px;
+  background: $surface;
+  border: 1px solid rgba($border, 0.95);
+  box-shadow: $cream-shadow;
+  max-width: 320px;
 
   .popup-bottom {
-    padding: 12px;
+    padding: 0.95rem;
   }
 
   .popup-top {
-    border-bottom: 1px solid $mystic;
-    padding: 12px;
+    border-bottom: 1px solid rgba($border-soft, 0.95);
+    padding: 0.95rem;
   }
 }
 
 .subheading {
-  color: $cape-cod-2;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.1px;
-  line-height: 1.33;
+  color: $oxford-blue;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1.4;
+  text-transform: uppercase;
 }
 
 .topic-breakdown {
-  font-size: 10px;
+  color: $muted;
+  font-size: 0.74rem;
   font-weight: 600;
-  letter-spacing: 0.1px;
+  letter-spacing: 0.08em;
   line-height: 1.6;
-  margin-top: 10px;
+  margin-top: 0.8rem;
+  text-transform: uppercase;
 }
 
 .vote-breakdown {
-  color: $cape-cod-2;
-  font-size: 10px;
+  color: $text;
+  font-size: 0.78rem;
   font-weight: 500;
-  letter-spacing: 0.1px;
-  line-height: 1.33;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
   display: grid;
   grid-template-columns: max-content auto;
-  gap: 7px 25px;
-  margin-top: 5px;
+  gap: 0.55rem 1rem;
+  margin-top: 0.7rem;
 }
 
 .vote-dot {
@@ -114,16 +127,16 @@ p {
   width: 4px;
 
   &.agree {
-    background-color: $magic-mint;
+    background-color: $sage;
   }
 
   &.disagree {
-    background-color: $your-pink;
+    background-color: $danger;
   }
 
   &.pass {
     background-color: $white;
-    border: 0.5px solid $boulder;
+    border: 1px solid $muted;
   }
 }
 

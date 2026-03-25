@@ -26,5 +26,6 @@ export * from './src/sensemaker_utils';
 // Export model interfaces
 export * from './src/models/model';
 
-// Export OpenRouter model implementation only
+// Export model implementations
 export { OpenRouterModel } from './src/models/openrouter_model';
+export { LmStudioModel } from './src/models/lmstudio_model';

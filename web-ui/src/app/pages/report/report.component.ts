@@ -19,6 +19,7 @@ import importedCommentData from  "../../../../data/comments.json";
 import importedReportMetadata from "../../../../data/metadata.json";
 
 import {
+  ReportMetadata,
   VoteGroup,
   Statement,
   Subtopic,
@@ -90,9 +91,15 @@ export class ReportComponent {
   topicData = importedTopicData as Topic[];
   summaryData = importedSummaryData;
   commentData = importedCommentData;
-  reportMetadata = importedReportMetadata;
+  reportMetadata = importedReportMetadata as ReportMetadata;
 
   reportTitle: string = this.reportMetadata.title || "Report";
+  reportSubtitle: string =
+    this.reportMetadata.subtitle || "Structured public-input analysis generated with a local model.";
+  reportQuestion: string = this.reportMetadata.question || "";
+  sourceUrl: string = this.reportMetadata.sourceUrl || "";
+  modelName: string = this.reportMetadata.modelName || "";
+  generatedAt: string = this.reportMetadata.generatedAt || "";
   selectedAlignmentType: AlignmentType = "high-alignment";
   isStatementDrawerOpen = false;
   drawerSubtopicName = "";
@@ -202,6 +209,20 @@ export class ReportComponent {
 
   get alignmentCards() {
     return this.getTopStatements(this.commentData, this.selectedAlignmentType);
+  }
+
+  get reportMetaItems(): string[] {
+    const items: string[] = [];
+    if (this.modelName) {
+      items.push(`Local model: ${this.modelName}`);
+    }
+    if (this.generatedAt) {
+      items.push(`Generated: ${this.generatedAt}`);
+    }
+    if (this.totalStatements) {
+      items.push(`${this.totalStatements.toLocaleString()} statements`);
+    }
+    return items;
   }
 
   getTopicSummaryData(topicName: string): any {

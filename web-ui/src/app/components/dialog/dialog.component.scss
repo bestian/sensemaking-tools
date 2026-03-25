@@ -4,24 +4,28 @@
   max-width: 450px;
 
   button[mat-button] {
-    color: $science-blue;
+    color: $teal;
     font-family: $main-font;
+    font-weight: 600;
   }
 
   h2[mat-dialog-title] {
-    color: $mine-shaft;
-    font-family: $main-font;
+    color: $oxford-blue;
+    font-family: $serif-font;
+    font-size: 1.7rem;
+    font-weight: 600;
   }
 
   mat-dialog-content {
-    color: $cape-cod;
+    color: $text;
     font-family: $main-font;
   }
 }
 
 .copy-container {
-  border: 1px solid $gray-nurse;
-  border-radius: 8px;
+  background: rgba($warm, 0.92);
+  border: 1px solid rgba($border, 0.95);
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -36,7 +40,7 @@
   }
 
   mat-icon {
-    color: $cape-cod;
+    color: $oxford-blue;
     flex-shrink: 0;
   }
 }

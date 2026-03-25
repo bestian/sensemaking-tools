@@ -5,8 +5,18 @@ const fs = require("fs");
 const { JSDOM } = jsdom;
 const srcDir = "dist/web-ui/browser";
 const destDir = "dist/bundled";
+const fontSrcDir = `${srcDir}/fonts`;
+const fontDestDir = `${destDir}/fonts`;
 
 fs.mkdirSync(destDir, { recursive: true });
+if (fs.existsSync(fontSrcDir)) {
+  fs.cpSync(fontSrcDir, fontDestDir, { recursive: true });
+}
+
+const rewriteBundledAssetUrls = (cssText) => cssText
+  .replaceAll('url("/fonts/', 'url("./fonts/')
+  .replaceAll("url('/fonts/", "url('./fonts/")
+  .replaceAll("url(/fonts/", "url(./fonts/");
 
 const indexFilePath = srcDir + "/index.csr.html"; // this is the root html file from the build
 const htmlSource = fs.readFileSync(indexFilePath);
@@ -47,7 +57,7 @@ linkTags.forEach((e) => {
     let styleFile = srcDir + "/" + href;
     // Add the stylesheet to dom as inline.
     const style = dom.window.document.createElement("style");
-    style.innerHTML = fs.readFileSync(styleFile).toString();
+    style.innerHTML = rewriteBundledAssetUrls(fs.readFileSync(styleFile).toString());
     dom.window.document.body.appendChild(style);
   }
   // find and remove unused resources to prevent console errors

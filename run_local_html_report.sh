@@ -1,0 +1,135 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+EXPORT_BASE_URL="${EXPORT_BASE_URL:-https://bloom.civic.ai/api/v3/reportExport/r2jstrdchy3udbrf8arjx}"
+WORK_DIR="${WORK_DIR:-${ROOT_DIR}/tmp/local-report}"
+REPORT_TITLE="${REPORT_TITLE:-Bloom Civic AI Report}"
+REPORT_SUBTITLE="${REPORT_SUBTITLE:-Structured public-input analysis generated locally with LM Studio.}"
+REPORT_QUESTION="${REPORT_QUESTION:-How should AI care for our communities, and who gets to decide?}"
+ADDITIONAL_CONTEXT="${ADDITIONAL_CONTEXT:-This is a public-input conversation about how AI should care for communities and who should decide how these systems are used. Summarize it clearly for a civic audience.}"
+MODEL_NAME="${MODEL_NAME:-nvidia/nemotron-3-nano-4b}"
+LM_STUDIO_BASE_URL="${LM_STUDIO_BASE_URL:-http://127.0.0.1:1234/v1}"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --export-base-url)
+      EXPORT_BASE_URL="$2"
+      shift 2
+      ;;
+    --work-dir)
+      WORK_DIR="$2"
+      shift 2
+      ;;
+    --report-title)
+      REPORT_TITLE="$2"
+      shift 2
+      ;;
+    --report-subtitle)
+      REPORT_SUBTITLE="$2"
+      shift 2
+      ;;
+    --report-question)
+      REPORT_QUESTION="$2"
+      shift 2
+      ;;
+    --additional-context)
+      ADDITIONAL_CONTEXT="$2"
+      shift 2
+      ;;
+    --model)
+      MODEL_NAME="$2"
+      shift 2
+      ;;
+    --lmstudio-base-url)
+      LM_STUDIO_BASE_URL="$2"
+      shift 2
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      exit 1
+      ;;
+  esac
+done
+
+RAW_DIR="${WORK_DIR}/raw"
+GENERATED_BASENAME="${WORK_DIR}/generated/local-report"
+FINAL_HTML="${WORK_DIR}/report.html"
+
+mkdir -p "${RAW_DIR}" "${WORK_DIR}/generated"
+
+download_export() {
+  local name="$1"
+  echo "Downloading ${name}.csv"
+  curl -L -sS -o "${RAW_DIR}/${name}.csv" "${EXPORT_BASE_URL}/${name}.csv"
+}
+
+download_export "summary"
+download_export "comments"
+download_export "votes"
+download_export "participant-votes"
+download_export "comment-groups"
+
+SOURCE_URL="$(python3 - <<'PY' "${RAW_DIR}/summary.csv"
+import csv
+import sys
+
+with open(sys.argv[1], newline="", encoding="utf-8") as fh:
+    reader = csv.reader(fh)
+    for row in reader:
+        if len(row) >= 2 and row[0] == "url":
+            print(row[1])
+            break
+PY
+)"
+
+if command -v lms >/dev/null 2>&1; then
+  echo "Reloading ${MODEL_NAME} in LM Studio with safe local settings"
+  lms unload "${MODEL_NAME}" >/dev/null 2>&1 || true
+  lms load "${MODEL_NAME}" \
+    --context-length 8192 \
+    --parallel 1 \
+    --gpu max \
+    --identifier "${MODEL_NAME}" \
+    -y >/dev/null
+fi
+
+echo "Converting Polis export to sensemaking input"
+python3 "${ROOT_DIR}/library/bin/process_polis_data.py" \
+  "${RAW_DIR}" \
+  --participants-votes "${RAW_DIR}/participant-votes.csv" \
+  -o "${WORK_DIR}/processed-comments.csv"
+
+echo "Generating structured report data with local model ${MODEL_NAME}"
+npx ts-node "${ROOT_DIR}/library/runner-cli/advanced_runner_lmstudio.ts" \
+  --inputFile "${WORK_DIR}/processed-comments.csv" \
+  --outputBasename "${GENERATED_BASENAME}" \
+  --additionalContext "${ADDITIONAL_CONTEXT}" \
+  --model "${MODEL_NAME}" \
+  --baseUrl "${LM_STUDIO_BASE_URL}" \
+  --outputLang en \
+  --topicDepth 2
+
+GENERATED_AT="$(date -u +"%Y-%m-%d %H:%M UTC")"
+
+echo "Building HTML report"
+(
+  cd "${ROOT_DIR}/web-ui"
+  npx ts-node site-build.ts \
+    --topics "${GENERATED_BASENAME}-topic-stats.json" \
+    --summary "${GENERATED_BASENAME}-summary.json" \
+    --comments "${GENERATED_BASENAME}-comments-with-scores.json" \
+    --reportTitle "${REPORT_TITLE}" \
+    --reportSubtitle "${REPORT_SUBTITLE}" \
+    --reportQuestion "${REPORT_QUESTION}" \
+    --sourceUrl "${SOURCE_URL}" \
+    --modelName "${MODEL_NAME}" \
+    --generatedAt "${GENERATED_AT}"
+  node single-html-build.js
+)
+
+cp "${ROOT_DIR}/web-ui/dist/bundled/report.html" "${FINAL_HTML}"
+echo
+echo "Report ready:"
+echo "${FINAL_HTML}"

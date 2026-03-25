@@ -3,7 +3,18 @@
     <main class="report-page">
       <section class="report-header">
         <div class="report-header-details">
+          <div class="report-kicker">Bloom civic report</div>
           <h1>{{ reportTitle }}</h1>
+          <p class="report-subtitle">{{ reportSubtitle }}</p>
+          @if (reportQuestion) {
+            <p class="report-question">{{ reportQuestion }}</p>
+          }
+          <div class="report-meta">
+            <span *ngFor="let item of reportMetaItems" class="report-meta-item">{{ item }}</span>
+            @if (sourceUrl) {
+              <a class="report-meta-link" [href]="sourceUrl" target="_blank" rel="noopener noreferrer">Source export</a>
+            }
+          </div>
         </div>
         <button
           mat-stroked-button
@@ -42,6 +53,9 @@
               <h2>About this report</h2>
             </div>
             <div class="card-section report-summary paragraphs">
+              @if (reportQuestion) {
+                <p class="lead-in">Question asked: <strong>{{ reportQuestion }}</strong></p>
+              }
               <p>This report summarizes the results of public input, encompassing {{ totalStatements | number }} statements and {{ totalVotes | number }} votes. From the statements submitted, {{ topicNumber | number }} high level topics were identified, as well as {{ subtopicNumber | number }} subtopics. All voters were anonymous.</p>
               <p>The report below summarizes points of <span class="tooltip-trigger" matTooltip="70% or more of participants voted the same way (e.g. 70% agree, or 70% disagree)">high alignment</span>, <span class="tooltip-trigger" matTooltip="Votes were about split between participants (e.g. 40% agree, 60% disagree, or vice versa)">low alignment</span>, and <span class="tooltip-trigger" matTooltip="More than 30% of participants voted “Unsure/pass”">uncertainty</span> among participants.</p>
             </div>

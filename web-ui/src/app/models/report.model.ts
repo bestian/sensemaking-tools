@@ -40,7 +40,17 @@ type Topic = {
   subtopicStats: Subtopic[],
 };
 
+type ReportMetadata = {
+  title?: string,
+  subtitle?: string,
+  question?: string,
+  sourceUrl?: string,
+  modelName?: string,
+  generatedAt?: string,
+};
+
 export {
+  ReportMetadata,
   VoteGroup,
   Statement,
   Subtopic,

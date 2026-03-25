@@ -2,14 +2,59 @@
 
 @import "style-vars";
 
-html, body {
+@font-face {
+  font-family: "Outfit";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("/fonts/outfit-latin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Cormorant Garamond";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("/fonts/cormorant-normal-latin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Cormorant Garamond";
+  font-style: italic;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("/fonts/cormorant-italic-latin.woff2") format("woff2");
+}
+
+:root {
+  --report-paper: #{$paper};
+  --report-warm: #{$warm};
+  --report-surface: #{$surface};
+  --report-text: #{$text};
+  --report-heading: #{$oxford-blue};
+  --report-muted: #{$muted};
+  --report-gold: #{$gold};
+  --report-teal: #{$teal};
+}
+
+html,
+body {
   height: 100%;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  color: #1F1F1F;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.98), rgba(250, 248, 245, 0.96) 42%, rgba(244, 241, 236, 1) 100%);
+  color: $text;
   font-family: $main-font;
   margin: 0;
+  min-height: 100%;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
 }
 
 *, *::before, *::after {
@@ -17,7 +62,37 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6, p, ul {
-  color: #1F1F1F;
+  color: $text;
   font-weight: 400;
   margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: $oxford-blue;
+}
+
+a {
+  color: $teal;
+  text-decoration-color: rgba($teal, 0.35);
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  color: $gold;
+}
+
+.mat-mdc-dialog-surface {
+  background: $surface !important;
+  border: 1px solid rgba($border, 0.95);
+  border-radius: 20px !important;
+  box-shadow: $cream-shadow !important;
+}
+
+.mat-mdc-tooltip {
+  --mdc-plain-tooltip-container-color: #{$oxford-blue};
+  --mdc-plain-tooltip-supporting-text-color: #{$white};
+  font-family: $main-font;
 }
