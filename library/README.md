@@ -8,7 +8,7 @@ This library is now available as an npm package optimized for Cloudflare Workers
 
 ### **Installation**
 
-Currently, the package is available from GitHub releases. Install from the release tarball:
+The 2025-08-27 tarball version is available via GitHub Releases (note: this stable version is not the latest version). Install using the release tarball:
 
 ```bash
 # Download and install from GitHub release
@@ -236,6 +236,8 @@ This library is implemented using Google Cloud's [VertexAI](https://cloud.google
 In addition to Gemini models available through VertexAI, users can integrate custom models using the library's `Model` abstraction. This can be done by implementing a class with only two methods, one for generating plain text and one for generating structured data ([docs](https://jigsaw-code.github.io/sensemaking-tools/docs/classes/models_model.Model.html) for methods). This allows for the library to be used with models other than Gemini, with other cloud providers, and even with on-premise infrastructure for complete data sovereignty.
 
 Please note that performance results for existing functionality may vary depending on the model selected.
+
+Two additional local-inference adapters are provided out of the box: **`GgmlModel`** (targets `llama-server` / llama.cpp with GGUF files) and **`LmStudioModel`** (targets LM Studio's OpenAI-compatible endpoint). Both require no cloud account and are drop-in replacements for `VertexModel` or `OpenRouterModel`.
 
 ### **Costs of Running**
 
@@ -505,6 +507,47 @@ npx ts-node ./library/runner-cli/categorization_runner_openrouter.ts \
 ```
 
 * [./library/runner-cli/advanced\_runner.ts](https://github.com/Jigsaw-Code/sensemaking-tools/blob/main/library/runner-cli/advanced_runner.ts): takes in a CSV representing a conversation and outputs three files for an advanced user more interested in the statistics. The first is a JSON of topics, their sizes, and their subtopics. The second is a JSON with all of the comments and their alignment scores and values. Third is the summary object as a JSON which can be used for additional processing.
+
+* [./library/runner-cli/runner\_ggml.ts](https://github.com/bestian/sensemaking-tools/blob/new-feature-open-router-ggml/library/runner-cli/runner_ggml.ts): Runs the full sensemaking pipeline against a local **GGUF model** served by [llama-server (llama.cpp)](https://github.com/ggerganov/llama.cpp). No cloud API key is required.
+
+  **Option A — start `llama-server` manually first:**
+  ```bash
+  llama-server --model /path/to/model.gguf --port 8080 --ctx-size 8192
+  npx ts-node ./library/runner-cli/runner_ggml.ts \
+    --inputFile "./files/comments.csv" \
+    --outputBasename out
+  ```
+
+  **Option B — let the runner auto-start `llama-server`:**
+  ```bash
+  npx ts-node ./library/runner-cli/runner_ggml.ts \
+    --inputFile "./files/comments.csv" \
+    --outputBasename out \
+    --modelPath /path/to/model.gguf \
+    --autoStart \
+    --ctxSize 32768 \
+    --output_lang zh-TW
+  ```
+
+  Key options: `--serverUrl` (default `http://127.0.0.1:8080`), `--modelPath`, `--autoStart`, `--ctxSize` (default 32768), `--output_lang`.  
+  Outputs: `.md`, `.html`, `.json`, and `-summaryAndSource.csv`.  
+  Override the binary path via the `LLAMA_SERVER_BIN` environment variable.
+
+* [./library/runner-cli/advanced\_runner\_lmstudio.ts](https://github.com/bestian/sensemaking-tools/blob/new-feature-open-router-ggml/library/runner-cli/advanced_runner_lmstudio.ts): Advanced runner that uses a locally running **[LM Studio](https://lmstudio.ai)** instance (OpenAI-compatible endpoint, default `http://127.0.0.1:1234/v1`). Outputs the same three JSON files as `advanced_runner.ts` (topic stats, comments with scores, and summary).
+
+  Start LM Studio and load a model, then run:
+  ```bash
+  npx ts-node ./library/runner-cli/advanced_runner_lmstudio.ts \
+    --inputFile "./files/comments.csv" \
+    --outputBasename out \
+    --model nvidia/nemotron-3-nano-4b \
+    --baseUrl http://127.0.0.1:1234/v1 \
+    --outputLang zh-TW \
+    --topicDepth 2
+  ```
+
+  Key options: `--model` (default `nvidia/nemotron-3-nano-4b`), `--baseUrl`, `--maxTokens` (default 4096), `--outputLang`, `--topicDepth` (1 / 2 / 3, default 2).  
+  You can also use the convenience shell script `run_local_html_report.sh`, which fetches raw data from a Bloom Civic AI export URL, runs this runner, and builds a self-contained HTML report.
 
 These tools process CSV input files.  These must contain the columns `comment_text` and `comment-id`.  For deliberations without group information, vote counts should be set in columns titled `agrees`, `disagrees` and `passes`.  If you do not have vote information, these can be set to 0. For deliberations with group breakdowns, you can set the columns `{group_name}-agree-count`, `{group_name}-disagree-count`, `{group_name}-pass-count`.
 
