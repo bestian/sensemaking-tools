@@ -1,5 +1,34 @@
 #!/usr/bin/env bash
 
+# Run a local HTML report for a given Polis export.
+#
+# Usage:
+#   run_local_html_report.sh [options]
+#
+# Options:
+#   --export-base-url <url>  The base URL of the Polis export (default: https://bloom.civic.ai/api/v3/reportExport/r2jstrdchy3udbrf8arjx)
+#   --work-dir <dir>         The directory to store the report (default: ${ROOT_DIR}/tmp/local-report)
+#   --report-title <title>   The title of the report (default: Bloom Civic AI Report)
+#   --report-subtitle <subtitle> The subtitle of the report (default: Structured public-input analysis generated locally with LM Studio.)
+#   --report-question <question> The question of the report (default: How should AI care for our communities, and who gets to decide?)
+#   --additional-context <context> The additional context of the report (default: This is a public-input conversation about how AI should care for communities and who should decide how these systems are used. Summarize it clearly for a civic audience.)
+#   --model <model>         The model to use for the report (default: nvidia/nemotron-3-nano-4b)
+#   --lmstudio-base-url <url> The base URL of the LM Studio instance (default: http://127.0.0.1:1234/v1)
+
+# Exit on error, unset variables, and pipefail.
+
+# Example usage (all options):
+#   bash ./run_local_html_report.sh \
+#     --export-base-url "https://bloom.civic.ai/api/v3/reportExport/r2jstrdchy3udbrf8arjx" \
+#     --work-dir "${ROOT_DIR}/tmp/local-report" \
+#     --report-title "Bloom Civic AI Report" \
+#     --report-subtitle "Structured public-input analysis generated locally with LM Studio." \
+#     --report-question "How should AI care for our communities, and who gets to decide?" \
+#     --additional-context "This is a public-input conversation about how AI should care for communities and who should decide how these systems are used. Summarize it clearly for a civic audience." \
+#     --model "nvidia/nemotron-3-nano-4b" \
+#     --lmstudio-base-url "http://127.0.0.1:1234/v1"
+
+
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
