@@ -14,6 +14,7 @@
 #   --additional-context <context> The additional context of the report (default: This is a public-input conversation about how AI should care for communities and who should decide how these systems are used. Summarize it clearly for a civic audience.)
 #   --model <model>         The model to use for the report (default: nvidia/nemotron-3-nano-4b)
 #   --lmstudio-base-url <url> The base URL of the LM Studio instance (default: http://127.0.0.1:1234/v1)
+#   --python-bin <path>     Python interpreter path (default: ${ROOT_DIR}/.venv/bin/python if present, otherwise python3)
 
 # Exit on error, unset variables, and pipefail.
 
@@ -26,7 +27,8 @@
 #     --report-question "How should AI care for our communities, and who gets to decide?" \
 #     --additional-context "This is a public-input conversation about how AI should care for communities and who should decide how these systems are used. Summarize it clearly for a civic audience." \
 #     --model "nvidia/nemotron-3-nano-4b" \
-#     --lmstudio-base-url "http://127.0.0.1:1234/v1"
+#     --lmstudio-base-url "http://127.0.0.1:1234/v1" \
+#     --python-bin "${ROOT_DIR}/.venv/bin/python"
 
 
 set -euo pipefail
@@ -40,6 +42,17 @@ REPORT_QUESTION="${REPORT_QUESTION:-How should AI care for our communities, and 
 ADDITIONAL_CONTEXT="${ADDITIONAL_CONTEXT:-This is a public-input conversation about how AI should care for communities and who should decide how these systems are used. Summarize it clearly for a civic audience.}"
 MODEL_NAME="${MODEL_NAME:-nvidia/nemotron-3-nano-4b}"
 LM_STUDIO_BASE_URL="${LM_STUDIO_BASE_URL:-http://127.0.0.1:1234/v1}"
+PYTHON_BIN="${PYTHON_BIN:-}"
+
+if [[ -z "${PYTHON_BIN}" ]]; then
+  if [[ -x "${ROOT_DIR}/.venv/bin/python" ]]; then
+    PYTHON_BIN="${ROOT_DIR}/.venv/bin/python"
+  else
+    PYTHON_BIN="python3"
+  fi
+fi
+
+echo "Using Python interpreter: ${PYTHON_BIN}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -75,6 +88,10 @@ while [[ $# -gt 0 ]]; do
       LM_STUDIO_BASE_URL="$2"
       shift 2
       ;;
+    --python-bin)
+      PYTHON_BIN="$2"
+      shift 2
+      ;;
     *)
       echo "Unknown argument: $1" >&2
       exit 1
@@ -100,7 +117,7 @@ download_export "votes"
 download_export "participant-votes"
 download_export "comment-groups"
 
-SOURCE_URL="$(python3 - <<'PY' "${RAW_DIR}/summary.csv"
+SOURCE_URL="$("${PYTHON_BIN}" - <<'PY' "${RAW_DIR}/summary.csv"
 import csv
 import sys
 
@@ -116,16 +133,48 @@ PY
 if command -v lms >/dev/null 2>&1; then
   echo "Reloading ${MODEL_NAME} in LM Studio with safe local settings"
   lms unload "${MODEL_NAME}" >/dev/null 2>&1 || true
-  lms load "${MODEL_NAME}" \
-    --context-length 8192 \
-    --parallel 1 \
-    --gpu max \
-    --identifier "${MODEL_NAME}" \
-    -y >/dev/null
+
+  set +e
+  LMS_LOAD_OUTPUT="$(
+    lms load "${MODEL_NAME}" \
+      --context-length 8192 \
+      --parallel 1 \
+      --gpu max \
+      --identifier "${MODEL_NAME}" \
+      -y 2>&1
+  )"
+  LMS_LOAD_EXIT_CODE=$?
+  set -e
+
+  if [[ ${LMS_LOAD_EXIT_CODE} -ne 0 ]]; then
+    if [[ "${LMS_LOAD_OUTPUT}" == *"already exists"* ]]; then
+      echo "LM Studio model identifier already exists; reusing loaded model ${MODEL_NAME}."
+    else
+      echo "${LMS_LOAD_OUTPUT}" >&2
+      exit ${LMS_LOAD_EXIT_CODE}
+    fi
+  else
+    echo "${LMS_LOAD_OUTPUT}"
+  fi
 fi
 
 echo "Converting Polis export to sensemaking input"
-python3 "${ROOT_DIR}/library/bin/process_polis_data.py" \
+"${PYTHON_BIN}" - <<'PY'
+import importlib.util
+import sys
+
+if importlib.util.find_spec("pandas") is None:
+    sys.stderr.write(
+        "Missing Python dependency: pandas\n"
+        "Please install dependencies in your venv, e.g.:\n"
+        "  python -m venv .venv\n"
+        "  . .venv/bin/activate\n"
+        "  pip install -r requirements.txt\n"
+    )
+    sys.exit(1)
+PY
+
+"${PYTHON_BIN}" "${ROOT_DIR}/library/bin/process_polis_data.py" \
   "${RAW_DIR}" \
   --participants-votes "${RAW_DIR}/participant-votes.csv" \
   -o "${WORK_DIR}/processed-comments.csv"
