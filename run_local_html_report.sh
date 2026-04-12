@@ -14,6 +14,7 @@
 #   --additional-context <context> The additional context of the report (default: This is a public-input conversation about how AI should care for communities and who should decide how these systems are used. Summarize it clearly for a civic audience.)
 #   --model <model>         The model to use for the report (default: nvidia/nemotron-3-nano-4b)
 #   --lmstudio-base-url <url> The base URL of the LM Studio instance (default: http://127.0.0.1:1234/v1)
+#   --batch-size <count>    Categorization batch size for local model calls (default: 20)
 #   --python-bin <path>     Python interpreter path (default: ${ROOT_DIR}/.venv/bin/python if present, otherwise python3)
 
 # Exit on error, unset variables, and pipefail.
@@ -28,6 +29,7 @@
 #     --additional-context "This is a public-input conversation about how AI should care for communities and who should decide how these systems are used. Summarize it clearly for a civic audience." \
 #     --model "nvidia/nemotron-3-nano-4b" \
 #     --lmstudio-base-url "http://127.0.0.1:1234/v1" \
+#     --batch-size "20" \
 #     --python-bin "${ROOT_DIR}/.venv/bin/python"
 
 
@@ -42,6 +44,7 @@ REPORT_QUESTION="${REPORT_QUESTION:-How should AI care for our communities, and 
 ADDITIONAL_CONTEXT="${ADDITIONAL_CONTEXT:-This is a public-input conversation about how AI should care for communities and who should decide how these systems are used. Summarize it clearly for a civic audience.}"
 MODEL_NAME="${MODEL_NAME:-nvidia/nemotron-3-nano-4b}"
 LM_STUDIO_BASE_URL="${LM_STUDIO_BASE_URL:-http://127.0.0.1:1234/v1}"
+LM_STUDIO_BATCH_SIZE="${LM_STUDIO_BATCH_SIZE:-20}"
 PYTHON_BIN="${PYTHON_BIN:-}"
 
 if [[ -z "${PYTHON_BIN}" ]]; then
@@ -86,6 +89,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --lmstudio-base-url)
       LM_STUDIO_BASE_URL="$2"
+      shift 2
+      ;;
+    --batch-size)
+      LM_STUDIO_BATCH_SIZE="$2"
       shift 2
       ;;
     --python-bin)
@@ -186,6 +193,7 @@ npx ts-node "${ROOT_DIR}/library/runner-cli/advanced_runner_lmstudio.ts" \
   --additionalContext "${ADDITIONAL_CONTEXT}" \
   --model "${MODEL_NAME}" \
   --baseUrl "${LM_STUDIO_BASE_URL}" \
+  --batchSize "${LM_STUDIO_BATCH_SIZE}" \
   --outputLang en \
   --topicDepth 2
 

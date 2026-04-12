@@ -31,11 +31,13 @@ type LmStudioModelOptions = {
   baseUrl?: string;
   maxTokens?: number;
   modelName?: string;
+  categorizationBatchSize?: number;
 };
 
 const DEFAULT_BASE_URL = "http://127.0.0.1:1234/v1";
 const DEFAULT_MODEL = "nvidia/nemotron-3-nano-4b";
 const DEFAULT_MAX_TOKENS = 4096;
+const DEFAULT_CATEGORIZATION_BATCH_SIZE = 20;
 const MAX_RETRIES = 3;
 
 export class LmStudioModel extends Model {
@@ -46,7 +48,13 @@ export class LmStudioModel extends Model {
 
   constructor(options: LmStudioModelOptions = {}) {
     // Smaller categorization batches keep local models within a comfortable context window.
-    super(20);
+    super(
+      parsePositiveInt(
+        options.categorizationBatchSize,
+        getEnvVar("LM_STUDIO_BATCH_SIZE", String(DEFAULT_CATEGORIZATION_BATCH_SIZE)),
+        DEFAULT_CATEGORIZATION_BATCH_SIZE
+      )
+    );
     this.apiKey = options.apiKey || getEnvVar("LM_STUDIO_API_KEY", undefined);
     this.baseUrl = normalizeBaseUrl(
       options.baseUrl || getEnvVar("LM_STUDIO_BASE_URL", DEFAULT_BASE_URL) || DEFAULT_BASE_URL
@@ -222,4 +230,23 @@ function looksLikeMetaPreamble(prefix: string): boolean {
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function parsePositiveInt(
+  directValue: number | undefined,
+  envValue: string | undefined,
+  defaultValue: number
+): number {
+  if (typeof directValue === "number" && Number.isFinite(directValue) && directValue > 0) {
+    return Math.floor(directValue);
+  }
+
+  if (envValue) {
+    const parsed = Number.parseInt(envValue, 10);
+    if (Number.isFinite(parsed) && parsed > 0) {
+      return parsed;
+    }
+  }
+
+  return defaultValue;
 }

@@ -124,6 +124,7 @@ async function summarizeWithLocalModel(
   modelName?: string,
   baseUrl?: string,
   maxTokens?: number,
+  batchSize?: number,
   topicDepth: 1 | 2 | 3 = 2
 ): Promise<{ categorizedComments: Comment[]; summary: Summary }> {
   const sensemaker = new Sensemaker({
@@ -131,6 +132,7 @@ async function summarizeWithLocalModel(
       baseUrl,
       maxTokens,
       modelName,
+      categorizationBatchSize: batchSize,
     }),
   });
 
@@ -173,6 +175,11 @@ async function main(): Promise<void> {
       "http://127.0.0.1:1234/v1"
     )
     .option("--maxTokens <count>", "Maximum completion tokens per local request.", "4096")
+    .option(
+      "--batchSize <count>",
+      "Categorization batch size per request (smaller values like 5-10 are often more stable for local models).",
+      "20"
+    )
     .option("-l, --outputLang <language>", "Output language.", "en")
     .option(
       "-d, --topicDepth <number>",
@@ -186,6 +193,10 @@ async function main(): Promise<void> {
   if (![1, 2, 3].includes(topicDepth)) {
     throw new Error("topicDepth must be one of 1, 2, or 3");
   }
+  const batchSize = parseInt(options.batchSize, 10);
+  if (!Number.isFinite(batchSize) || batchSize <= 0) {
+    throw new Error("batchSize must be a positive integer");
+  }
 
   const comments = await getCommentsFromCsv(options.inputFile);
   const { categorizedComments, summary } = await summarizeWithLocalModel(
@@ -195,6 +206,7 @@ async function main(): Promise<void> {
     options.model,
     options.baseUrl,
     parseInt(options.maxTokens, 10),
+    batchSize,
     topicDepth
   );
 
