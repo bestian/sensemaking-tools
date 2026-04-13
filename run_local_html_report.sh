@@ -7,7 +7,7 @@
 #
 # Options:
 #   --export-base-url <url>  The base URL of the Polis export (default: https://bloom.civic.ai/api/v3/reportExport/r2jstrdchy3udbrf8arjx)
-#   --work-dir <dir>         The directory to store the report (default: ${ROOT_DIR}/tmp/local-report)
+#   --work-dir <dir>         The directory to store the report (default: ./tmp/local-report under this script's directory)
 #   --report-title <title>   The title of the report (default: Bloom Civic AI Report)
 #   --report-subtitle <subtitle> The subtitle of the report (default: Structured public-input analysis generated locally with LM Studio.)
 #   --report-question <question> The question of the report (default: How should AI care for our communities, and who gets to decide?)
@@ -22,7 +22,7 @@
 # Example usage (all options):
 #   bash ./run_local_html_report.sh \
 #     --export-base-url "https://bloom.civic.ai/api/v3/reportExport/r2jstrdchy3udbrf8arjx" \
-#     --work-dir "${ROOT_DIR}/tmp/local-report" \
+#     --work-dir "./tmp/local-report" \
 #     --report-title "Bloom Civic AI Report" \
 #     --report-subtitle "Structured public-input analysis generated locally with LM Studio." \
 #     --report-question "How should AI care for our communities, and who gets to decide?" \
@@ -106,9 +106,39 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+resolve_work_dir() {
+  local value="$1"
+
+  if [[ "${value}" == '${ROOT_DIR}'* ]]; then
+    value="${ROOT_DIR}${value#\$\{ROOT_DIR\}}"
+  elif [[ "${value}" == '$ROOT_DIR'* ]]; then
+    value="${ROOT_DIR}${value#\$ROOT_DIR}"
+  elif [[ "${value}" != /* ]]; then
+    value="${ROOT_DIR}/${value#./}"
+  fi
+
+  printf '%s' "${value}"
+}
+
+WORK_DIR="$(resolve_work_dir "${WORK_DIR}")"
+
+if [[ "${WORK_DIR}" == "/tmp/local-report" ]]; then
+  echo "Detected /tmp/local-report (likely from an empty ROOT_DIR in your shell); using project-local tmp instead."
+  WORK_DIR="${ROOT_DIR}/tmp/local-report"
+fi
+
+echo "Using work directory: ${WORK_DIR}"
+
 RAW_DIR="${WORK_DIR}/raw"
 GENERATED_BASENAME="${WORK_DIR}/generated/local-report"
 FINAL_HTML="${WORK_DIR}/report.html"
+TOPICS_JSON="${GENERATED_BASENAME}-topic-stats.json"
+SUMMARY_JSON="${GENERATED_BASENAME}-summary.json"
+COMMENTS_JSON="${GENERATED_BASENAME}-comments-with-scores.json"
+
+TOPICS_JSON="$(resolve_work_dir "${TOPICS_JSON}")"
+SUMMARY_JSON="$(resolve_work_dir "${SUMMARY_JSON}")"
+COMMENTS_JSON="$(resolve_work_dir "${COMMENTS_JSON}")"
 
 mkdir -p "${RAW_DIR}" "${WORK_DIR}/generated"
 
@@ -203,9 +233,9 @@ echo "Building HTML report"
 (
   cd "${ROOT_DIR}/web-ui"
   npx ts-node site-build.ts \
-    --topics "${GENERATED_BASENAME}-topic-stats.json" \
-    --summary "${GENERATED_BASENAME}-summary.json" \
-    --comments "${GENERATED_BASENAME}-comments-with-scores.json" \
+    --topics "${TOPICS_JSON}" \
+    --summary "${SUMMARY_JSON}" \
+    --comments "${COMMENTS_JSON}" \
     --reportTitle "${REPORT_TITLE}" \
     --reportSubtitle "${REPORT_SUBTITLE}" \
     --reportQuestion "${REPORT_QUESTION}" \
