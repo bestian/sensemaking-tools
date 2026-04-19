@@ -15,6 +15,7 @@
 #   --model <model>         The model to use for the report (default: nvidia/nemotron-3-nano-4b)
 #   --lmstudio-base-url <url> The base URL of the LM Studio instance (default: http://127.0.0.1:1234/v1)
 #   --batch-size <count>    Categorization batch size for local model calls (default: 20)
+#   --outputLang <language> Output language for generated report data and UI labels (default: en)
 #   --python-bin <path>     Python interpreter path (default: ${ROOT_DIR}/.venv/bin/python if present, otherwise python3)
 
 # Exit on error, unset variables, and pipefail.
@@ -30,6 +31,7 @@
 #     --model "nvidia/nemotron-3-nano-4b" \
 #     --lmstudio-base-url "http://127.0.0.1:1234/v1" \
 #     --batch-size "20" \
+#     --outputLang "zh-TW" \
 #     --python-bin "${ROOT_DIR}/.venv/bin/python"
 
 
@@ -45,6 +47,7 @@ ADDITIONAL_CONTEXT="${ADDITIONAL_CONTEXT:-This is a public-input conversation ab
 MODEL_NAME="${MODEL_NAME:-nvidia/nemotron-3-nano-4b}"
 LM_STUDIO_BASE_URL="${LM_STUDIO_BASE_URL:-http://127.0.0.1:1234/v1}"
 LM_STUDIO_BATCH_SIZE="${LM_STUDIO_BATCH_SIZE:-20}"
+OUTPUT_LANG="${OUTPUT_LANG:-en}"
 PYTHON_BIN="${PYTHON_BIN:-}"
 
 if [[ -z "${PYTHON_BIN}" ]]; then
@@ -93,6 +96,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --batch-size)
       LM_STUDIO_BATCH_SIZE="$2"
+      shift 2
+      ;;
+    --outputLang)
+      OUTPUT_LANG="$2"
       shift 2
       ;;
     --python-bin)
@@ -224,7 +231,7 @@ npx ts-node "${ROOT_DIR}/library/runner-cli/advanced_runner_lmstudio.ts" \
   --model "${MODEL_NAME}" \
   --baseUrl "${LM_STUDIO_BASE_URL}" \
   --batchSize "${LM_STUDIO_BATCH_SIZE}" \
-  --outputLang en \
+  --outputLang "${OUTPUT_LANG}" \
   --topicDepth 2
 
 GENERATED_AT="$(date -u +"%Y-%m-%d %H:%M UTC")"
@@ -241,7 +248,8 @@ echo "Building HTML report"
     --reportQuestion "${REPORT_QUESTION}" \
     --sourceUrl "${SOURCE_URL}" \
     --modelName "${MODEL_NAME}" \
-    --generatedAt "${GENERATED_AT}"
+    --generatedAt "${GENERATED_AT}" \
+    --outputLang "${OUTPUT_LANG}"
   node single-html-build.js
 )
 

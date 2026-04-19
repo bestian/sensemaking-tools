@@ -572,7 +572,7 @@ npx ts-node ./library/runner-cli/categorization_runner_openrouter.ts \
   ```
 
   主要參數：`--model`（預設 `nvidia/nemotron-3-nano-4b`）、`--baseUrl`、`--maxTokens`（預設 4096）、`--outputLang`、`--topicDepth`（1 / 2 / 3，預設 2）。  
-  也可使用便利的 shell 腳本 `run_local_html_report.sh`，它會從 Bloom Civic AI 匯出 URL 抓取原始資料、執行此 runner，並建置獨立的 HTML 報告。
+  也可使用便利的 shell 腳本 `run_local_html_report.sh`，它會從 Bloom Civic AI 匯出 URL 抓取原始資料、執行此 runner，並建置獨立的 HTML 報告。腳本同樣支援 `--outputLang`，例如 `--outputLang zh-TW` 可生成繁體中文介面的報告。
 
 這些工具處理 CSV 輸入檔案，必須包含 `comment_text` 和 `comment-id` 欄位。對於無群組資訊的討論，投票數應設定在 `agrees`、`disagrees` 和 `passes` 欄位中。若無投票資訊，可將這些欄位設為 0。對於有群組劃分的討論，可設定 `{group_name}-agree-count`、`{group_name}-disagree-count`、`{group_name}-pass-count` 欄位。
 

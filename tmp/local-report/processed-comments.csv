@@ -1,0 +1,36 @@
+timestamp,datetime,comment-id,author-id,agrees,disagrees,moderated,comment_text,passes,Group-none-disagree-count,Group-none-pass-count,Group-none-agree-count,Group-1-disagree-count,Group-1-pass-count,Group-1-agree-count,Group-2-disagree-count,Group-2-pass-count,Group-2-agree-count,Group-3-disagree-count,Group-3-pass-count,Group-3-agree-count,votes,agree_rate,disagree_rate,pass_rate,difference_of_opinion_rank
+1774343775,Tue Mar 24 2026 09:16:15 GMT+0000 (Coordinated Universal Time),0,0,31,0,1,"AI in care homes should free up time for staff to spend with residents, not replace human
+contact.",3,0,1,6,0,2,8,0,0,13,0,0,4,34,0.9117647058823529,0.0,0.08823529411764706,1.3877787807814457e-17
+1774343783,Tue Mar 24 2026 09:16:23 GMT+0000 (Coordinated Universal Time),1,0,27,2,1,People living with dementia deserve a say in whether AI tools are used in their care.,3,0,1,5,1,2,6,1,0,13,0,0,3,32,0.84375,0.0625,0.09375,0.125
+1774343792,Tue Mar 24 2026 09:16:32 GMT+0000 (Coordinated Universal Time),2,0,22,6,1,"Using AI to keep an elderly person company when no human is available is better than
+leaving them alone.",7,2,2,5,1,4,7,3,1,8,0,0,2,35,0.6285714285714286,0.17142857142857143,0.2,0.3428571428571429
+1774343800,Tue Mar 24 2026 09:16:40 GMT+0000 (Coordinated Universal Time),3,0,21,15,1,"Families caring for someone with a serious illness should be offered AI tools to help, even if
+those tools are not perfect.",7,6,2,3,3,3,6,6,2,5,0,0,7,43,0.4883720930232558,0.3488372093023256,0.16279069767441862,0.6976744186046511
+1774343808,Tue Mar 24 2026 09:16:48 GMT+0000 (Coordinated Universal Time),4,0,29,1,1,"When AI helps make a decision about your benefits, housing, or health, you should be told.",2,0,0,5,0,1,9,1,1,11,0,0,4,32,0.90625,0.03125,0.0625,0.0625
+1774343814,Tue Mar 24 2026 09:16:54 GMT+0000 (Coordinated Universal Time),5,0,31,2,1,"If an AI system treats people unfairly because of their race, age, or disability, someone
+should be held responsible.",4,1,0,7,0,1,7,1,1,12,0,2,5,37,0.8378378378378378,0.05405405405405406,0.10810810810810811,0.10810810810810811
+1774343824,Tue Mar 24 2026 09:17:04 GMT+0000 (Coordinated Universal Time),6,0,32,1,1,"People should always be able to reach a real person when dealing with a government
+service, even if AI handles most tasks.",2,0,1,7,0,1,9,0,0,12,1,0,4,35,0.9142857142857143,0.02857142857142857,0.05714285714285714,0.05714285714285718
+1774343832,Tue Mar 24 2026 09:17:12 GMT+0000 (Coordinated Universal Time),7,0,28,3,1,"The UK should create an independent body with real power to shut down harmful AI
+systems.",6,0,1,9,0,2,9,3,2,7,0,1,3,37,0.7567567567567568,0.08108108108108109,0.16216216216216217,0.16216216216216217
+1774343840,Tue Mar 24 2026 09:17:20 GMT+0000 (Coordinated Universal Time),8,0,32,4,1,"People are being harmed by AI-driven decisions while the government takes too long to
+act.",2,1,0,9,1,2,7,2,0,11,0,0,5,38,0.8421052631578947,0.10526315789473684,0.05263157894736842,0.21052631578947373
+1774343846,Tue Mar 24 2026 09:17:26 GMT+0000 (Coordinated Universal Time),9,0,31,4,1,"Workers who lose their jobs because of AI should get real help finding new work, not just
+advice.",4,1,2,7,0,2,8,3,0,11,0,0,5,39,0.7948717948717948,0.10256410256410256,0.10256410256410256,0.20512820512820515
+1774343856,Tue Mar 24 2026 09:17:36 GMT+0000 (Coordinated Universal Time),10,0,16,15,1,"Companies should not be allowed to replace workers with AI unless they help those workers
+find new roles.",6,4,1,6,2,4,5,8,1,2,1,0,3,37,0.43243243243243246,0.40540540540540543,0.16216216216216217,0.8108108108108109
+1774343864,Tue Mar 24 2026 09:17:44 GMT+0000 (Coordinated Universal Time),11,0,12,9,1,"New AI data centres in Oxfordshire will create good jobs for local people, not just for tech
+workers from elsewhere.",10,2,2,3,2,4,3,5,1,5,0,3,1,31,0.3870967741935484,0.2903225806451613,0.3225806451612903,0.5806451612903227
+1774343871,Tue Mar 24 2026 09:17:51 GMT+0000 (Coordinated Universal Time),12,0,31,2,1,"Communities should have a voice in deciding how AI is used in their local schools and
+hospitals.",3,1,0,7,0,2,10,1,1,10,0,0,4,36,0.8611111111111112,0.05555555555555555,0.08333333333333333,0.11111111111111109
+1774343879,Tue Mar 24 2026 09:17:59 GMT+0000 (Coordinated Universal Time),13,0,31,1,1,"Schools should teach children to question what AI tells them, not just how to use it.",1,0,0,6,0,1,8,1,0,13,0,0,4,33,0.9393939393939394,0.030303030303030304,0.030303030303030304,0.060606060606060524
+1774343884,Tue Mar 24 2026 09:18:04 GMT+0000 (Coordinated Universal Time),14,0,9,17,1,"AI tools in schools do more to help struggling students catch up than they do to harm
+learning.",10,5,2,1,5,4,2,5,2,6,2,2,0,36,0.25,0.4722222222222222,0.2777777777777778,0.5
+1774343893,Tue Mar 24 2026 09:18:13 GMT+0000 (Coordinated Universal Time),15,0,32,2,1,"When I talk to a chatbot or AI assistant, I should always be told it is not a real person.",2,0,0,9,0,2,9,1,0,11,1,0,3,36,0.8888888888888888,0.05555555555555555,0.05555555555555555,0.11111111111111119
+1774343900,Tue Mar 24 2026 09:18:20 GMT+0000 (Coordinated Universal Time),16,0,30,1,1,"Big technology companies care more about profits than about what happens to our
+communities.",3,0,1,8,0,2,7,1,0,12,0,0,3,34,0.8823529411764706,0.029411764705882353,0.08823529411764706,0.05882352941176473
+1774343906,Tue Mar 24 2026 09:18:26 GMT+0000 (Coordinated Universal Time),17,0,24,3,1,"A community that takes care of its people matters more than one with the most advanced
+technology.",4,2,0,6,1,1,6,0,2,9,0,1,3,31,0.7741935483870968,0.0967741935483871,0.12903225806451613,0.19354838709677424
+1774343912,Tue Mar 24 2026 09:18:32 GMT+0000 (Coordinated Universal Time),18,0,31,2,1,"AI companies should have to pay artists and writers when they use their work to train AI
+systems.",2,1,0,6,0,2,8,1,0,13,0,0,4,35,0.8857142857142857,0.05714285714285714,0.05714285714285714,0.11428571428571435
+1774343923,Tue Mar 24 2026 09:18:43 GMT+0000 (Coordinated Universal Time),19,0,25,9,1,We should slow down on AI until we better understand what it does to people.,5,1,2,5,0,3,9,7,0,8,1,0,3,39,0.6410256410256411,0.23076923076923078,0.1282051282051282,0.46153846153846145

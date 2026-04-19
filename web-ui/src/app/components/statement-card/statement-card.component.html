@@ -1,19 +1,19 @@
 <ng-template #mainStatement let-truncated="truncated">
   <div class="pills" [ngSwitch]="type">
     <ng-container *ngSwitchCase="'high-alignment'">
-      <div class="pill pos" *ngIf="isOverallAgree">{{ agreePercent }}% voted agree</div>
-      <div class="pill neg" *ngIf="!isOverallAgree">{{ disagreePercent }}% voted disagree</div>
+      <div class="pill pos" *ngIf="isOverallAgree">{{ agreePercent }}% {{ t("voted agree", "投票同意") }}</div>
+      <div class="pill neg" *ngIf="!isOverallAgree">{{ disagreePercent }}% {{ t("voted disagree", "投票不同意") }}</div>
     </ng-container>
     <ng-container *ngSwitchCase="'low-alignment'">
-      <div class="pill neutral">{{ agreePercent }}% voted agree</div>
-      <div class="pill neutral">{{ disagreePercent }}% voted disagree</div>
+      <div class="pill neutral">{{ agreePercent }}% {{ t("voted agree", "投票同意") }}</div>
+      <div class="pill neutral">{{ disagreePercent }}% {{ t("voted disagree", "投票不同意") }}</div>
     </ng-container>
     <ng-container *ngSwitchCase="'high-uncertainty'">
-      <div class="pill blank">{{ passPercent }}% voted "unsure/pass"</div>
+      <div class="pill blank">{{ passPercent }}% {{ t('voted "unsure/pass"', "投票「不確定／略過」") }}</div>
     </ng-container>
     <ng-container *ngSwitchCase="'uncategorized'">
-      <div class="pill blank">{{ agreePercent }}% voted agree</div>
-      <div class="pill blank">{{ disagreePercent }}% voted disagree</div>
+      <div class="pill blank">{{ agreePercent }}% {{ t("voted agree", "投票同意") }}</div>
+      <div class="pill blank">{{ disagreePercent }}% {{ t("voted disagree", "投票不同意") }}</div>
     </ng-container>
   </div>
   <p [class.truncated]="truncated">{{ data?.text }}</p>
@@ -25,24 +25,24 @@
   <div class="popup-card">
     <div class="popup-top">
       <ng-container *ngTemplateOutlet="mainStatement"></ng-container>
-      <div class="topic-breakdown">Topic(s): {{ topics }}</div>
+      <div class="topic-breakdown">{{ t("Topic(s):", "主題：") }} {{ topics }}</div>
     </div>
     <div class="popup-bottom">
-      <div class="subheading">{{ voteTotal }} total votes</div>
+      <div class="subheading">{{ voteTotal }} {{ t("total votes", "總票數") }}</div>
       <div class="vote-breakdown">
         <div class="vote-type">
           <div class="vote-dot agree"></div>
-          <div>Agree</div>
+          <div>{{ t("Agree", "同意") }}</div>
         </div>
         <div>{{ agreeTotal }}</div>
         <div class="vote-type">
           <div class="vote-dot disagree"></div>
-          <div>Disagree</div>
+          <div>{{ t("Disagree", "不同意") }}</div>
         </div>
         <div>{{ disagreeTotal }}</div>
         <div class="vote-type">
           <div class="vote-dot pass"></div>
-          <div>"Unsure/Pass"</div>
+          <div>{{ t('"Unsure/Pass"', "「不確定／略過」") }}</div>
         </div>
         <div>{{ passTotal }}</div>
       </div>

@@ -47,6 +47,7 @@ type ReportMetadata = {
   sourceUrl?: string,
   modelName?: string,
   generatedAt?: string,
+  outputLang?: string,
 };
 
 export {

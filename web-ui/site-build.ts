@@ -15,6 +15,7 @@ async function main(): Promise<void> {
   program.option("--sourceUrl <url>", "Optional source URL for the report data.");
   program.option("--modelName <name>", "Optional model label to display in the report.");
   program.option("--generatedAt <timestamp>", "Optional generated-at timestamp for the report.");
+  program.option("--outputLang <language>", "Optional output language for UI labels.", "en");
   program.parse(process.argv);
   const options = program.opts();
 
@@ -38,6 +39,7 @@ async function main(): Promise<void> {
     sourceUrl: options["sourceUrl"],
     modelName: options["modelName"],
     generatedAt: options["generatedAt"],
+    outputLang: options["outputLang"] || "en",
   };
 
   // path to "data" folder

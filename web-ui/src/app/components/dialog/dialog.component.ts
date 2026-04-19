@@ -9,6 +9,7 @@ type DialogData = {
   link: string,
   text: string,
   title: string,
+  outputLang?: "en" | "zh-TW",
 };
 
 @Component({

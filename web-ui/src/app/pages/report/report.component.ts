@@ -27,6 +27,7 @@ import {
 } from "../../models/report.model";
 
 type AlignmentType = "high-alignment" | "low-alignment" | "high-uncertainty";
+type UiLanguage = "en" | "zh-TW";
 
 let totalVoteNumber = 0;
 
@@ -92,10 +93,43 @@ export class ReportComponent {
   summaryData = importedSummaryData;
   commentData = importedCommentData;
   reportMetadata = importedReportMetadata as ReportMetadata;
+  outputLang: UiLanguage = this.getUiLanguage(this.reportMetadata.outputLang);
+  numberLocale: string = this.outputLang === "zh-TW" ? "zh-TW" : "en-US";
 
-  reportTitle: string = this.reportMetadata.title || "Report";
+  private readonly uiText: Record<UiLanguage, Record<string, string>> = {
+    en: {
+      reportFallbackTitle: "Report",
+      reportFallbackSubtitle: "Structured public-input analysis generated with a local model.",
+      alignmentHighest: "highest alignment",
+      alignmentLowest: "lowest alignment",
+      alignmentUncertainty: "highest uncertainty",
+      metaLocalModel: "Local model",
+      metaGenerated: "Generated",
+      metaStatements: "statements",
+      dialogShareReportTitle: "Share report",
+      dialogShareReportText: "Copy link to share report",
+      sectionTopicsTitleContains: "Topics",
+      sectionThemesTitleContains: "themes",
+    },
+    "zh-TW": {
+      reportFallbackTitle: "報告",
+      reportFallbackSubtitle: "由本機模型產生的結構化公眾意見分析。",
+      alignmentHighest: "最高一致性",
+      alignmentLowest: "最低一致性",
+      alignmentUncertainty: "最高不確定性",
+      metaLocalModel: "本機模型",
+      metaGenerated: "產生時間",
+      metaStatements: "則留言",
+      dialogShareReportTitle: "分享報告",
+      dialogShareReportText: "複製連結以分享此報告",
+      sectionTopicsTitleContains: "主題",
+      sectionThemesTitleContains: "主題群",
+    },
+  };
+
+  reportTitle: string = this.reportMetadata.title || this.t("reportFallbackTitle");
   reportSubtitle: string =
-    this.reportMetadata.subtitle || "Structured public-input analysis generated with a local model.";
+    this.reportMetadata.subtitle || this.t("reportFallbackSubtitle");
   reportQuestion: string = this.reportMetadata.question || "";
   sourceUrl: string = this.reportMetadata.sourceUrl || "";
   modelName: string = this.reportMetadata.modelName || "";
@@ -115,6 +149,14 @@ export class ReportComponent {
   @ViewChildren("subtopicPanel") subtopicPanels!: QueryList<MatExpansionPanel>;
 
   constructor(private dialog: MatDialog) {}
+
+  private getUiLanguage(lang?: string): UiLanguage {
+    return lang === "zh-TW" ? "zh-TW" : "en";
+  }
+
+  t(key: string): string {
+    return this.uiText[this.outputLang][key] || this.uiText.en[key] || key;
+  }
 
   ngOnInit(): void {
     // Initialize view states for each topic
@@ -145,6 +187,7 @@ export class ReportComponent {
         link,
         text,
         title,
+        outputLang: this.outputLang,
       }
     });
   }
@@ -174,11 +217,11 @@ export class ReportComponent {
   get alignmentString() {
     switch(this.selectedAlignmentType) {
       case "high-alignment":
-        return "highest alignment";
+        return this.t("alignmentHighest");
       case "low-alignment":
-        return "lowest alignment";
+        return this.t("alignmentLowest");
       case "high-uncertainty":
-        return "highest uncertainty";
+        return this.t("alignmentUncertainty");
       default:
         return "";
     }
@@ -214,19 +257,21 @@ export class ReportComponent {
   get reportMetaItems(): string[] {
     const items: string[] = [];
     if (this.modelName) {
-      items.push(`Local model: ${this.modelName}`);
+      items.push(`${this.t("metaLocalModel")}: ${this.modelName}`);
     }
     if (this.generatedAt) {
-      items.push(`Generated: ${this.generatedAt}`);
+      items.push(`${this.t("metaGenerated")}: ${this.generatedAt}`);
     }
     if (this.totalStatements) {
-      items.push(`${this.totalStatements.toLocaleString()} statements`);
+      items.push(`${this.totalStatements.toLocaleString(this.numberLocale)} ${this.t("metaStatements")}`);
     }
     return items;
   }
 
   getTopicSummaryData(topicName: string): any {
-    const summaryTopicData: any = this.summaryData.contents.find(c => c.title.includes("Topics"));
+    const summaryTopicData: any = this.summaryData.contents.find(
+      c => c.title.includes(this.t("sectionTopicsTitleContains")) || c.title.includes("Topics")
+    );
     const topicData = summaryTopicData?.subContents.find((s: any) => s.title.includes(topicName));
     return topicData;
   }
@@ -239,7 +284,9 @@ export class ReportComponent {
 
   getSubtopicThemesData(topicName: string, subtopicName: string): any {
     const subtopicData = this.getSubtopicSummaryData(topicName, subtopicName);
-    const subtopicThemesData = subtopicData?.subContents.find((s: any) => s.title.includes("themes"));
+    const subtopicThemesData = subtopicData?.subContents.find(
+      (s: any) => s.title.includes(this.t("sectionThemesTitleContains")) || s.title.includes("themes")
+    );
     return subtopicThemesData;
   }
 

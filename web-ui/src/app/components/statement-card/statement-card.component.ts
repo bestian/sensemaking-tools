@@ -20,6 +20,7 @@ export class StatementCardComponent implements OnInit {
   @Input() data?: Statement;
   @Input() truncate = false;
   @Input() type = "";
+  @Input() outputLang: "en" | "zh-TW" = "en";
   isOverallAgree?: boolean;
   agreePercent?: number;
   disagreePercent?: number;
@@ -29,6 +30,10 @@ export class StatementCardComponent implements OnInit {
   passTotal = 0;
   voteTotal = 0;
   topics = "";
+
+  t(enText: string, zhText: string): string {
+    return this.outputLang === "zh-TW" ? zhText : enText;
+  }
 
   ngOnInit() {
     if(!this.data) return;
