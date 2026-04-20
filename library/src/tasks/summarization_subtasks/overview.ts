@@ -112,7 +112,7 @@ export class OverviewSummary extends RecursiveSummary<OverviewInput> {
         }
       },
       (result) => isMdListValid(result, topicNames),
-      3,
+      6, // 6 retries
       "Overview summary failed to conform to markdown list format, or did not include all topic descriptions exactly as intended.",
       undefined,
       [this.model, prompt, output_lang],  // ← 加入 output_lang
