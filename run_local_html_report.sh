@@ -17,6 +17,7 @@
 #   --batch-size <count>    Categorization batch size for local model calls (default: 20)
 #   --outputLang <language> Output language for generated report data and UI labels (default: en).
 #                           Supported: en (English), zh-TW (繁體中文), zh-CN (简体中文), fr (Français), es (Español), ja (日本語), de (Deutsch)
+#   --skip-LLM              Skip data generation and use existing JSON files to build HTML only.
 #   --python-bin <path>     Python interpreter path (default: ${ROOT_DIR}/.venv/bin/python if present, otherwise python3)
 
 # Exit on error, unset variables, and pipefail.
@@ -33,6 +34,7 @@
 #     --lmstudio-base-url "http://127.0.0.1:1234/v1" \
 #     --batch-size "20" \
 #     --outputLang "zh-TW" \
+#     --skip-LLM \
 #     --python-bin "${ROOT_DIR}/.venv/bin/python"
 
 
@@ -49,6 +51,7 @@ MODEL_NAME="${MODEL_NAME:-nvidia/nemotron-3-nano-4b}"
 LM_STUDIO_BASE_URL="${LM_STUDIO_BASE_URL:-http://127.0.0.1:1234/v1}"
 LM_STUDIO_BATCH_SIZE="${LM_STUDIO_BATCH_SIZE:-20}"
 OUTPUT_LANG="${OUTPUT_LANG:-en}"
+SKIP_LLM="${SKIP_LLM:-false}"
 PYTHON_BIN="${PYTHON_BIN:-}"
 
 if [[ -z "${PYTHON_BIN}" ]]; then
@@ -103,6 +106,10 @@ while [[ $# -gt 0 ]]; do
       OUTPUT_LANG="$2"
       shift 2
       ;;
+    --skip-LLM)
+      SKIP_LLM="true"
+      shift
+      ;;
     --python-bin)
       PYTHON_BIN="$2"
       shift 2
@@ -156,13 +163,9 @@ download_export() {
   curl -L -sS -o "${RAW_DIR}/${name}.csv" "${EXPORT_BASE_URL}/${name}.csv"
 }
 
-download_export "summary"
-download_export "comments"
-download_export "votes"
-download_export "participant-votes"
-download_export "comment-groups"
-
-SOURCE_URL="$("${PYTHON_BIN}" - <<'PY' "${RAW_DIR}/summary.csv"
+extract_source_url() {
+  local summary_csv="$1"
+  "${PYTHON_BIN}" - <<'PY' "${summary_csv}"
 import csv
 import sys
 
@@ -173,38 +176,64 @@ with open(sys.argv[1], newline="", encoding="utf-8") as fh:
             print(row[1])
             break
 PY
-)"
+}
 
-if command -v lms >/dev/null 2>&1; then
-  echo "Reloading ${MODEL_NAME} in LM Studio with safe local settings"
-  lms unload "${MODEL_NAME}" >/dev/null 2>&1 || true
+SOURCE_URL=""
+if [[ "${SKIP_LLM}" == "true" ]]; then
+  echo "Skipping LLM pipeline and reusing generated data files."
 
-  set +e
-  LMS_LOAD_OUTPUT="$(
-    lms load "${MODEL_NAME}" \
-      --context-length 8192 \
-      --parallel 1 \
-      --gpu max \
-      --identifier "${MODEL_NAME}" \
-      -y 2>&1
-  )"
-  LMS_LOAD_EXIT_CODE=$?
-  set -e
-
-  if [[ ${LMS_LOAD_EXIT_CODE} -ne 0 ]]; then
-    if [[ "${LMS_LOAD_OUTPUT}" == *"already exists"* ]]; then
-      echo "LM Studio model identifier already exists; reusing loaded model ${MODEL_NAME}."
-    else
-      echo "${LMS_LOAD_OUTPUT}" >&2
-      exit ${LMS_LOAD_EXIT_CODE}
+  for required_file in "${TOPICS_JSON}" "${SUMMARY_JSON}" "${COMMENTS_JSON}"; do
+    if [[ ! -f "${required_file}" ]]; then
+      echo "Missing required generated file: ${required_file}" >&2
+      echo "Run without --skip-LLM first to generate report data." >&2
+      exit 1
     fi
-  else
-    echo "${LMS_LOAD_OUTPUT}"
-  fi
-fi
+  done
 
-echo "Converting Polis export to sensemaking input"
-"${PYTHON_BIN}" - <<'PY'
+  if [[ -f "${RAW_DIR}/summary.csv" ]]; then
+    SOURCE_URL="$(extract_source_url "${RAW_DIR}/summary.csv")"
+  else
+    echo "No existing ${RAW_DIR}/summary.csv found; source URL metadata will be empty."
+  fi
+else
+  download_export "summary"
+  download_export "comments"
+  download_export "votes"
+  download_export "participant-votes"
+  download_export "comment-groups"
+
+  SOURCE_URL="$(extract_source_url "${RAW_DIR}/summary.csv")"
+
+  if command -v lms >/dev/null 2>&1; then
+    echo "Reloading ${MODEL_NAME} in LM Studio with safe local settings"
+    lms unload "${MODEL_NAME}" >/dev/null 2>&1 || true
+
+    set +e
+    LMS_LOAD_OUTPUT="$(
+      lms load "${MODEL_NAME}" \
+        --context-length 8192 \
+        --parallel 1 \
+        --gpu max \
+        --identifier "${MODEL_NAME}" \
+        -y 2>&1
+    )"
+    LMS_LOAD_EXIT_CODE=$?
+    set -e
+
+    if [[ ${LMS_LOAD_EXIT_CODE} -ne 0 ]]; then
+      if [[ "${LMS_LOAD_OUTPUT}" == *"already exists"* ]]; then
+        echo "LM Studio model identifier already exists; reusing loaded model ${MODEL_NAME}."
+      else
+        echo "${LMS_LOAD_OUTPUT}" >&2
+        exit ${LMS_LOAD_EXIT_CODE}
+      fi
+    else
+      echo "${LMS_LOAD_OUTPUT}"
+    fi
+  fi
+
+  echo "Converting Polis export to sensemaking input"
+  "${PYTHON_BIN}" - <<'PY'
 import importlib.util
 import sys
 
@@ -219,21 +248,31 @@ if importlib.util.find_spec("pandas") is None:
     sys.exit(1)
 PY
 
-"${PYTHON_BIN}" "${ROOT_DIR}/library/bin/process_polis_data.py" \
-  "${RAW_DIR}" \
-  --participants-votes "${RAW_DIR}/participant-votes.csv" \
-  -o "${WORK_DIR}/processed-comments.csv"
+  "${PYTHON_BIN}" "${ROOT_DIR}/library/bin/process_polis_data.py" \
+    "${RAW_DIR}" \
+    --participants-votes "${RAW_DIR}/participant-votes.csv" \
+    -o "${WORK_DIR}/processed-comments.csv"
 
-echo "Generating structured report data with local model ${MODEL_NAME}"
-npx ts-node "${ROOT_DIR}/library/runner-cli/advanced_runner_lmstudio.ts" \
-  --inputFile "${WORK_DIR}/processed-comments.csv" \
-  --outputBasename "${GENERATED_BASENAME}" \
-  --additionalContext "${ADDITIONAL_CONTEXT}" \
-  --model "${MODEL_NAME}" \
-  --baseUrl "${LM_STUDIO_BASE_URL}" \
-  --batchSize "${LM_STUDIO_BATCH_SIZE}" \
-  --outputLang "${OUTPUT_LANG}" \
-  --topicDepth 2
+  echo "Generating structured report data with local model ${MODEL_NAME}"
+  npx ts-node "${ROOT_DIR}/library/runner-cli/advanced_runner_lmstudio.ts" \
+    --inputFile "${WORK_DIR}/processed-comments.csv" \
+    --outputBasename "${GENERATED_BASENAME}" \
+    --additionalContext "${ADDITIONAL_CONTEXT}" \
+    --model "${MODEL_NAME}" \
+    --baseUrl "${LM_STUDIO_BASE_URL}" \
+    --batchSize "${LM_STUDIO_BATCH_SIZE}" \
+    --outputLang "${OUTPUT_LANG}" \
+    --topicDepth 2
+fi
+
+if [[ "${SKIP_LLM}" == "false" ]]; then
+  for required_file in "${TOPICS_JSON}" "${SUMMARY_JSON}" "${COMMENTS_JSON}"; do
+    if [[ ! -f "${required_file}" ]]; then
+      echo "Expected generated file is missing: ${required_file}" >&2
+      exit 1
+    fi
+  done
+fi
 
 GENERATED_AT="$(date -u +"%Y-%m-%d %H:%M UTC")"
 
