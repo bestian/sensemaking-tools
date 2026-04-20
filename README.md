@@ -4,31 +4,38 @@ This repository shares tools developed by [Jigsaw](http://jigsaw.google.com) as 
 
 # **About This Fork**
 
-This fork extends the upstream Sensemaker so users can run it via **OpenRouter** or a **local LM Studio** instance — achieving low cost, high performance, and full choice of model, with user-selectable output language for reports. A single script, `run_local_html_report.sh`, turns a Polis export into a complete interactive HTML report end-to-end.
+This fork extends the upstream Sensemaker so users can run it via **OpenRouter** or a **local LM Studio** instance — achieving low cost, high performance, and full choice of model, with user-selectable output language for reports. For the local LM Studio workflow, the one-shot script `run_local_html_report.sh` turns a Polis export into a complete interactive HTML report end-to-end.
+For usage and parameter examples, see the comments at the top of [run_local_html_report.sh](https://github.com/bestian/sensemaking-tools/blob/new-feature-open-router-ggml/run_local_html_report.sh).
 
 ### 繁體中文
 
-此分支擴充了 Sensemaker，讓使用者能透過 **OpenRouter** 或地端 **LM Studio** 以低成本、高效能、自選模型的方式執行意見綜整器，並可自訂報告輸出的語言。只需執行 `run_local_html_report.sh` 一個腳本，即可從 Polis 匯出資料一鍵產生完整的互動式 HTML 網頁報告。
+此分支擴充了 Sensemaker，讓使用者能透過 **OpenRouter** 或地端 **LM Studio** 以低成本、高效能、自選模型的方式執行意見綜整器，並可自訂報告輸出的語言。若採用地端 LM Studio 的工作流程，只需執行 `run_local_html_report.sh` 一個腳本，即可從 Polis 匯出資料一鍵產生完整的互動式 HTML 網頁報告。
+使用方式及參數設計範例，請見 [run_local_html_report.sh](https://github.com/bestian/sensemaking-tools/blob/new-feature-open-router-ggml/run_local_html_report.sh) 中的註解。
 
 ### 简体中文
 
-此分支扩展了 Sensemaker，使用户可以通过 **OpenRouter** 或本地 **LM Studio**，以低成本、高性能、自选模型的方式运行意见综整器，并可自定义报告输出的语言。只需执行 `run_local_html_report.sh` 一个脚本，即可从 Polis 导出数据一键生成完整的交互式 HTML 网页报告。
+此分支扩展了 Sensemaker，使用户可以通过 **OpenRouter** 或本地 **LM Studio**，以低成本、高性能、自选模型的方式运行意见综整器，并可自定义报告输出的语言。若采用本地 LM Studio 的工作流程，只需执行 `run_local_html_report.sh` 一个脚本，即可从 Polis 导出数据一键生成完整的交互式 HTML 网页报告。
+使用方式及参数设计示例，请见 [run_local_html_report.sh](https://github.com/bestian/sensemaking-tools/blob/new-feature-open-router-ggml/run_local_html_report.sh) 中的注释。
 
 ### Français
 
-Ce fork étend Sensemaker pour permettre son exécution via **OpenRouter** ou une instance locale de **LM Studio** — à faible coût, avec une grande performance et un choix complet du modèle, ainsi qu'une langue de sortie configurable pour les rapports. Un seul script, `run_local_html_report.sh`, transforme un export Polis en un rapport HTML interactif complet, de bout en bout.
+Ce fork étend Sensemaker pour permettre son exécution via **OpenRouter** ou une instance locale de **LM Studio** — à faible coût, avec une grande performance et un choix complet du modèle, ainsi qu'une langue de sortie configurable pour les rapports. Pour le flux local avec LM Studio, le script unique `run_local_html_report.sh` transforme un export Polis en un rapport HTML interactif complet, de bout en bout.
+Pour des exemples d'utilisation et de paramètres, consultez les commentaires en tête de [run_local_html_report.sh](https://github.com/bestian/sensemaking-tools/blob/new-feature-open-router-ggml/run_local_html_report.sh).
 
 ### Español
 
-Este fork amplía Sensemaker para que los usuarios puedan ejecutarlo mediante **OpenRouter** o una instancia local de **LM Studio**: bajo coste, alto rendimiento y elección completa del modelo, con idioma de salida configurable para los informes. Un único script, `run_local_html_report.sh`, convierte una exportación de Polis en un informe HTML interactivo completo, de principio a fin.
+Este fork amplía Sensemaker para que los usuarios puedan ejecutarlo mediante **OpenRouter** o una instancia local de **LM Studio**: bajo coste, alto rendimiento y elección completa del modelo, con idioma de salida configurable para los informes. Para el flujo local con LM Studio, el script único `run_local_html_report.sh` convierte una exportación de Polis en un informe HTML interactivo completo, de principio a fin.
+Para ejemplos de uso y parámetros, consulte los comentarios al inicio de [run_local_html_report.sh](https://github.com/bestian/sensemaking-tools/blob/new-feature-open-router-ggml/run_local_html_report.sh).
 
 ### 日本語
 
-このフォークは Sensemaker を拡張し、**OpenRouter** またはローカルの **LM Studio** を介して、低コスト・高性能・自由なモデル選択で実行できるようにし、レポートの出力言語もユーザーが指定できるようにしました。`run_local_html_report.sh` という 1 本のスクリプトで、Polis のエクスポートから完全にインタラクティブな HTML レポートをエンドツーエンドで生成できます。
+このフォークは Sensemaker を拡張し、**OpenRouter** またはローカルの **LM Studio** を介して、低コスト・高性能・自由なモデル選択で実行できるようにし、レポートの出力言語もユーザーが指定できるようにしました。ローカル LM Studio のワークフローでは、`run_local_html_report.sh` という 1 本のスクリプトで、Polis のエクスポートから完全にインタラクティブな HTML レポートをエンドツーエンドで生成できます。
+使い方とパラメータの例については、[run_local_html_report.sh](https://github.com/bestian/sensemaking-tools/blob/new-feature-open-router-ggml/run_local_html_report.sh) 冒頭のコメントをご覧ください。
 
 ### Deutsch
 
-Dieser Fork erweitert Sensemaker so, dass er über **OpenRouter** oder eine lokale **LM Studio**-Instanz betrieben werden kann — kostengünstig, leistungsstark und mit freier Modellwahl sowie einer benutzerdefinierten Ausgabesprache für Berichte. Ein einziges Skript, `run_local_html_report.sh`, erzeugt aus einem Polis-Export einen vollständigen, interaktiven HTML-Bericht von Anfang bis Ende.
+Dieser Fork erweitert Sensemaker so, dass er über **OpenRouter** oder eine lokale **LM Studio**-Instanz betrieben werden kann — kostengünstig, leistungsstark und mit freier Modellwahl sowie einer benutzerdefinierten Ausgabesprache für Berichte. Für den lokalen LM-Studio-Workflow erzeugt das einzelne Skript `run_local_html_report.sh` aus einem Polis-Export einen vollständigen, interaktiven HTML-Bericht von Anfang bis Ende.
+Nutzungs- und Parameterbeispiele findest du in den Kommentaren am Anfang von [run_local_html_report.sh](https://github.com/bestian/sensemaking-tools/blob/new-feature-open-router-ggml/run_local_html_report.sh).
 
 # **Overview**
 
