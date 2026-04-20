@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 
 import { formatProminentThemes } from "../../helpers/formatProminentThemes.js";
+import { t } from "../../helpers/i18n.js";
 
 /**
  * Renders a single topic row with stacked bar segments for subtopics.
@@ -47,7 +48,10 @@ export function renderTopicRow({
 
   const subtitle = document.createElement("div");
   subtitle.className = "chart-subtitle";
-  subtitle.textContent = `(${topicData.subtopicCount} subtopics, ${topicData.totalStatements} total statements)`;
+  subtitle.textContent = t("topicSubtitle", {
+    subtopicCount: topicData.subtopicCount,
+    totalStatements: topicData.totalStatements,
+  });
 
   headerContainer.appendChild(title);
   headerContainer.appendChild(subtitle);

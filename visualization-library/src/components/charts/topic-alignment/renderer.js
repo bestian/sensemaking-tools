@@ -1,20 +1,21 @@
 import { shadeColor } from "../../helpers/shadeColor.js";
+import { t } from "../../helpers/i18n.js";
 
 /**
  * @typedef {Object} Group
- * @property {string} label - Display label for the group
+ * @property {string} labelKey - i18n key resolved at render time
  * @property {string} value - Internal identifier for the group
  */
 
 /** @type {Group[]} */
 const groups = [{
-    label: "Alignment",
+    labelKey: "groupAlignment",
     value: "alignment"
 }, {
-    label: "Uncertainty",
+    labelKey: "groupUncertainty",
     value: "uncertainty"
 }, {
-    label: "Uncategorized",
+    labelKey: "groupUncategorized",
     value: "uncategorized"
 }];
 
@@ -60,7 +61,7 @@ function createGrid({ type = 'solid', width, height, data, info, labelTooltip })
         const label = document.createElement("div");
         label.tabIndex = 0;
         label.className = "group-label";
-        label.textContent = group.label;
+        label.textContent = t(group.labelKey);
         groupElement.appendChild(label);
         
         addHover(label, labelTooltip, info[group.value]);
@@ -122,7 +123,7 @@ export function createSolid({
 
         const subtitle = document.createElement("div");
         subtitle.className = "solid-group-box-section-text-subtitle";
-        subtitle.textContent = "Of statements";
+        subtitle.textContent = t("ofStatements");
         text.appendChild(subtitle);
 
         section.appendChild(text);
@@ -160,7 +161,7 @@ export function createSolid({
             const highSectionLabel = document.createElement("div");
             highSectionLabel.tabIndex = 0;
             highSectionLabel.className = "section-label high";
-            highSectionLabel.textContent = "High";
+            highSectionLabel.textContent = t("sectionHigh");
             highSectionLabel.style.color = shadeColor(theme.colors[0], -20);
             highSection.appendChild(highSectionLabel);
             addHover(highSectionLabel, labelTooltip, info['high']);
@@ -178,7 +179,7 @@ export function createSolid({
             const lowSectionLabel = document.createElement("div");
             lowSectionLabel.tabIndex = 0;
             lowSectionLabel.className = "section-label low";
-            lowSectionLabel.textContent = "Low";
+            lowSectionLabel.textContent = t("sectionLow");
             lowSectionLabel.style.color = shadeColor(theme.colors[1], -20);
             if (lowSectionWidth/100*width < 25) {
                 lowSectionLabel.style.left = "-18px";
@@ -276,7 +277,7 @@ export function createWaffle({
 
             const highSectionLabel = document.createElement("div");
             highSectionLabel.className = "section-label high";
-            highSectionLabel.textContent = "High";
+            highSectionLabel.textContent = t("sectionHigh");
             highSectionLabel.style.color = shadeColor(theme.colors[0], -20);
             highSection.appendChild(highSectionLabel);
             highSectionLabel.tabIndex = 0;
@@ -296,7 +297,7 @@ export function createWaffle({
 
             const lowSectionLabel = document.createElement("div");
             lowSectionLabel.className = "section-label low";
-            lowSectionLabel.textContent = "Low";
+            lowSectionLabel.textContent = t("sectionLow");
             lowSectionLabel.style.color = shadeColor(theme.colors[1], -20);
             lowSection.appendChild(lowSectionLabel);
             lowSectionLabel.tabIndex = 0;
@@ -420,19 +421,19 @@ function addSquare({ el, data, fill, squareSize, invert = false, vizTooltip }) {
         if (data.isHighAlignment) {
             statusSection = `<div class="sm-tooltip-status ${isAgree ? 'agree' : 'disagree'}">${Math.round(
                 isAgree ? data.agreeRate * 100 : data.disagreeRate * 100
-            )}% voted ${isAgree ? 'agree' : 'disagree'}</div>`;
+            )}% ${isAgree ? t('votedAgree') : t('votedDisagree')}</div>`;
         } else if (data.isHighUncertainty) {
             statusSection = `<div class="sm-tooltip-status pass">${Math.round(
                 data.passRate * 100
-            )}% voted "unsure/pass"</div>`;
+            )}% ${t('votedUnsurePass')}</div>`;
         } else {
             statusSection = `
                 <div class="sm-tooltip-status">${Math.round(
                     data.agreeRate * 100
-                )}% voted agree</div>
+                )}% ${t('votedAgree')}</div>
                 <div class="sm-tooltip-status">${Math.round(
                     data.disagreeRate * 100
-                )}% voted disagree</div>
+                )}% ${t('votedDisagree')}</div>
             `;
         }
 
@@ -448,18 +449,18 @@ function addSquare({ el, data, fill, squareSize, invert = false, vizTooltip }) {
                 })()}</div>
                 <hr/>
                 <div class="sm-tooltip-votes">
-                    <div>${totalVotes.toLocaleString()} total votes</div>
+                    <div>${totalVotes.toLocaleString()} ${t('totalVotes')}</div>
                     <ul style="width: 200px;">
                         <li><span class="row">
-                            <span>Agree</span>
+                            <span>${t('agree')}</span>
                             <span class="count">${agreeVotes.toLocaleString()}</span>
                         </li>
                         <li><span class="row">
-                            <span>Disagree</span>
+                            <span>${t('disagree')}</span>
                             <span class="count">${disagreeVotes.toLocaleString()}</span>
                         </li>
                         <li><span class="row">
-                            <span>Unsure/Passed</span>
+                            <span>${t('unsurePassed')}</span>
                             <span class="count">${passVotes.toLocaleString()}</span>
                         </li>
                     </ul>

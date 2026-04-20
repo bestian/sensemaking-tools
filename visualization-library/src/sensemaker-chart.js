@@ -13,6 +13,7 @@ import { globalStyle } from "./components/helpers/globalStyle.js";
 import { chartStyle } from "./components/helpers/chartStyle.js";
 import { downloadData } from "./components/helpers/downloadData.js";
 import { generateAltText } from "./components/helpers/generateAltText.js";
+import { t } from "./components/helpers/i18n.js";
 
 const defaultTheme = {
   colors: [
@@ -309,9 +310,9 @@ class SensemakerChart extends HTMLElement {
     // Add download button
     const downloadButton = document.createElement("button");
     downloadButton.className = "download-button";
-    downloadButton.textContent = "Download Data";
+    downloadButton.textContent = t("downloadData");
     downloadButton.setAttribute("tabindex", "0");
-    downloadButton.setAttribute("aria-label", "Download data for this chart");
+    downloadButton.setAttribute("aria-label", t("downloadDataAria"));
     downloadButton.addEventListener("click", () => {
       downloadData(this._data, chartType, this._view, this._topicFilter, this._summaryData);
     });
