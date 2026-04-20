@@ -25,9 +25,14 @@ import {
   Subtopic,
   Topic,
 } from "../../models/report.model";
+import {
+  NUMBER_LOCALE,
+  UiLanguage,
+  normalizeLang,
+  translate,
+} from "../../i18n/i18n";
 
 type AlignmentType = "high-alignment" | "low-alignment" | "high-uncertainty";
-type UiLanguage = "en" | "zh-TW";
 
 let totalVoteNumber = 0;
 
@@ -93,39 +98,8 @@ export class ReportComponent {
   summaryData = importedSummaryData;
   commentData = importedCommentData;
   reportMetadata = importedReportMetadata as ReportMetadata;
-  outputLang: UiLanguage = this.getUiLanguage(this.reportMetadata.outputLang);
-  numberLocale: string = this.outputLang === "zh-TW" ? "zh-TW" : "en-US";
-
-  private readonly uiText: Record<UiLanguage, Record<string, string>> = {
-    en: {
-      reportFallbackTitle: "Report",
-      reportFallbackSubtitle: "Structured public-input analysis generated with a local model.",
-      alignmentHighest: "highest alignment",
-      alignmentLowest: "lowest alignment",
-      alignmentUncertainty: "highest uncertainty",
-      metaLocalModel: "Local model",
-      metaGenerated: "Generated",
-      metaStatements: "statements",
-      dialogShareReportTitle: "Share report",
-      dialogShareReportText: "Copy link to share report",
-      sectionTopicsTitleContains: "Topics",
-      sectionThemesTitleContains: "themes",
-    },
-    "zh-TW": {
-      reportFallbackTitle: "報告",
-      reportFallbackSubtitle: "由本機模型產生的結構化公眾意見分析。",
-      alignmentHighest: "最高一致性",
-      alignmentLowest: "最低一致性",
-      alignmentUncertainty: "最高不確定性",
-      metaLocalModel: "本機模型",
-      metaGenerated: "產生時間",
-      metaStatements: "則留言",
-      dialogShareReportTitle: "分享報告",
-      dialogShareReportText: "複製連結以分享此報告",
-      sectionTopicsTitleContains: "主題",
-      sectionThemesTitleContains: "主題群",
-    },
-  };
+  outputLang: UiLanguage = normalizeLang(this.reportMetadata.outputLang);
+  numberLocale: string = NUMBER_LOCALE[this.outputLang];
 
   reportTitle: string = this.reportMetadata.title || this.t("reportFallbackTitle");
   reportSubtitle: string =
@@ -148,14 +122,21 @@ export class ReportComponent {
 
   @ViewChildren("subtopicPanel") subtopicPanels!: QueryList<MatExpansionPanel>;
 
-  constructor(private dialog: MatDialog) {}
-
-  private getUiLanguage(lang?: string): UiLanguage {
-    return lang === "zh-TW" ? "zh-TW" : "en";
+  constructor(private dialog: MatDialog) {
+    if (typeof document !== "undefined") {
+      const docTitle = this.reportMetadata.title || this.t("documentTitle");
+      document.title = docTitle;
+      document.documentElement.lang = this.outputLang;
+    }
   }
 
-  t(key: string): string {
-    return this.uiText[this.outputLang][key] || this.uiText.en[key] || key;
+  t(key: string, params?: Record<string, string | number>): string {
+    return translate(this.outputLang, key, params);
+  }
+
+  formatNumber(value: number | undefined | null): string {
+    if (value === undefined || value === null) return "";
+    return value.toLocaleString(this.numberLocale);
   }
 
   ngOnInit(): void {
@@ -214,6 +195,19 @@ export class ReportComponent {
   totalStatements = this.commentData.length;
   totalVotes = totalVoteNumber;
 
+  get aboutReportSummary(): string {
+    return this.t("aboutReportSummary", {
+      statements: this.formatNumber(this.totalStatements),
+      votes: this.formatNumber(this.totalVotes),
+      topics: this.formatNumber(this.topicNumber),
+      subtopics: this.formatNumber(this.subtopicNumber),
+    });
+  }
+
+  shareTopicTitle(topicName: string): string {
+    return this.t("shareTopicTitlePrefix", { topic: topicName });
+  }
+
   get alignmentString() {
     switch(this.selectedAlignmentType) {
       case "high-alignment":
@@ -263,7 +257,7 @@ export class ReportComponent {
       items.push(`${this.t("metaGenerated")}: ${this.generatedAt}`);
     }
     if (this.totalStatements) {
-      items.push(`${this.totalStatements.toLocaleString(this.numberLocale)} ${this.t("metaStatements")}`);
+      items.push(`${this.formatNumber(this.totalStatements)} ${this.t("metaStatements")}`);
     }
     return items;
   }

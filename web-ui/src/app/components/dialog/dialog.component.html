@@ -4,12 +4,12 @@
     <div>{{ data.text }}</div>
     <div class="copy-container">
       <div class="copy-text">{{ data.link }}</div>
-      <button mat-icon-button (click)="copyLink()" [attr.aria-label]="data.outputLang === 'zh-TW' ? '複製連結到剪貼簿' : 'Copy link to clipboard'">
+      <button mat-icon-button (click)="copyLink()" [attr.aria-label]="t('dialogCopyLink')">
         <mat-icon>content_copy</mat-icon>
       </button>
     </div>
   </mat-dialog-content>
   <mat-dialog-actions>
-    <button mat-button (click)="close()">{{ data.outputLang === "zh-TW" ? "關閉" : "Close" }}</button>
+    <button mat-button (click)="close()">{{ t("dialogClose") }}</button>
   </mat-dialog-actions>
 </div>

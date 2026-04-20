@@ -3,6 +3,26 @@ const { copyFileSync, writeFileSync } = require("fs");
 const path = require("path");
 const { exec, ExecException } = require("child_process");
 
+const SUPPORTED_LANGS = ["en", "zh-TW", "zh-CN", "fr", "es", "ja"] as const;
+type SupportedLang = (typeof SUPPORTED_LANGS)[number];
+
+function normalizeOutputLang(value: string | undefined): SupportedLang {
+  const fallback: SupportedLang = "en";
+  if (!value) return fallback;
+  const lower = value.toLowerCase();
+  if (lower === "zh-tw" || lower === "zh_tw" || lower === "zh-hant") return "zh-TW";
+  if (lower === "zh-cn" || lower === "zh_cn" || lower === "zh-hans" || lower === "zh") return "zh-CN";
+  if (lower.startsWith("fr")) return "fr";
+  if (lower.startsWith("es")) return "es";
+  if (lower.startsWith("ja")) return "ja";
+  if (lower.startsWith("en")) return "en";
+  if ((SUPPORTED_LANGS as readonly string[]).includes(value)) {
+    return value as SupportedLang;
+  }
+  console.warn(`Unknown outputLang "${value}", falling back to "${fallback}".`);
+  return fallback;
+}
+
 async function main(): Promise<void> {
   // Parse command line arguments.
   const program = new Command();
@@ -15,7 +35,11 @@ async function main(): Promise<void> {
   program.option("--sourceUrl <url>", "Optional source URL for the report data.");
   program.option("--modelName <name>", "Optional model label to display in the report.");
   program.option("--generatedAt <timestamp>", "Optional generated-at timestamp for the report.");
-  program.option("--outputLang <language>", "Optional output language for UI labels.", "en");
+  program.option(
+    "--outputLang <language>",
+    `Optional output language for UI labels. One of: ${SUPPORTED_LANGS.join(", ")}.`,
+    "en",
+  );
   program.parse(process.argv);
   const options = program.opts();
 
@@ -39,7 +63,7 @@ async function main(): Promise<void> {
     sourceUrl: options["sourceUrl"],
     modelName: options["modelName"],
     generatedAt: options["generatedAt"],
-    outputLang: options["outputLang"] || "en",
+    outputLang: normalizeOutputLang(options["outputLang"]),
   };
 
   // path to "data" folder

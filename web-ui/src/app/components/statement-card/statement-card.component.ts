@@ -4,6 +4,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { CustomTooltipDirective } from "../../directives/custom-tooltip/custom-tooltip.directive";
 
 import { VoteGroup, Statement } from "../../models/report.model";
+import { UiLanguage, normalizeLang, translate } from "../../i18n/i18n";
 
 @Component({
   selector: 'app-statement-card',
@@ -20,7 +21,7 @@ export class StatementCardComponent implements OnInit {
   @Input() data?: Statement;
   @Input() truncate = false;
   @Input() type = "";
-  @Input() outputLang: "en" | "zh-TW" = "en";
+  @Input() outputLang: string = "en";
   isOverallAgree?: boolean;
   agreePercent?: number;
   disagreePercent?: number;
@@ -31,8 +32,12 @@ export class StatementCardComponent implements OnInit {
   voteTotal = 0;
   topics = "";
 
-  t(enText: string, zhText: string): string {
-    return this.outputLang === "zh-TW" ? zhText : enText;
+  get lang(): UiLanguage {
+    return normalizeLang(this.outputLang);
+  }
+
+  t(key: string, params?: Record<string, string | number>): string {
+    return translate(this.lang, key, params);
   }
 
   ngOnInit() {

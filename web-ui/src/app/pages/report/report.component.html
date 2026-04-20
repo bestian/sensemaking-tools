@@ -11,7 +11,7 @@
           <div class="report-meta">
             <span *ngFor="let item of reportMetaItems" class="report-meta-item">{{ item }}</span>
             @if (sourceUrl) {
-              <a class="report-meta-link" [href]="sourceUrl" target="_blank" rel="noopener noreferrer">{{ outputLang === "zh-TW" ? "來源匯出" : "Source export" }}</a>
+              <a class="report-meta-link" [href]="sourceUrl" target="_blank" rel="noopener noreferrer">{{ t("sourceExport") }}</a>
             }
           </div>
         </div>
@@ -19,7 +19,7 @@
           mat-stroked-button
           class="icon-button-subtle"
           (click)="openShareReportDialog({ title: t('dialogShareReportTitle'), text: t('dialogShareReportText') })"
-        ><mat-icon>share</mat-icon> {{ outputLang === "zh-TW" ? "分享報告" : "Share Report" }}</button>
+        ><mat-icon>share</mat-icon> {{ t("shareReport") }}</button>
       </section>
       <div class="report-main">
         <div class="nav">
@@ -27,8 +27,8 @@
             mat-flat-button
             class="icon-button-fancy"
             (click)="scrollToElement('report-overview')"
-          ><mat-icon>cards_star</mat-icon>{{ outputLang === "zh-TW" ? "報告總覽" : "Report Overview" }}</button>
-          <div class="nav-label">{{ outputLang === "zh-TW" ? "報告主題" : "Report Topics" }}</div>
+          ><mat-icon>cards_star</mat-icon>{{ t("reportOverview") }}</button>
+          <div class="nav-label">{{ t("reportTopics") }}</div>
           <div class="accordion-nav">
             <mat-accordion displayMode="flat">
               <mat-expansion-panel *ngFor="let topic of topicData">
@@ -49,61 +49,51 @@
         <div class="report-content">
           <section class="card"  id="report-overview">
             <div class="card-header">
-              <h2>{{ outputLang === "zh-TW" ? "關於此報告" : "About this report" }}</h2>
+              <h2>{{ t("aboutReportTitle") }}</h2>
             </div>
             <div class="card-section report-summary paragraphs">
               @if (reportQuestion) {
-                <p class="lead-in">{{ outputLang === "zh-TW" ? "提問：" : "Question asked:" }} <strong>{{ reportQuestion }}</strong></p>
+                <p class="lead-in">{{ t("questionAsked") }} <strong>{{ reportQuestion }}</strong></p>
               }
-              @if (outputLang === "zh-TW") {
-                <p>此報告總結公眾意見輸入結果，共涵蓋 {{ totalStatements | number }} 則留言與 {{ totalVotes | number }} 票。從提交的留言中，系統識別出 {{ topicNumber | number }} 個高層主題與 {{ subtopicNumber | number }} 個子主題。所有投票者皆為匿名。</p>
-                <p>以下報告整理參與者之間的<span class="tooltip-trigger" matTooltip="70% 以上參與者投票方向一致（例如 70% 同意，或 70% 不同意）">高一致性</span>、<span class="tooltip-trigger" matTooltip="參與者票數接近對半（例如 40% 同意、60% 不同意，反之亦然）">低一致性</span>與<span class="tooltip-trigger" matTooltip="30% 以上參與者選擇「不確定／略過」">不確定性</span>重點。</p>
-              } @else {
-                <p>This report summarizes the results of public input, encompassing {{ totalStatements | number }} statements and {{ totalVotes | number }} votes. From the statements submitted, {{ topicNumber | number }} high level topics were identified, as well as {{ subtopicNumber | number }} subtopics. All voters were anonymous.</p>
-                <p>The report below summarizes points of <span class="tooltip-trigger" matTooltip="70% or more of participants voted the same way (e.g. 70% agree, or 70% disagree)">high alignment</span>, <span class="tooltip-trigger" matTooltip="Votes were about split between participants (e.g. 40% agree, 60% disagree, or vice versa)">low alignment</span>, and <span class="tooltip-trigger" matTooltip="More than 30% of participants voted “Unsure/pass”">uncertainty</span> among participants.</p>
-              }
+              <p>{{ aboutReportSummary }}</p>
+              <p>{{ t("alignmentSummaryPrefix") }}<span class="tooltip-trigger" [matTooltip]="t('highAlignmentTooltip')">{{ t("highAlignmentLabel") }}</span>{{ t("alignmentSummarySep1") }}<span class="tooltip-trigger" [matTooltip]="t('lowAlignmentTooltip')">{{ t("lowAlignmentLabel") }}</span>{{ t("alignmentSummarySep2") }}<span class="tooltip-trigger" [matTooltip]="t('uncertaintyTooltip')">{{ t("uncertaintyLabel") }}</span>{{ t("alignmentSummarySuffix") }}</p>
             </div>
             <div class="card-section breakdown">
               <div class="breakdown-widget">
                 <div class="breakdown-icon"><mat-icon>rate_review</mat-icon></div>
                 <div class="breakdown-data">
-                  <div class="breakdown-number">{{ totalStatements | number }}</div>
-                  <div class="breakdown-subject">{{ outputLang === "zh-TW" ? "留言總數" : "Total statements" }}</div>
+                  <div class="breakdown-number">{{ formatNumber(totalStatements) }}</div>
+                  <div class="breakdown-subject">{{ t("totalStatements") }}</div>
                 </div>
               </div>
               <div class="breakdown-widget">
                 <div class="breakdown-icon"><mat-icon class="icon-vote">how_to_vote</mat-icon></div>
                 <div class="breakdown-data">
-                  <div class="breakdown-number">{{ totalVotes | number }}</div>
-                  <div class="breakdown-subject">{{ outputLang === "zh-TW" ? "投票總數" : "Total votes" }}</div>
+                  <div class="breakdown-number">{{ formatNumber(totalVotes) }}</div>
+                  <div class="breakdown-subject">{{ t("totalVotes") }}</div>
                 </div>
               </div>
               <div class="breakdown-widget">
                 <div class="breakdown-icon"><mat-icon>list_alt</mat-icon></div>
                 <div class="breakdown-data">
-                  <div class="breakdown-number">{{ topicNumber | number }}</div>
-                  <div class="breakdown-subject">{{ outputLang === "zh-TW" ? "識別主題數" : "Topics captured" }}</div>
+                  <div class="breakdown-number">{{ formatNumber(topicNumber) }}</div>
+                  <div class="breakdown-subject">{{ t("topicsCaptured") }}</div>
                 </div>
               </div>
             </div>
           </section>
           <section class="card" id="Conversation-Overview">
             <div class="card-header">
-              <h2>{{ outputLang === "zh-TW" ? "對話總覽" : "Conversation overview" }}</h2>
-              @let overviewShareTitle = outputLang === "zh-TW" ? "分享「對話總覽」" : "Share 'Conversation overview'";
-              @let overviewShareText = outputLang === "zh-TW" ? "複製連結以分享報告總覽" : "Copy link to share the report overview";
+              <h2>{{ t("conversationOverview") }}</h2>
               <button
                 mat-stroked-button
                 class="icon-button-subtle"
-                (click)="openShareReportDialog({ elementId: 'Conversation-Overview', title: overviewShareTitle, text: overviewShareText })"
-              ><mat-icon>share</mat-icon> {{ outputLang === "zh-TW" ? "分享" : "Share" }}</button>
+                (click)="openShareReportDialog({ elementId: 'Conversation-Overview', title: t('shareConversationOverviewTitle'), text: t('shareConversationOverviewText') })"
+              ><mat-icon>share</mat-icon> {{ t("shareSection") }}</button>
             </div>
             <div class="card-section">
               <div class="overview-summary">
-                <p>{{ outputLang === "zh-TW"
-                  ? "以下為本次對話中的主題高層總覽，以及各主題所涵蓋留言的比例。若單一留言同時歸屬於多個主題，百分比總和可能超過 100%。"
-                  : "Below is a high level overview of the topics discussed in the conversation, as well as the percentage of statements categorized under each topic. Note that the percentages may add up to greater than 100% when statements fall under more than one topic."
-                }}</p>
+                <p>{{ t("conversationOverviewDescription") }}</p>
               </div>
               <div class="overview-visualization">
                 <app-sensemaking-chart-wrapper
@@ -116,25 +106,23 @@
           </section>
           <section class="card" id="Participant-Alignment">
             <div class="card-header">
-              <h2>{{ outputLang === "zh-TW" ? "參與者一致性" : "Participant alignment" }}</h2>
-              @let alignmentShareTitle = outputLang === "zh-TW" ? "分享「參與者一致性」" : "Share 'Participant alignment'";
-              @let alignmentShareText = outputLang === "zh-TW" ? "複製連結以分享一致性分析" : "Copy link to share the report alignment";
+              <h2>{{ t("participantAlignment") }}</h2>
               <button
                 mat-stroked-button
                 class="icon-button-subtle"
-                (click)="openShareReportDialog({ elementId: 'Participant-Alignment', title: alignmentShareTitle, text: alignmentShareText })"
-              ><mat-icon>share</mat-icon> {{ outputLang === "zh-TW" ? "分享" : "Share" }}</button>
+                (click)="openShareReportDialog({ elementId: 'Participant-Alignment', title: t('shareParticipantAlignmentTitle'), text: t('shareParticipantAlignmentText') })"
+              ><mat-icon>share</mat-icon> {{ t("shareSection") }}</button>
             </div>
             <div class="card-section">
               <div class="toggle-group-wrapper">
                 <mat-button-toggle-group class="toggle-group" [(ngModel)]="selectedAlignmentType">
-                  <mat-button-toggle value="high-alignment">{{ outputLang === "zh-TW" ? "高一致性" : "High alignment" }}</mat-button-toggle>
-                  <mat-button-toggle value="low-alignment">{{ outputLang === "zh-TW" ? "低一致性" : "Low alignment" }}</mat-button-toggle>
-                  <mat-button-toggle value="high-uncertainty">{{ outputLang === "zh-TW" ? "不確定性" : "Uncertainty" }}</mat-button-toggle>
+                  <mat-button-toggle value="high-alignment">{{ t("alignmentToggleHigh") }}</mat-button-toggle>
+                  <mat-button-toggle value="low-alignment">{{ t("alignmentToggleLow") }}</mat-button-toggle>
+                  <mat-button-toggle value="high-uncertainty">{{ t("alignmentToggleUncertainty") }}</mat-button-toggle>
                 </mat-button-toggle-group>
               </div>
               <div class="overview-description">
-                <p>{{ outputLang === "zh-TW" ? "在" : "Across" }} <strong>{{ outputLang === "zh-TW" ? "所有主題與子主題" : "all topics and subtopics" }}</strong>{{ outputLang === "zh-TW" ? "中，參與者在以下留言呈現" : ", participants found the" }} {{ alignmentString }}{{ outputLang === "zh-TW" ? "。" : " on the following statements." }}</p>
+                <p>{{ t("alignSentencePrefix") }}<strong>{{ t("alignSentenceScope") }}</strong>{{ t("alignSentenceMiddle") }}{{ alignmentString }}{{ t("alignSentenceSuffix") }}</p>
               </div>
               <div class="statement-card-group">
                 <app-statement-card
@@ -148,32 +136,30 @@
             </div>
           </section>
           <div class="heading-badge-wrapper">
-            <div class="heading-badge">{{ topicNumber | number }} {{ outputLang === "zh-TW" ? "個已識別主題" : "topics identified" }}</div>
+            <div class="heading-badge">{{ formatNumber(topicNumber) }} {{ t("topicsIdentified") }}</div>
           </div>
           <section class="card" *ngFor="let topic of topicData" id="{{ topic.name }}">
             <div class="card-header">
               <h2>{{ topic.name }}</h2>
-              @let topicShareTitle = "Share " + "'" + topic.name + "'";
-              @let topicShareText = outputLang === "zh-TW" ? "複製連結以分享此主題" : "Copy link to share this topic";
               <button
                 mat-stroked-button
                 class="icon-button-subtle"
-                (click)="openShareReportDialog({ elementId: topic.name, title: topicShareTitle, text: topicShareText })"
-              ><mat-icon>share</mat-icon> {{ outputLang === "zh-TW" ? "分享" : "Share" }}</button>
+                (click)="openShareReportDialog({ elementId: topic.name, title: shareTopicTitle(topic.name), text: t('shareTopicText') })"
+              ><mat-icon>share</mat-icon> {{ t("shareSection") }}</button>
             </div>
             <div class="topic-breakdown-wrapper">
               <div class="topic-breakdown">
                 <div class="topic-breakdown-item">
-                  <div class="pill">{{ topic.subtopicStats.length | number }}</div>
-                  <div class="topic-breakdown-item-text">{{ outputLang === "zh-TW" ? "子主題" : "Subtopics" }}</div>
+                  <div class="pill">{{ formatNumber(topic.subtopicStats.length) }}</div>
+                  <div class="topic-breakdown-item-text">{{ t("subtopicsLabel") }}</div>
                 </div>
                 <div class="topic-breakdown-item">
-                  <div class="pill">{{ topic.commentCount | number }}</div>
-                  <div class="topic-breakdown-item-text">{{ outputLang === "zh-TW" ? "留言總數" : "Total statements" }}</div>
+                  <div class="pill">{{ formatNumber(topic.commentCount) }}</div>
+                  <div class="topic-breakdown-item-text">{{ t("totalStatements") }}</div>
                 </div>
                 <div class="topic-breakdown-item">
-                  <div class="pill">{{ topic.voteCount | number }}</div>
-                  <div class="topic-breakdown-item-text">{{ outputLang === "zh-TW" ? "投票總數" : "Total votes" }}</div>
+                  <div class="pill">{{ formatNumber(topic.voteCount) }}</div>
+                  <div class="topic-breakdown-item-text">{{ t("totalVotes") }}</div>
                 </div>
               </div>
             </div>
@@ -183,8 +169,8 @@
                   class="toggle-group"
                   [value]="topicAlignmentViews[topic.name]"
                   (change)="updateTopicView(topic.name, $event.value)">
-                    <mat-button-toggle value="solid">{{ outputLang === "zh-TW" ? "分群" : "Groupings" }}</mat-button-toggle>
-                    <mat-button-toggle value="waffle">{{ outputLang === "zh-TW" ? "留言" : "Statements" }}</mat-button-toggle>
+                    <mat-button-toggle value="solid">{{ t("toggleGroupings") }}</mat-button-toggle>
+                    <mat-button-toggle value="waffle">{{ t("toggleStatements") }}</mat-button-toggle>
                 </mat-button-toggle-group>
               </div>
               <div class="topic-visualization">
@@ -214,25 +200,25 @@
                     <section class="subtopic-section">
                       <div class="subtopic-breakdown">
                         <div class="subtopic-breakdown-item">
-                          <div class="pill">{{ subtopic.commentCount | number }}</div>
-                          <div class="subtopic-breakdown-item-text">{{ outputLang === "zh-TW" ? "留言總數" : "Total statements" }}</div>
+                          <div class="pill">{{ formatNumber(subtopic.commentCount) }}</div>
+                          <div class="subtopic-breakdown-item-text">{{ t("totalStatements") }}</div>
                         </div>
                         <div class="subtopic-breakdown-item">
-                          <div class="pill">{{ subtopic.voteCount | number }}</div>
-                          <div class="subtopic-breakdown-item-text">{{ outputLang === "zh-TW" ? "投票總數" : "Total votes" }}</div>
+                          <div class="pill">{{ formatNumber(subtopic.voteCount) }}</div>
+                          <div class="subtopic-breakdown-item-text">{{ t("totalVotes") }}</div>
                         </div>
                         <div class="breakdown-divider"></div>
-                        <div class="subtopic-breakdown-description">{{ outputLang === "zh-TW" ? "相較於其他子主題，此子主題呈現" : "This subtopic had" }} <strong>{{ subtopic.relativeAlignment }}</strong> {{ outputLang === "zh-TW" ? "的一致性與" : "and" }} <strong>{{ subtopic.relativeEngagement }}</strong>{{ outputLang === "zh-TW" ? "的參與度。" : " compared to the other subtopics." }}</div>
+                        <div class="subtopic-breakdown-description">{{ t("subComparePrefix") }}<strong>{{ subtopic.relativeAlignment }}</strong>{{ t("subCompareMiddle") }}<strong>{{ subtopic.relativeEngagement }}</strong>{{ t("subCompareSuffix") }}</div>
                       </div>
-                      <h4>{{ outputLang === "zh-TW" ? "從所有提交留言中浮現的主要主題群：" : "Prominent themes emerged from all statements submitted:" }}</h4>
+                      <h4>{{ t("prominentThemes") }}</h4>
                       <div class="subtopic-themes-group">
                         <markdown>{{ getSubtopicThemesText(topic.name, subtopic.name) }}</markdown>
                       </div>
                     </section>
                     <section class="subtopic-section">
-                      <h4>{{ outputLang === "zh-TW" ? "參與者在以下留言呈現最高一致性：" : "Participants found the highest alignment on the following statements:" }}</h4>
+                      <h4>{{ t("highestAlignmentSubtopic") }}</h4>
                       <div class="subtopic-section-summary">
-                        <p>{{ outputLang === "zh-TW" ? "70% 以上參與者對這些留言投下相同方向（同意或不同意）。" : "70% or more of participants agreed or disagreed with these statements." }}</p>
+                        <p>{{ t("highAlignmentDescription") }}</p>
                       </div>
                       @let topStatementsHighAlignment = getTopSubtopicStatements(topic.name, subtopic.name, "high-alignment");
                       @if (topStatementsHighAlignment.length) {
@@ -248,14 +234,14 @@
                       } @else {
                         <div class="subtopic-section-description">
                           <mat-icon>info</mat-icon>
-                          <p>{{ outputLang === "zh-TW" ? "此子主題中沒有符合「高一致性」門檻的留言。" : "There were no statements in this subtopic that fit within the threshold of “high alignment.”" }}</p>
+                          <p>{{ t("noHighAlignment") }}</p>
                         </div>
                       }
                     </section>
                     <section class="subtopic-section">
-                      <h4>{{ outputLang === "zh-TW" ? "參與者在以下留言呈現最低一致性：" : "Participants found the lowest alignment on the following statements:" }}</h4>
+                      <h4>{{ t("lowestAlignmentSubtopic") }}</h4>
                       <div class="subtopic-section-summary">
-                        <p>{{ outputLang === "zh-TW" ? "意見分歧。這些留言中，約 40–60% 投票者分別選擇同意或不同意。" : "Opinions were split. 40–60% of voters either agreed or disagreed with these statements." }}</p>
+                        <p>{{ t("lowAlignmentDescription") }}</p>
                       </div>
                       @let topStatementsLowAlignment = getTopSubtopicStatements(topic.name, subtopic.name, "low-alignment");
                       @if (topStatementsLowAlignment.length) {
@@ -271,14 +257,14 @@
                       } @else {
                         <div class="subtopic-section-description">
                           <mat-icon>info</mat-icon>
-                          <p>{{ outputLang === "zh-TW" ? "此子主題中沒有符合「低一致性」門檻的留言。" : "There were no statements in this subtopic that fit within the threshold of “low alignment.”" }}</p>
+                          <p>{{ t("noLowAlignment") }}</p>
                         </div>
                       }
                     </section>
                     <section class="subtopic-section">
-                      <h4>{{ outputLang === "zh-TW" ? "以下留言呈現較高不確定性：" : "There were high levels of uncertainty on the following statements:" }}</h4>
+                      <h4>{{ t("highUncertaintySubtopic") }}</h4>
                       <div class="subtopic-section-summary">
-                        <p>{{ outputLang === "zh-TW" ? "此類留言為整體對話中被略過比例前 25%，或至少有 20% 參與者選擇略過。" : "Statements in this category were among the 25% most passed on in the conversation as a whole or were passed on by at least 20% of participants." }}</p>
+                        <p>{{ t("highUncertaintyDescription") }}</p>
                       </div>
                       @let topStatementsHighUncertainty = getTopSubtopicStatements(topic.name, subtopic.name, "high-uncertainty");
                       @if (topStatementsHighUncertainty.length) {
@@ -294,13 +280,13 @@
                       } @else {
                         <div class="subtopic-section-description">
                           <mat-icon>info</mat-icon>
-                          <p>{{ outputLang === "zh-TW" ? "此子主題中沒有符合「不確定性」門檻的留言。" : "There were no statements in this subtopic that fit within the threshold of “uncertainty.”" }}</p>
+                          <p>{{ t("noHighUncertainty") }}</p>
                         </div>
                       }
                     </section>
                     <section class="subtopic-section centered">
                       <button mat-stroked-button class="icon-button-main" (click)="openStatementDrawer(subtopic)">
-                        <mat-icon>visibility</mat-icon> {{ outputLang === "zh-TW" ? "查看" : "View all statements in" }} {{ subtopic.name }}{{ outputLang === "zh-TW" ? "的全部留言" : "" }}
+                        <mat-icon>visibility</mat-icon> {{ t("viewAllStatementsPrefix") }}{{ subtopic.name }}{{ t("viewAllStatementsSuffix") }}
                       </button>
                     </section>
                   </div>
@@ -318,14 +304,14 @@
       <button
         mat-icon-button
         class="drawer-close-button"
-        [attr.aria-label]="outputLang === 'zh-TW' ? '關閉側欄' : 'Close drawer'"
+        [attr.aria-label]="t('closeDrawer')"
         (click)="closeStatementDrawer()"
       ><mat-icon>close</mat-icon></button>
     </div>
     <div class="drawer-content">
       <div class="drawer-statement-group">
-        <h5>{{ outputLang === "zh-TW" ? "高一致性留言" : "High alignment statements" }} ({{ drawerSubtopicStatementsHighAlignment.length }})</h5>
-        <p>{{ outputLang === "zh-TW" ? "70% 以上參與者對這些留言投下相同方向（同意或不同意）。" : "70% or more of participants agreed or disagreed with these statements." }}</p>
+        <h5>{{ t("highAlignmentStatements") }} ({{ drawerSubtopicStatementsHighAlignment.length }})</h5>
+        <p>{{ t("highAlignmentDescription") }}</p>
         @if (drawerSubtopicStatementsHighAlignment.length) {
           <div class="drawer-statement-list">
             <app-statement-card
@@ -340,8 +326,8 @@
         }
       </div>
       <div class="drawer-statement-group">
-        <h5>{{ outputLang === "zh-TW" ? "低一致性留言" : "Low alignment statements" }} ({{ drawerSubtopicStatementsLowAlignment.length }})</h5>
-        <p>{{ outputLang === "zh-TW" ? "意見分歧。這些留言中，約 40–60% 投票者分別選擇同意或不同意。" : "Opinions were split. 40–60% of voters either agreed or disagreed with these statements." }}</p>
+        <h5>{{ t("lowAlignmentStatements") }} ({{ drawerSubtopicStatementsLowAlignment.length }})</h5>
+        <p>{{ t("lowAlignmentDescription") }}</p>
         @if (drawerSubtopicStatementsLowAlignment.length) {
           <div class="drawer-statement-list">
             <app-statement-card
@@ -356,8 +342,8 @@
         }
       </div>
       <div class="drawer-statement-group">
-        <h5>{{ outputLang === "zh-TW" ? "高不確定性留言" : "High uncertainty statements" }} ({{ drawerSubtopicStatementsHighUncertainty.length }})</h5>
-        <p>{{ outputLang === "zh-TW" ? "此類留言為整體對話中被略過比例前 25%，或至少有 20% 參與者選擇略過。" : "Statements in this category were among the 25% most passed on in the conversation as a whole or were passed on by at least 20% of participants." }}</p>
+        <h5>{{ t("highUncertaintyStatements") }} ({{ drawerSubtopicStatementsHighUncertainty.length }})</h5>
+        <p>{{ t("highUncertaintyDescription") }}</p>
         @if (drawerSubtopicStatementsHighUncertainty.length) {
           <div class="drawer-statement-list">
             <app-statement-card
@@ -372,8 +358,8 @@
         }
       </div>
       <div class="drawer-statement-group">
-        <h5>{{ outputLang === "zh-TW" ? "未分類留言" : "Uncategorized statements" }} ({{ drawerSubtopicStatementsUncategorized.length }})</h5>
-        <p>{{ outputLang === "zh-TW" ? "這些留言不符合高一致性、低一致性或高不確定性的條件。" : "These statements do not meet criteria for high alignment, low alignment, or high uncertainty." }}</p>
+        <h5>{{ t("uncategorizedStatements") }} ({{ drawerSubtopicStatementsUncategorized.length }})</h5>
+        <p>{{ t("uncategorizedDescription") }}</p>
         @if (drawerSubtopicStatementsUncategorized.length) {
           <div class="drawer-statement-list">
             <app-statement-card
