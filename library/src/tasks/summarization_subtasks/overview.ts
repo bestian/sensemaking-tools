@@ -100,10 +100,14 @@ export class OverviewSummary extends RecursiveSummary<OverviewInput> {
     console.log(`[DEBUG] OverviewSummary.oneShotSummary() calling getAbstractPrompt with: output_lang="${this.output_lang}"`);
     
     return await retryCall(
-      async function (model, prompt, output_lang) {
+      async function (model, prompt, output_lang, topicNames) {
         console.log(`Generating OVERVIEW SUMMARY in one shot`);
         console.log(`[DEBUG] retryCall function received output_lang: ${output_lang}`);
-        let result = await model.generateText(prompt, output_lang);
+        const rawResult = await model.generateText(prompt, output_lang);
+        let result = extractOverviewList(rawResult, topicNames);
+        if (!result) {
+          result = rawResult;
+        }
         result = removeEmptyLines(result);
         if (!result) {
           throw new Error(`Overview summary failed to conform to markdown list format.`);
@@ -115,7 +119,7 @@ export class OverviewSummary extends RecursiveSummary<OverviewInput> {
       6, // 6 retries
       "Overview summary failed to conform to markdown list format, or did not include all topic descriptions exactly as intended.",
       undefined,
-      [this.model, prompt, output_lang],  // ← 加入 output_lang
+      [this.model, prompt, output_lang, topicNames],  // ← 加入 output_lang
       []
     );
   }
@@ -201,7 +205,14 @@ export function removeEmptyLines(mdList: string): string {
  * lines matches the expected format (* **bold topic**: summary...)
  */
 export function isMdListValid(mdList: string, topicNames: string[]): boolean {
-  const lines = mdList.split("\n");
+  const lines = removeEmptyLines(mdList).split("\n").filter(Boolean);
+  if (lines.length !== topicNames.length) {
+    console.log(
+      `Overview markdown list line count mismatch. Expected ${topicNames.length}, got ${lines.length}.`
+    );
+    return false;
+  }
+
   for (const [index, line] of lines.entries()) {
     // Check to make sure that every line matches the expected format
     // Valid examples:
@@ -218,17 +229,117 @@ export function isMdListValid(mdList: string, topicNames: string[]): boolean {
     // Check to make sure that every single topicName in topicNames is in the list, and in the right order
     // 使用更寬鬆的檢查，處理可能的格式變化
     const expectedTopicName = topicNames[index];
+    if (!expectedTopicName) {
+      console.log(`Unexpected extra line in overview list:\n`, line);
+      return false;
+    }
     const normalizedExpected = normalizeTopicName(expectedTopicName);
-    const normalizedLine = normalizeTopicName(line);
-    
-    if (!normalizedLine.includes(normalizedExpected)) {
+    const topicLabel = getMdListTopicLabel(line);
+    const normalizedLineTopic = normalizeTopicName(topicLabel || line);
+
+    if (normalizedLineTopic !== normalizedExpected) {
       console.log(`Topic "${expectedTopicName}" not found at line:\n`, line);
       console.log(`Normalized expected: "${normalizedExpected}"`);
-      console.log(`Normalized line: "${normalizedLine}"`);
+      console.log(`Normalized line topic: "${normalizedLineTopic}"`);
       return false;
     }
   }
   return true;
+}
+
+/**
+ * Extract a valid overview markdown list from verbose model output.
+ * This is a safety net for responses that include analysis or other
+ * non-list preamble before the actual final answer.
+ */
+function extractOverviewList(modelOutput: string, topicNames: string[]): string {
+  const lines = modelOutput
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line && !shouldDropAnalysisLine(line));
+  const extractedLines: string[] = [];
+  let searchStartIndex = 0;
+
+  for (const topicName of topicNames) {
+    const normalizedTopicName = normalizeTopicName(topicName);
+    let foundLineIndex = -1;
+
+    for (let i = searchStartIndex; i < lines.length; i++) {
+      const line = lines[i];
+      if (!isMdListLine(line)) {
+        continue;
+      }
+      const topicLabel = getMdListTopicLabel(line);
+      if (!topicLabel) {
+        continue;
+      }
+      if (normalizeTopicName(topicLabel) === normalizedTopicName) {
+        foundLineIndex = i;
+        break;
+      }
+    }
+
+    if (foundLineIndex === -1) {
+      return "";
+    }
+
+    extractedLines.push(lines[foundLineIndex]);
+    searchStartIndex = foundLineIndex + 1;
+  }
+
+  return removeEmptyLines(extractedLines.join("\n"));
+}
+
+function isMdListLine(line: string): boolean {
+  return Boolean(
+    line.match(/^[\*\-]\s+\*\*.*:?\*\*:?\s/) || line.match(/^[\*\-]\s+\_\_.*:?\_\_:?\s/)
+  );
+}
+
+function getMdListTopicLabel(line: string): string {
+  const match = line.match(/^[\*\-]\s+(?:\*\*([^*]+?)\*\*|__([^_]+?)__)\s*:?\s+/);
+  if (!match) {
+    return "";
+  }
+  return (match[1] || match[2] || "").replace(/:\s*$/, "").trim();
+}
+
+function shouldDropAnalysisLine(line: string): boolean {
+  const normalized = line.toLowerCase().replace(/\s+/g, " ").trim();
+  const analysisPrefixes = [
+    "analyze user input",
+    "deconstruct constraints",
+    "constraint check",
+    "check against constraints",
+    "self-correction",
+    "output generation",
+    "role/constraint",
+    "input data",
+    "instructions/constraints",
+    "data says",
+    "draft:",
+    "draft generation",
+    "constraints:",
+  ];
+
+  if (analysisPrefixes.some((prefix) => normalized.startsWith(prefix))) {
+    return true;
+  }
+
+  if (normalized.startsWith("- **role/constraint:**")) {
+    return true;
+  }
+  if (normalized.startsWith("- data says:") || normalized.startsWith("- draft:")) {
+    return true;
+  }
+  if (normalized.match(/^\d+\.\s+\*\*analyze user input:\*\*/)) {
+    return true;
+  }
+  if (normalized.startsWith("[output generation]")) {
+    return true;
+  }
+
+  return false;
 }
 
 /**
