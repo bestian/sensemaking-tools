@@ -2,6 +2,34 @@
 
 This repository shares tools developed by [Jigsaw](http://jigsaw.google.com) as a proof of concept to help make sense of large-scale online conversations. It demonstrates how Large Language Models (LLMs) like Gemini can be leveraged for such tasks. This library offers a transparent look into Jigsaw's methods for categorization, summarization, and identifying agreement/disagreement in complex text. Our goal in sharing this is to inspire others and provide a potential starting point or useful elements for those tackling similar challenges.
 
+# **About This Fork**
+
+This fork extends the upstream Sensemaker so users can run it via **OpenRouter** or a **local LM Studio** instance — achieving low cost, high performance, and full choice of model, with user-selectable output language for reports. A single script, `run_local_html_report.sh`, turns a Polis export into a complete interactive HTML report end-to-end.
+
+### 繁體中文
+
+此分支擴充了 Sensemaker，讓使用者能透過 **OpenRouter** 或地端 **LM Studio** 以低成本、高效能、自選模型的方式執行意見綜整器，並可自訂報告輸出的語言。只需執行 `run_local_html_report.sh` 一個腳本，即可從 Polis 匯出資料一鍵產生完整的互動式 HTML 網頁報告。
+
+### 简体中文
+
+此分支扩展了 Sensemaker，使用户可以通过 **OpenRouter** 或本地 **LM Studio**，以低成本、高性能、自选模型的方式运行意见综整器，并可自定义报告输出的语言。只需执行 `run_local_html_report.sh` 一个脚本，即可从 Polis 导出数据一键生成完整的交互式 HTML 网页报告。
+
+### Français
+
+Ce fork étend Sensemaker pour permettre son exécution via **OpenRouter** ou une instance locale de **LM Studio** — à faible coût, avec une grande performance et un choix complet du modèle, ainsi qu'une langue de sortie configurable pour les rapports. Un seul script, `run_local_html_report.sh`, transforme un export Polis en un rapport HTML interactif complet, de bout en bout.
+
+### Español
+
+Este fork amplía Sensemaker para que los usuarios puedan ejecutarlo mediante **OpenRouter** o una instancia local de **LM Studio**: bajo coste, alto rendimiento y elección completa del modelo, con idioma de salida configurable para los informes. Un único script, `run_local_html_report.sh`, convierte una exportación de Polis en un informe HTML interactivo completo, de principio a fin.
+
+### 日本語
+
+このフォークは Sensemaker を拡張し、**OpenRouter** またはローカルの **LM Studio** を介して、低コスト・高性能・自由なモデル選択で実行できるようにし、レポートの出力言語もユーザーが指定できるようにしました。`run_local_html_report.sh` という 1 本のスクリプトで、Polis のエクスポートから完全にインタラクティブな HTML レポートをエンドツーエンドで生成できます。
+
+### Deutsch
+
+Dieser Fork erweitert Sensemaker so, dass er über **OpenRouter** oder eine lokale **LM Studio**-Instanz betrieben werden kann — kostengünstig, leistungsstark und mit freier Modellwahl sowie einer benutzerdefinierten Ausgabesprache für Berichte. Ein einziges Skript, `run_local_html_report.sh`, erzeugt aus einem Polis-Export einen vollständigen, interaktiven HTML-Bericht von Anfang bis Ende.
+
 # **Overview**
 
 Effectively understanding large-scale public input is a significant challenge, as traditional methods struggle to translate thousands of diverse opinions into actionable insights. ‘Sensemaker’ showcases how Google's Gemini models can be used to transform massive volumes of raw community feedback into clear, digestible insights, aiding the analysis of these complex discussions.
