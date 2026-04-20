@@ -8,7 +8,7 @@
 # Options:
 #   --export-base-url <url>  The base URL of the Polis export (default: https://bloom.civic.ai/api/v3/reportExport/r2jstrdchy3udbrf8arjx)
 #   --work-dir <dir>         The directory to store the report (default: ./tmp/local-report under this script's directory)
-#   --report-title <title>   The title of the report (default: Bloom Civic AI Report)
+#   --report-title <title>   The title of the report (default: Sensemaker Report)
 #   --report-subtitle <subtitle> The subtitle of the report (default: Structured public-input analysis generated locally with LM Studio.)
 #   --report-question <question> The question of the report (default: How should AI care for our communities, and who gets to decide?)
 #   --additional-context <context> The additional context of the report (default: This is a public-input conversation about how AI should care for communities and who should decide how these systems are used. Summarize it clearly for a civic audience.)
@@ -43,7 +43,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 EXPORT_BASE_URL="${EXPORT_BASE_URL:-https://bloom.civic.ai/api/v3/reportExport/r2jstrdchy3udbrf8arjx}"
 WORK_DIR="${WORK_DIR:-${ROOT_DIR}/tmp/local-report}"
-REPORT_TITLE="${REPORT_TITLE:-Bloom Civic AI Report}"
+REPORT_TITLE="${REPORT_TITLE:-Sensemaker Report}"
 REPORT_SUBTITLE="${REPORT_SUBTITLE:-Structured public-input analysis generated locally with LM Studio.}"
 REPORT_QUESTION="${REPORT_QUESTION:-How should AI care for our communities, and who gets to decide?}"
 ADDITIONAL_CONTEXT="${ADDITIONAL_CONTEXT:-This is a public-input conversation about how AI should care for communities and who should decide how these systems are used. Summarize it clearly for a civic audience.}"
