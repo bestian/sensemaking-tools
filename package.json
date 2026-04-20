@@ -8,7 +8,7 @@
     "api-server",
     "library",
     "web-ui",
-    "visualizations-library",
+    "visualization-library",
     "napolitan"
   ],
   "scripts": {
