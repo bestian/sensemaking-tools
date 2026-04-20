@@ -14,3 +14,7 @@ todo.md
 .vscode
 *.pkl
 *.tgz
+
+
+# /tmp files for local report
+/tmp/local-report/
