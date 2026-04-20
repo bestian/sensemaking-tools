@@ -2,6 +2,7 @@ import { processData } from "./dataProcessor.js";
 import { createWaffle, createSolid } from "./renderer.js";
 import { getStyles } from "./styles.js";
 import { createTooltip } from "../../helpers/tooltip.js";
+import { t } from "../../helpers/i18n.js";
 
 /**
  * Renders the topic alignment visualization with both solid and waffle views.
@@ -27,14 +28,11 @@ export function render(container, data, theme, view, topicFilter, chartOptions) 
 
   // Tooltip content definitions for different categories
   const tooltipInfo = {
-    alignment:
-      "<b>Alignment</b><br/><br/>These statements showed an especially high or especially low level of alignment amongst participants",
-    high: "<b>High Alignment</b><br/><br/>70% or more of participants agreed or disagreed with these statements.",
-    low: "<b>Low Alignment</b><br/><br/>Opinions were split. 40–60% of voters either agreed or disagreed with these statements.",
-    uncategorized:
-      "<b>Uncategorized</b><br/><br/>These statements do not meet criteria for high alignment, low alignment, or high uncertainty.",
-    uncertainty:
-      "<b>Uncertainty</b><br/><br/>Statements in this category were among the 25% most passed on in the conversation as a whole or were passed on by at least 20% of participants.",
+    alignment: t("tipAlignment"),
+    high: t("tipHigh"),
+    low: t("tipLow"),
+    uncategorized: t("tipUncategorized"),
+    uncertainty: t("tipUncertainty"),
   };
 
   const height = 500;

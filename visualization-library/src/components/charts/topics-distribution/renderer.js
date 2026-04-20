@@ -3,18 +3,20 @@ import { createTooltip } from "../../helpers/tooltip.js";
 import { wrap } from "../../helpers/wrap.js";
 import { formatProminentThemes } from "../../helpers/formatProminentThemes.js";
 import { calculateColumnPosition } from "./dataProcessor.js";
+import { t } from "../../helpers/i18n.js";
 
 /**
- * Tooltip content for different alignment levels
- * @type {Object}
+ * Returns the tooltip content for different alignment levels in the current UI language.
+ * Computed lazily so that language changes are picked up at render time.
+ * @returns {{highAgree: string, low: string, highDisagree: string}}
  */
-const alignmentInfo = {
-  highAgree:
-    "<b>High alignment (Agree)</b><br/><br/>On average, 70% or more of participants agreed with statements in this subtopic.",
-  low: "<b>Low alignment</b><br/><br/>Opinions were split. On average, 40–60% of voters either agreed or disagreed with statements in this subtopic.",
-  highDisagree:
-    "<b>High alignment (Disagree)</b><br/><br/>On average, 70% or more of participants disagreed with statements in this subtopic on average.",
-};
+function getAlignmentInfo() {
+  return {
+    highAgree: t("scatterTipHighAgree"),
+    low: t("scatterTipLow"),
+    highDisagree: t("scatterTipHighDisagree"),
+  };
+}
 
 /**
  * Renders the visualization elements for both cluster and scatter views.
@@ -46,6 +48,9 @@ export function renderVisualization({
   // Initialize tooltips
   const labelTooltip = createTooltip();
   const { margin } = dimensions;
+
+  // Resolve localized tooltip content once per render
+  const alignmentInfo = getAlignmentInfo();
 
   // Create main visualization container
   const vizContainer = container.append("g").attr("class", "viz-container");
@@ -200,7 +205,7 @@ export function renderVisualization({
     .attr("class", "highlight-text")
     .attr("x", dimensions.views["scatter"].xOffset - 10)
     .attr("y", 0)
-    .text("100% Agree")
+    .text(t("scatterAxisAgree100"))
     .attr("text-anchor", "end")
     .attr("alignment-baseline", "before-edge")
     .attr("font-size", "12px");
@@ -211,7 +216,7 @@ export function renderVisualization({
     .attr("class", "highlight-text")
     .attr("x", dimensions.views["scatter"].xOffset - 10)
     .attr("y", dimensions.views["scatter"].innerHeight * 0.1)
-    .text("High Alignment (Agree)")
+    .text(t("scatterAxisHighAgree"))
     .attr("text-anchor", "end")
     .attr("alignment-baseline", "middle")
     .attr("font-size", "12px")
@@ -235,7 +240,7 @@ export function renderVisualization({
     .attr("class", "highlight-text")
     .attr("x", dimensions.views["scatter"].xOffset - 10)
     .attr("y", dimensions.views["scatter"].innerHeight * 0.5)
-    .text("Low Alignment")
+    .text(t("scatterAxisLow"))
     .attr("text-anchor", "end")
     .attr("alignment-baseline", "middle")
     .attr("font-size", "12px")
@@ -259,7 +264,7 @@ export function renderVisualization({
     .attr("class", "highlight-text")
     .attr("x", dimensions.views["scatter"].xOffset - 10)
     .attr("y", dimensions.views["scatter"].innerHeight * 0.9)
-    .text("High Alignment (Disagree)")
+    .text(t("scatterAxisHighDisagree"))
     .attr("text-anchor", "end")
     .attr("alignment-baseline", "middle")
     .attr("font-size", "12px")
@@ -283,7 +288,7 @@ export function renderVisualization({
     .attr("class", "highlight-text")
     .attr("x", dimensions.views["scatter"].xOffset - 10)
     .attr("y", dimensions.views["scatter"].innerHeight)
-    .text("0% Agree")
+    .text(t("scatterAxisAgree0"))
     .attr("text-anchor", "end")
     .attr("font-size", "12px");
 
@@ -339,7 +344,7 @@ export function renderVisualization({
 
       const tooltipContent = `
                 <div class="sm-tooltip-topic">${d.topic} &gt;</div>
-                <div class="sm-tooltip-subtopic">${d.name} (${d.value} statements)</div>
+                <div class="sm-tooltip-subtopic">${d.name} ${t("subtopicStatementCount", { count: d.value })}</div>
                 ${prominentThemesText ? `<div class="sm-tooltip-subtopic-summary">${prominentThemesText}</div>` : ""}
             `;
       vizTooltip.show(tooltipContent, event.clientX, event.clientY);
@@ -403,7 +408,11 @@ export function renderVisualization({
       .attr("data-topic", topic)
       .attr("x", groupX)
       .attr("y", groupY + 20)
-      .text(`${subtopics.length} subtopic${subtopics.length === 1 ? "" : "s"}`);
+      .text(
+        subtopics.length === 1
+          ? t("clusterSubtopicsOne")
+          : t("clusterSubtopicsMany", { count: subtopics.length })
+      );
 
     // Add statement count
     clusterLabelContainer
@@ -412,7 +421,7 @@ export function renderVisualization({
       .attr("data-topic", topic)
       .attr("x", groupX)
       .attr("y", groupY + 35)
-      .text(`${new Set(items.map((d) => d.id)).size} statements`);
+      .text(t("clusterStatementsCount", { count: new Set(items.map((d) => d.id)).size }));
   });
 
   // Setup cleanup function

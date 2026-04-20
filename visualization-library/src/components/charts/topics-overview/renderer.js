@@ -110,7 +110,7 @@ export function renderTopicRow({
         // Show tooltip with topic and subtopic information
         const tooltipContent = `
                     <div class="sm-tooltip-topic">${topicData.topic} &gt;</div>
-                    <div class="sm-tooltip-subtopic">${subtopic.name} (${subtopic.value} statements)</div>
+                    <div class="sm-tooltip-subtopic">${subtopic.name} ${t("subtopicStatementCount", { count: subtopic.value })}</div>
                     ${prominentThemesText ? `<div class="sm-tooltip-subtopic-summary">${prominentThemesText}</div>` : ""}
                 `;
         tooltip.show(tooltipContent, event.clientX, event.clientY);

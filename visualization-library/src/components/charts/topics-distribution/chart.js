@@ -6,6 +6,7 @@ import { updateView } from "./viewTransitions.js";
 import { getStyles } from "./styles.js";
 import { createTooltip } from "../../helpers/tooltip.js";
 import { extractTopicsSubContent } from "../../helpers/extractSubcontentSummary.js";
+import { t } from "../../helpers/i18n.js";
 
 /**
  * Renders a topics distribution visualization that shows the distribution of statements across topics.
@@ -153,7 +154,7 @@ export function render(container, data, theme, view, topicFilter, chartOptions, 
   legend.innerHTML = `
         <div style="margin-left: 12px; display: flex; align-items: center;" aria-hidden="true">
             <span style="margin-right:12px; text-align:right; min-width:60px; font-size:12px; color:#555;">
-                Fewer<br>Statements
+                ${t("legendFewerStatements")}
             </span>
             <svg width="100" height="40" style="vertical-align:middle;">
                 <circle cx="10" cy="20" r="10" fill="#ccc"/>
@@ -161,7 +162,7 @@ export function render(container, data, theme, view, topicFilter, chartOptions, 
                 <circle cx="80" cy="20" r="20" fill="#ccc"/>
             </svg>
             <span style="margin-left:12px; text-align:left; min-width:60px; font-size:12px; color:#555;">
-                More<br>Statements
+                ${t("legendMoreStatements")}
             </span>
         </div>
     `;

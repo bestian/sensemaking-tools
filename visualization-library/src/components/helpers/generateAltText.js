@@ -1,5 +1,9 @@
+import { t } from "./i18n.js";
+
 /**
- * Constants for alignment group labels and their test functions
+ * Constants for alignment group labels and their test functions.
+ * The `label` field is retained for backward compatibility with any external
+ * consumer, but the generated alt text below does not embed it directly.
  * @type {Array<{key: string, label: string, test: Function}>}
  */
 const alignmentGroupLabels = [
@@ -84,7 +88,7 @@ function formatTopTopics(topicCounts, topicSubtopicCounts, totalStatements, n = 
     const percent = totalStatements > 0 ? Math.round((count / totalStatements) * 100) : 0;
     const subtopics = topicSubtopicCounts[topic] || {};
     const largestSubtopic = Object.entries(subtopics).sort((a, b) => b[1] - a[1])[0]?.[0] || "";
-    return `- ${topic}, with ${percent}% of statements. Its largest subtopic was ${largestSubtopic}.`;
+    return t("altTopTopic", { topic, percent, subtopic: largestSubtopic });
   });
 }
 
@@ -101,25 +105,49 @@ function formatTopTopics(topicCounts, topicSubtopicCounts, totalStatements, n = 
 export function generateAltText(data, chartType, view, topicFilter) {
   if (chartType === "topic-alignment" && view === "solid" && Array.isArray(data) && topicFilter) {
     const percentages = getAlignmentGroupStats(data, topicFilter);
-    return `A tree map chart of the ${topicFilter} topic, depicting a percent breakdown of 4 categories: statements with High and Low Alignment, Pass/Unsure, and Uncategorized.\n\nThe High Alignment category was ${percentages[0].percent}%, Low Alignment category ${percentages[1].percent}%, Pass/unsure category ${percentages[2].percent}%, and Uncategorized category ${percentages[3].percent}%.`;
+    return t("altTopicAlignmentSolid", {
+      topic: topicFilter,
+      high: percentages[0].percent,
+      low: percentages[1].percent,
+      uncertainty: percentages[2].percent,
+      uncategorized: percentages[3].percent,
+    });
   }
   if (chartType === "topic-alignment" && view === "waffle" && Array.isArray(data) && topicFilter) {
     const percentages = getAlignmentGroupStats(data, topicFilter);
-    return `A chart of the ${topicFilter} topic, depicting a percent breakdown of 4 categories: statements with High and Low Alignment, Pass/Unsure, and Uncategorized. Additionally each category is presented as a grid of squares, with each square representing an individual statement within the topic.\n\nThe High Alignment category was ${percentages[0].percent}% (or ${percentages[0].count} statements), Low Alignment category ${percentages[1].percent}% (or ${percentages[1].count} statements), Pass/unsure category ${percentages[2].percent}% (or ${percentages[2].count} statements), and Uncategorized category ${percentages[3].percent}% (or ${percentages[3].count} statements).`;
+    return t("altTopicAlignmentWaffle", {
+      topic: topicFilter,
+      highPercent: percentages[0].percent,
+      highCount: percentages[0].count,
+      lowPercent: percentages[1].percent,
+      lowCount: percentages[1].count,
+      uncertaintyPercent: percentages[2].percent,
+      uncertaintyCount: percentages[2].count,
+      uncategorizedPercent: percentages[3].percent,
+      uncategorizedCount: percentages[3].count,
+    });
   }
   if (chartType === "topics-distribution" && view === "cluster" && Array.isArray(data)) {
     const { totalStatements, topicCounts, topicSubtopicCounts } = getTopicAndSubtopicStats(data);
     const topTopicLines = formatTopTopics(topicCounts, topicSubtopicCounts, totalStatements, 3);
-    return `A breakdown of the ${totalStatements} statements into ${Object.keys(topicCounts).length} topics, encoding each subtopic's quantity of statements using circle radius. The top 3 topics were:\n\n${topTopicLines.join("\n")}`;
+    return t("altTopicsDistributionCluster", {
+      totalStatements,
+      topicCount: Object.keys(topicCounts).length,
+      topTopics: topTopicLines.join("\n"),
+    });
   }
   if (chartType === "topics-distribution" && view === "scatter" && Array.isArray(data)) {
-    return `A scatter plot of the average agreement rate for statements in each topic's subtopics. Each subtopic is placed on a scale of 0% to 100% agree, on average.\n\nEach subtopic is depicted as a circle, additionally encoding its quantity of statements using radius size.`;
+    return t("altTopicsDistributionScatter");
   }
   if (chartType === "topics-overview" && Array.isArray(data)) {
     const { totalStatements, topicCounts, topicSubtopicCounts } = getTopicAndSubtopicStats(data);
     const topTopicLines = formatTopTopics(topicCounts, topicSubtopicCounts, totalStatements, 3);
-    return `A breakdown of the ${totalStatements} statements into ${Object.keys(topicCounts).length} topics, encoding the topic's quantity of statements using rectangle width. The top 3 topics were:\n\n${topTopicLines.join("\n")}`;
+    return t("altTopicsOverview", {
+      totalStatements,
+      topicCount: Object.keys(topicCounts).length,
+      topTopics: topTopicLines.join("\n"),
+    });
   }
   // Default fallback
-  return `A data visualization showing data generated from the Sensemaker tools`;
+  return t("altDefault");
 }
