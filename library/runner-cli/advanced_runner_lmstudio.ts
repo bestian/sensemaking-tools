@@ -180,7 +180,7 @@ async function main(): Promise<void> {
       "Categorization batch size per request (smaller values like 5-10 are often more stable for local models).",
       "20"
     )
-    .option("-l, --outputLang <language>", "Output language.", "en")
+    .option("-l, --outputLang <language>", "Output language (en, zh-TW, zh-CN, fr, es, ja, de).", "en")
     .option(
       "-d, --topicDepth <number>",
       "Topic depth to learn. Use 1 for topics only, 2 for topics + subtopics, or 3 for sub-subtopics.",

@@ -8,7 +8,8 @@ export const STATISTICS_MESSAGES = {
     "zh-CN": "个意见",
     "fr": "déclarations",
     "es": "declaraciones",
-    "ja": "個の声明"
+    "ja": "個の声明",
+    "de": "Aussagen"
   },
   noCommonGround: {
     "en": `No statements met the thresholds necessary to be considered as a point of common ground (at least {minVoteCount} votes, and at least {minCommonGroundProb} agreement{acrossGroups}).`,
@@ -16,7 +17,8 @@ export const STATISTICS_MESSAGES = {
     "zh-CN": `没有意见达到被视为共同点的必要门槛（至少需要 {minVoteCount} 个投票，且至少需要 {minCommonGroundProb} 的同意率{acrossGroups}）。`,
     "fr": `Aucune déclaration n'a atteint les seuils nécessaires pour être considérée comme un terrain d'entente (au moins {minVoteCount} votes et au moins {minCommonGroundProb} d'accord{acrossGroups}).`,
     "es": `Ninguna declaración cumplió con los umbrales necesarios para ser considerada como un punto de terreno común (al menos {minVoteCount} votos, y al menos {minCommonGroundProb} de acuerdo{acrossGroups}).`,
-    "ja": `声明は、共通点と見なすために必要な閾値を満たしていません（少なくとも{minVoteCount}票、かつ少なくとも{minCommonGroundProb}の同意率{acrossGroups}）。`
+    "ja": `声明は、共通点と見なすために必要な閾値を満たしていません（少なくとも{minVoteCount}票、かつ少なくとも{minCommonGroundProb}の同意率{acrossGroups}）。`,
+    "de": `Keine Aussage hat die erforderlichen Schwellenwerte erreicht, um als Punkt des gemeinsamen Verständnisses zu gelten (mindestens {minVoteCount} Abstimmungen und mindestens {minCommonGroundProb} Zustimmung{acrossGroups}).`
   },
   noDifferencesOfOpinion: {
     "en": `No statements met the thresholds necessary to be considered as a significant difference of opinion (at least {minVoteCount} votes, and more than {minAgreeProbDifference} difference in agreement rate between groups).`,
@@ -24,7 +26,8 @@ export const STATISTICS_MESSAGES = {
     "zh-CN": `没有意见达到被视为显著意见分歧的必要门槛（至少需要 {minVoteCount} 个投票，且群组间同意率差异超过 {minAgreeProbDifference}）。`,
     "fr": `Aucune déclaration n'a atteint les seuils nécessaires pour être considérée comme une différence d'opinion significative (au moins {minVoteCount} votes et plus de {minAgreeProbDifference} de différence dans le taux d'accord entre les groupes).`,
     "es": `Ninguna declaración cumplió con los umbrales necesarios para ser considerada como una diferencia de opinión significativa (al menos {minVoteCount} votos, y más de {minAgreeProbDifference} de diferencia en la tasa de acuerdo entre grupos).`,
-    "ja": `声明は、意見の相違として見なすために必要な閾値を満たしていません（少なくとも{minVoteCount}票、かつグループ間の同意率の差が{minAgreeProbDifference}を超える）。`
+    "ja": `声明は、意見の相違として見なすために必要な閾値を満たしていません（少なくとも{minVoteCount}票、かつグループ間の同意率の差が{minAgreeProbDifference}を超える）。`,
+    "de": `Keine Aussage hat die erforderlichen Schwellenwerte erreicht, um als signifikante Meinungsverschiedenheit zu gelten (mindestens {minVoteCount} Abstimmungen und eine Differenz der Zustimmungsrate zwischen den Gruppen von mehr als {minAgreeProbDifference}).`
   },
   noCommonGroundDisagree: {
     "en": `No statements met the thresholds necessary to be considered as a point of common ground (at least {minVoteCount} votes, and at least {minCommonGroundProb} agreement across groups).`,
@@ -32,7 +35,8 @@ export const STATISTICS_MESSAGES = {
     "zh-CN": `没有意见达到被视为群组间共同点的必要门槛（至少需要 {minVoteCount} 个投票，且至少需要 {minCommonGroundProb} 的群组间同意率）。`,
     "fr": `Aucune déclaration n'a atteint les seuils nécessaires pour être considérée comme un terrain d'entente entre les groupes (au moins {minVoteCount} votes et au moins {minCommonGroundProb} d'accord entre les groupes).`,
     "es": `Ninguna declaración cumplió con los umbrales necesarios para ser considerada como un punto de terreno común entre grupos (al menos {minVoteCount} votos, y al menos {minCommonGroundProb} de acuerdo entre grupos).`,
-    "ja": `声明は、グループ間の共通点と見なすために必要な閾値を満たしていません（少なくとも{minVoteCount}票、かつグループ間の同意率が少なくとも{minCommonGroundProb}）。`
+    "ja": `声明は、グループ間の共通点と見なすために必要な閾値を満たしていません（少なくとも{minVoteCount}票、かつグループ間の同意率が少なくとも{minCommonGroundProb}）。`,
+    "de": `Keine Aussage hat die erforderlichen Schwellenwerte erreicht, um als Punkt des gemeinsamen Verständnisses zu gelten (mindestens {minVoteCount} Abstimmungen und mindestens {minCommonGroundProb} Zustimmung über alle Gruppen hinweg).`
   },
   noDifferencesOfOpinionGroups: {
     "en": `No statements met the thresholds necessary to be considered as a significant difference of opinion (at least {minVoteCount} votes, and more than {minAgreeProbDifference} difference in agreement rate between groups).`,
@@ -40,7 +44,8 @@ export const STATISTICS_MESSAGES = {
     "zh-CN": `没有意见达到被视为群组间显著意见分歧的必要门槛（至少需要 {minVoteCount} 个投票，且群组间同意率差异超过 {minAgreeProbDifference}）。`,
     "fr": `Aucune déclaration n'a atteint les seuils nécessaires pour être considérée comme une différence d'opinion significative entre les groupes (au moins {minVoteCount} votes et plus de {minAgreeProbDifference} de différence dans le taux d'accord entre les groupes).`,
     "es": `Ninguna declaración cumplió con los umbrales necesarios para ser considerada como una diferencia de opinión significativa entre grupos (al menos {minVoteCount} votos, y más de {minAgreeProbDifference} de diferencia en la tasa de acuerdo entre grupos).`,
-    "ja": `声明は、グループ間の意見の相違として見なすために必要な閾値を満たしていません（少なくとも{minVoteCount}票、かつグループ間の同意率の差が{minAgreeProbDifference}を超える）。`
+    "ja": `声明は、グループ間の意見の相違として見なすために必要な閾値を満たしていません（少なくとも{minVoteCount}票、かつグループ間の同意率の差が{minAgreeProbDifference}を超える）。`,
+    "de": `Keine Aussage hat die erforderlichen Schwellenwerte erreicht, um als signifikante Meinungsverschiedenheit zwischen Gruppen zu gelten (mindestens {minVoteCount} Abstimmungen und eine Differenz der Zustimmungsrate zwischen den Gruppen von mehr als {minAgreeProbDifference}).`
   }
 };
 

@@ -8,7 +8,8 @@ export const TOPIC_NAMES = {
     "zh-CN": "其他",
     "fr": "Autre",
     "es": "Otros",
-    "ja": "その他"
+    "ja": "その他",
+    "de": "Sonstiges"
   },
   uncategorized: {
     "en": "Uncategorized",
@@ -16,7 +17,8 @@ export const TOPIC_NAMES = {
     "zh-CN": "未分类",
     "fr": "Non catégorisé",
     "es": "Sin categorizar",
-    "ja": "未分類"
+    "ja": "未分類",
+    "de": "Nicht kategorisiert"
   }
 };
 

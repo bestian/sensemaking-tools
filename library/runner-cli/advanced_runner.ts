@@ -160,7 +160,7 @@ async function main(): Promise<void> {
       "A short description of the conversation to add context."
     )
     .option("-v, --vertexProject <project>", "The Vertex Project name.")
-    .option("-l, --outputLang <language>", "The output language (en, zh-TW, zh-CN, fr, es, ja).", "en");
+    .option("-l, --outputLang <language>", "The output language (en, zh-TW, zh-CN, fr, es, ja, de).", "en");
   program.parse(process.argv);
   const options = program.opts();
 

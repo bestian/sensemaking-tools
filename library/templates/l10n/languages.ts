@@ -1,7 +1,7 @@
 // Supported languages configuration
-export type SupportedLanguage = "en" | "zh-TW" | "zh-CN" | "fr" | "es" | "ja";
+export type SupportedLanguage = "en" | "zh-TW" | "zh-CN" | "fr" | "es" | "ja" | "de";
 
-export const SUPPORTED_LANGUAGES: SupportedLanguage[] = ["en", "zh-TW", "zh-CN", "fr", "es", "ja"];
+export const SUPPORTED_LANGUAGES: SupportedLanguage[] = ["en", "zh-TW", "zh-CN", "fr", "es", "ja", "de"];
 
 export const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
   "en": "English",
@@ -9,7 +9,8 @@ export const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
   "zh-CN": "简体中文",
   "fr": "Français",
   "es": "Español",
-  "ja": "日本語"
+  "ja": "日本語",
+  "de": "Deutsch"
 };
 
 export const LANGUAGE_PREFIXES: Record<SupportedLanguage, string> = {
@@ -18,7 +19,8 @@ export const LANGUAGE_PREFIXES: Record<SupportedLanguage, string> = {
   "zh-CN": "你是一个只会写简体中文的AI，请一定要全文使用简体中文回答",
   "fr": "Tu es une IA qui ne sait écrire qu'en français. Veuillez répondre en français.",
   "es": "Eres una IA que solo sabe escribir en español. Por favor responde en español.",
-  "ja": "あなたは日本語しか書けないAIです。必ず日本語で回答してください。"
+  "ja": "あなたは日本語しか書けないAIです。必ず日本語で回答してください。",
+  "de": "Du bist eine KI, die nur auf Deutsch schreiben kann. Bitte antworte ausschließlich auf Deutsch."
 };
 
 export function getLanguageName(lang: SupportedLanguage): string {

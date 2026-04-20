@@ -8,7 +8,8 @@ export const SUBSECTION_TITLES = {
     "zh-CN": "主要主题包括：",
     "fr": "Les thèmes principaux étaient :",
     "es": "Los temas prominentes fueron:",
-    "ja": "主要なテーマは以下の通りです："
+    "ja": "主要なテーマは以下の通りです：",
+    "de": "Die wichtigsten Themen waren:"
   },
   commonGround: {
     "en": "Common ground:",
@@ -16,7 +17,8 @@ export const SUBSECTION_TITLES = {
     "zh-CN": "共同点：",
     "fr": "Terrain d'entente :",
     "es": "Puntos en común:",
-    "ja": "共通点："
+    "ja": "共通点：",
+    "de": "Gemeinsames Verständnis:"
   },
   commonGroundBetweenGroups: {
     "en": "Common ground between groups:",
@@ -24,7 +26,8 @@ export const SUBSECTION_TITLES = {
     "zh-CN": "群组间的共同点：",
     "fr": "Terrain d'entente entre les groupes :",
     "es": "Puntos en común entre grupos:",
-    "ja": "グループ間の共通点："
+    "ja": "グループ間の共通点：",
+    "de": "Gemeinsames Verständnis zwischen den Gruppen:"
   },
   differencesOfOpinion: {
     "en": "Differences of opinion:",
@@ -32,7 +35,8 @@ export const SUBSECTION_TITLES = {
     "zh-CN": "意见分歧：",
     "fr": "Différences d'opinion :",
     "es": "Diferencias de opinión:",
-    "ja": "意見の相違："
+    "ja": "意見の相違：",
+    "de": "Meinungsverschiedenheiten:"
   },
   otherStatements: {
     "en": "**Other statements** ({count} statements",
@@ -40,7 +44,8 @@ export const SUBSECTION_TITLES = {
     "zh-CN": "**其他意见** ({count} 个意见",
     "fr": "**Autres déclarations** ({count} déclarations",
     "es": "**Otras declaraciones** ({count} declaraciones",
-    "ja": "**その他の声明** ({count} 件の声明"
+    "ja": "**その他の声明** ({count} 件の声明",
+    "de": "**Weitere Aussagen** ({count} Aussagen"
   }
 };
 

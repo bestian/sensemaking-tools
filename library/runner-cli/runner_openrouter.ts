@@ -59,7 +59,7 @@ async function main(): Promise<void> {
     )
     .option(
       "--output_lang <language>",
-      "Output language for the report (default: en, supported: en, zh-TW)",
+      "Output language for the report (default: en, supported: en, zh-TW, zh-CN, fr, es, ja, de)",
       "en"
     );
   program.parse(process.argv);

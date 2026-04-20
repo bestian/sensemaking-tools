@@ -29,7 +29,7 @@
 //     --autoStart
 //
 // The server URL defaults to http://127.0.0.1:8080; override with --serverUrl.
-// Output language: --output_lang en|zh-TW  (default: en)
+// Output language: --output_lang en|zh-TW|zh-CN|fr|es|ja|de  (default: en)
 
 import { Command } from "commander";
 import { writeFileSync } from "fs";
@@ -129,7 +129,7 @@ async function main(): Promise<void> {
     )
     .option(
       "--output_lang <language>",
-      "Output language: en | zh-TW",
+      "Output language: en | zh-TW | zh-CN | fr | es | ja | de",
       "en"
     );
 

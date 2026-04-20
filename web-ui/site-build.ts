@@ -3,7 +3,7 @@ const { copyFileSync, writeFileSync } = require("fs");
 const path = require("path");
 const { exec, ExecException } = require("child_process");
 
-const SUPPORTED_LANGS = ["en", "zh-TW", "zh-CN", "fr", "es", "ja"] as const;
+const SUPPORTED_LANGS = ["en", "zh-TW", "zh-CN", "fr", "es", "ja", "de"] as const;
 type SupportedLang = (typeof SUPPORTED_LANGS)[number];
 
 function normalizeOutputLang(value: string | undefined): SupportedLang {
@@ -15,6 +15,7 @@ function normalizeOutputLang(value: string | undefined): SupportedLang {
   if (lower.startsWith("fr")) return "fr";
   if (lower.startsWith("es")) return "es";
   if (lower.startsWith("ja")) return "ja";
+  if (lower.startsWith("de")) return "de";
   if (lower.startsWith("en")) return "en";
   if ((SUPPORTED_LANGS as readonly string[]).includes(value)) {
     return value as SupportedLang;

@@ -7,11 +7,12 @@
 //   fr    – French
 //   es    – Spanish
 //   ja    – Japanese
+//   de    – German
 //
 // Translation strings may include named placeholders in the form `{name}`
 // which are interpolated at runtime by `translate(lang, key, params)`.
 
-export const SUPPORTED_LANGS = ["en", "zh-TW", "zh-CN", "fr", "es", "ja"] as const;
+export const SUPPORTED_LANGS = ["en", "zh-TW", "zh-CN", "fr", "es", "ja", "de"] as const;
 export type UiLanguage = (typeof SUPPORTED_LANGS)[number];
 
 export const DEFAULT_LANG: UiLanguage = "en";
@@ -24,6 +25,7 @@ export const NUMBER_LOCALE: Record<UiLanguage, string> = {
   fr: "fr-FR",
   es: "es-ES",
   ja: "ja-JP",
+  de: "de-DE",
 };
 
 // Normalize an arbitrary language tag to one of the supported UI languages.
@@ -35,6 +37,7 @@ export function normalizeLang(lang?: string | null): UiLanguage {
   if (lower.startsWith("fr")) return "fr";
   if (lower.startsWith("es")) return "es";
   if (lower.startsWith("ja")) return "ja";
+  if (lower.startsWith("de")) return "de";
   if (lower.startsWith("en")) return "en";
   // Fallback if the value already matches a supported lang (any casing variant
   // we did not handle above is unlikely – default to English).
@@ -737,6 +740,119 @@ const JA: Dict = {
   documentTitle: "意見分析レポート",
 };
 
+const DE: Dict = {
+  reportFallbackTitle: "Bericht",
+  reportFallbackSubtitle: "Strukturierte Analyse öffentlicher Beiträge, erstellt mit einem lokalen Modell.",
+  metaLocalModel: "Lokales Modell",
+  metaGenerated: "Erstellt am",
+  metaStatements: "Aussagen",
+  sourceExport: "Quellen-Export",
+
+  shareReport: "Bericht teilen",
+  reportOverview: "Berichtsüberblick",
+  reportTopics: "Berichtsthemen",
+
+  dialogShareReportTitle: "Bericht teilen",
+  dialogShareReportText: "Link zum Teilen des Berichts kopieren",
+  shareSection: "Teilen",
+  shareConversationOverviewTitle: "„Konversationsüberblick“ teilen",
+  shareConversationOverviewText: "Link zum Teilen des Berichtsüberblicks kopieren",
+  shareParticipantAlignmentTitle: "„Teilnehmerübereinstimmung“ teilen",
+  shareParticipantAlignmentText: "Link zum Teilen der Übereinstimmungsanalyse kopieren",
+  shareTopicTitlePrefix: "„{topic}“ teilen",
+  shareTopicText: "Link zum Teilen dieses Themas kopieren",
+
+  aboutReportTitle: "Über diesen Bericht",
+  questionAsked: "Gestellte Frage:",
+  aboutReportSummary:
+    "Dieser Bericht fasst die Ergebnisse der öffentlichen Beteiligung zusammen und umfasst {statements} Aussagen und {votes} Abstimmungen. Aus den eingereichten Aussagen wurden {topics} übergeordnete Themen sowie {subtopics} Unterthemen identifiziert. Alle Abstimmenden waren anonym.",
+  alignmentSummaryPrefix: "Der folgende Bericht fasst Punkte ",
+  alignmentSummarySep1: ", ",
+  alignmentSummarySep2: " und ",
+  alignmentSummarySuffix: " unter den Teilnehmenden zusammen.",
+  highAlignmentLabel: "hoher Übereinstimmung",
+  lowAlignmentLabel: "geringer Übereinstimmung",
+  uncertaintyLabel: "Unsicherheit",
+  highAlignmentTooltip:
+    "70 % oder mehr der Teilnehmenden haben gleich abgestimmt (z. B. 70 % Zustimmung oder 70 % Ablehnung)",
+  lowAlignmentTooltip:
+    "Die Stimmen waren etwa hälftig verteilt (z. B. 40 % Zustimmung, 60 % Ablehnung oder umgekehrt)",
+  uncertaintyTooltip: "Mehr als 30 % der Teilnehmenden haben „Unsicher/überspringen“ gewählt",
+
+  totalStatements: "Gesamtzahl der Aussagen",
+  totalVotes: "Gesamtzahl der Abstimmungen",
+  topicsCaptured: "Erfasste Themen",
+
+  conversationOverview: "Konversationsüberblick",
+  conversationOverviewDescription:
+    "Nachfolgend findet sich ein übergeordneter Überblick über die in der Konversation diskutierten Themen sowie der Anteil der Aussagen, die unter jedes Thema fallen. Beachte, dass die Prozentsätze in Summe mehr als 100 % ergeben können, wenn Aussagen mehr als einem Thema zugeordnet werden.",
+
+  participantAlignment: "Teilnehmerübereinstimmung",
+  alignmentToggleHigh: "Hohe Übereinstimmung",
+  alignmentToggleLow: "Geringe Übereinstimmung",
+  alignmentToggleUncertainty: "Unsicherheit",
+  alignSentencePrefix: "Über ",
+  alignSentenceScope: "alle Themen und Unterthemen hinweg",
+  alignSentenceMiddle: " zeigten die Teilnehmenden die ",
+  alignSentenceSuffix: " bei den folgenden Aussagen.",
+  alignmentHighest: "höchste Übereinstimmung",
+  alignmentLowest: "geringste Übereinstimmung",
+  alignmentUncertainty: "höchste Unsicherheit",
+
+  topicsIdentified: "identifizierte Themen",
+  subtopicsLabel: "Unterthemen",
+  toggleGroupings: "Gruppierungen",
+  toggleStatements: "Aussagen",
+
+  subComparePrefix: "Dieses Unterthema wies ",
+  subCompareMiddle: " und ",
+  subCompareSuffix: " im Vergleich zu den anderen Unterthemen auf.",
+
+  prominentThemes: "Aus allen eingereichten Aussagen traten folgende prominente Themen hervor:",
+
+  highestAlignmentSubtopic: "Die Teilnehmenden zeigten die höchste Übereinstimmung bei den folgenden Aussagen:",
+  highAlignmentDescription: "70 % oder mehr der Teilnehmenden stimmten diesen Aussagen zu oder lehnten sie ab.",
+  noHighAlignment: "In diesem Unterthema gab es keine Aussagen, die die Schwelle für „hohe Übereinstimmung“ erreichten.",
+
+  lowestAlignmentSubtopic: "Die Teilnehmenden zeigten die geringste Übereinstimmung bei den folgenden Aussagen:",
+  lowAlignmentDescription:
+    "Die Meinungen waren geteilt. 40–60 % der Abstimmenden stimmten diesen Aussagen zu oder lehnten sie ab.",
+  noLowAlignment: "In diesem Unterthema gab es keine Aussagen, die die Schwelle für „geringe Übereinstimmung“ erreichten.",
+
+  highUncertaintySubtopic: "Bei den folgenden Aussagen gab es hohe Unsicherheit:",
+  highUncertaintyDescription:
+    "Aussagen in dieser Kategorie gehörten zu den 25 % am häufigsten übersprungenen Aussagen der gesamten Konversation oder wurden von mindestens 20 % der Teilnehmenden übersprungen.",
+  noHighUncertainty: "In diesem Unterthema gab es keine Aussagen, die die Schwelle für „Unsicherheit“ erreichten.",
+
+  viewAllStatementsPrefix: "Alle Aussagen anzeigen in ",
+  viewAllStatementsSuffix: "",
+
+  closeDrawer: "Seitenleiste schließen",
+  highAlignmentStatements: "Aussagen mit hoher Übereinstimmung",
+  lowAlignmentStatements: "Aussagen mit geringer Übereinstimmung",
+  highUncertaintyStatements: "Aussagen mit hoher Unsicherheit",
+  uncategorizedStatements: "Nicht kategorisierte Aussagen",
+  uncategorizedDescription:
+    "Diese Aussagen erfüllen weder die Kriterien für hohe Übereinstimmung, geringe Übereinstimmung noch für hohe Unsicherheit.",
+
+  sectionTopicsTitleContains: "Themen",
+  sectionThemesTitleContains: "Themen",
+
+  dialogClose: "Schließen",
+  dialogCopyLink: "Link in die Zwischenablage kopieren",
+
+  votedAgree: "stimmten zu",
+  votedDisagree: "lehnten ab",
+  votedUnsurePass: "stimmten mit „unsicher/überspringen“",
+  topicsLabel: "Thema/Themen:",
+  totalVotesLabel: "Abstimmungen insgesamt",
+  agree: "Zustimmen",
+  disagree: "Ablehnen",
+  unsurePass: "„Unsicher/Überspringen“",
+
+  documentTitle: "Sensemaking-Bericht",
+};
+
 export const TRANSLATIONS: Record<UiLanguage, Dict> = {
   en: EN,
   "zh-TW": ZH_TW,
@@ -744,6 +860,7 @@ export const TRANSLATIONS: Record<UiLanguage, Dict> = {
   fr: FR,
   es: ES,
   ja: JA,
+  de: DE,
 };
 
 // Translate a key for the given language. If the key is missing in the target

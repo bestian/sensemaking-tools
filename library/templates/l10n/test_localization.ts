@@ -22,6 +22,7 @@ function testLocalization() {
   console.log(`   "fr" is valid: ${isValidLanguage("fr")}`);
   console.log(`   "es" is valid: ${isValidLanguage("es")}`);
   console.log(`   "ja" is valid: ${isValidLanguage("ja")}`);
+  console.log(`   "de" is valid: ${isValidLanguage("de")}`);
   console.log(`   "invalid" is valid: ${isValidLanguage("invalid")}\n`);
 
   // Test 2: Language prefixes
@@ -31,7 +32,8 @@ function testLocalization() {
   console.log(`   Simplified Chinese prefix: "${getLanguagePrefix("zh-CN")}"`);
   console.log(`   French prefix: "${getLanguagePrefix("fr")}"`);
   console.log(`   Spanish prefix: "${getLanguagePrefix("es")}"`);
-  console.log(`   Japanese prefix: "${getLanguagePrefix("ja")}"\n`);
+  console.log(`   Japanese prefix: "${getLanguagePrefix("ja")}"`);
+  console.log(`   German prefix: "${getLanguagePrefix("de")}"\n`);
 
   // Test 3: Report section titles
   console.log("3. Testing report section titles:");
@@ -41,12 +43,14 @@ function testLocalization() {
   console.log(`   Introduction (fr): ${getReportSectionTitle("introduction", "fr")}`);
   console.log(`   Introduction (es): ${getReportSectionTitle("introduction", "es")}`);
   console.log(`   Introduction (ja): ${getReportSectionTitle("introduction", "ja")}`);
+  console.log(`   Introduction (de): ${getReportSectionTitle("introduction", "de")}`);
   console.log(`   Top Subtopics (en, count=5): ${getReportSectionTitle("topSubtopics", "en", 5)}`);
   console.log(`   Top Subtopics (zh-TW, count=5): ${getReportSectionTitle("topSubtopics", "zh-TW", 5)}`);
   console.log(`   Top Subtopics (zh-CN, count=5): ${getReportSectionTitle("topSubtopics", "zh-CN", 5)}`);
   console.log(`   Top Subtopics (fr, count=5): ${getReportSectionTitle("topSubtopics", "fr", 5)}`);
   console.log(`   Top Subtopics (es, count=5): ${getReportSectionTitle("topSubtopics", "es", 5)}`);
-  console.log(`   Top Subtopics (ja, count=5): ${getReportSectionTitle("topSubtopics", "ja", 5)}\n`);
+  console.log(`   Top Subtopics (ja, count=5): ${getReportSectionTitle("topSubtopics", "ja", 5)}`);
+  console.log(`   Top Subtopics (de, count=5): ${getReportSectionTitle("topSubtopics", "de", 5)}\n`);
 
   // Test 4: Report content
   console.log("4. Testing report content:");
@@ -85,6 +89,12 @@ function testLocalization() {
     subtopicsText: ", as well as 8 subtopics",
     groupsText: " between opinion groups,",
     groupsBetweenText: "between groups "
+  })}`);
+  console.log(`   Topics overview (de): ${getReportContent("topics", "overview", "de", {
+    topicCount: 3,
+    subtopicsText: ", as well as 8 subtopics",
+    groupsText: " between opinion groups,",
+    groupsBetweenText: "between groups "
   })}\n`);
 
   // Test 5: Subsection titles
@@ -95,12 +105,14 @@ function testLocalization() {
   console.log(`   Prominent themes (fr): ${getSubsectionTitle("prominentThemes", "fr")}`);
   console.log(`   Prominent themes (es): ${getSubsectionTitle("prominentThemes", "es")}`);
   console.log(`   Prominent themes (ja): ${getSubsectionTitle("prominentThemes", "ja")}`);
+  console.log(`   Prominent themes (de): ${getSubsectionTitle("prominentThemes", "de")}`);
   console.log(`   Common ground (en): ${getSubsectionTitle("commonGround", "en")}`);
   console.log(`   Common ground (zh-TW): ${getSubsectionTitle("commonGround", "zh-TW")}`);
   console.log(`   Common ground (zh-CN): ${getSubsectionTitle("commonGround", "zh-CN")}`);
   console.log(`   Common ground (fr): ${getSubsectionTitle("commonGround", "fr")}`);
   console.log(`   Common ground (es): ${getSubsectionTitle("commonGround", "es")}`);
-  console.log(`   Common ground (ja): ${getSubsectionTitle("commonGround", "ja")}\n`);
+  console.log(`   Common ground (ja): ${getSubsectionTitle("commonGround", "ja")}`);
+  console.log(`   Common ground (de): ${getSubsectionTitle("commonGround", "de")}\n`);
 
   // Test 6: Topic summaries
   console.log("6. Testing topic summaries:");
@@ -139,6 +151,12 @@ function testLocalization() {
     subtopicPlural: getPluralForm(3, "ja"),
     statementCount: 15,
     statementPlural: getPluralForm(15, "ja")
+  })}`);
+  console.log(`   Topic summary (de): ${getTopicSummaryText("topicSummary", "de", {
+    subtopicCount: 3,
+    subtopicPlural: getPluralForm(3, "de"),
+    statementCount: 15,
+    statementPlural: getPluralForm(15, "de")
   })}\n`);
 
   // Test 7: Plural forms
@@ -148,7 +166,8 @@ function testLocalization() {
   console.log(`   Simplified Chinese: 1 个子主题${getPluralForm(1, "zh-CN")}, 2 个子主题${getPluralForm(2, "zh-CN")}`);
   console.log(`   French: 1 sous-sujet${getPluralForm(1, "fr")}, 2 sous-sujet${getPluralForm(2, "fr")}`);
   console.log(`   Spanish: 1 subtema${getPluralForm(1, "es")}, 2 subtema${getPluralForm(2, "es")}`);
-  console.log(`   Japanese: 1 サブトピック${getPluralForm(1, "ja")}, 2 サブトピック${getPluralForm(2, "ja")}\n`);
+  console.log(`   Japanese: 1 サブトピック${getPluralForm(1, "ja")}, 2 サブトピック${getPluralForm(2, "ja")}`);
+  console.log(`   German: 1 Unterthema${getPluralForm(1, "de")}, 2 Unterthemen${getPluralForm(2, "de")}\n`);
 
   // Test 8: Statistics messages (new statements functionality)
   console.log("8. Testing statistics messages:");
@@ -157,7 +176,8 @@ function testLocalization() {
   console.log(`   Statements (zh-CN): ${getStatisticsMessage("statements", "zh-CN", {})}`);
   console.log(`   Statements (fr): ${getStatisticsMessage("statements", "fr", {})}`);
   console.log(`   Statements (es): ${getStatisticsMessage("statements", "es", {})}`);
-  console.log(`   Statements (ja): ${getStatisticsMessage("statements", "ja", {})}\n`);
+  console.log(`   Statements (ja): ${getStatisticsMessage("statements", "ja", {})}`);
+  console.log(`   Statements (de): ${getStatisticsMessage("statements", "de", {})}\n`);
 
   console.log("✅ Localization system test completed!");
 }

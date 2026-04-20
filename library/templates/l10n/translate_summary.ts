@@ -18,7 +18,8 @@ export function translateSummary(content: Summary, output_lang: SupportedLanguag
     "zh-CN": "其他",
     "fr": "Autre",
     "es": "Otro",
-    "ja": "その他"
+    "ja": "その他",
+    "de": "Sonstiges"
   };
 
   // 處理 Summary 對象

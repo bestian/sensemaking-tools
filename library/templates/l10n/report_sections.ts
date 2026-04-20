@@ -8,7 +8,8 @@ export const REPORT_SECTIONS = {
     "zh-CN": "## 简介",
     "fr": "## Introduction",
     "es": "## Introducción",
-    "ja": "## はじめに"
+    "ja": "## はじめに",
+    "de": "## Einführung"
   },
   overview: {
     "en": "## Overview",
@@ -16,7 +17,8 @@ export const REPORT_SECTIONS = {
     "zh-CN": "## 概述",
     "fr": "## Aperçu",
     "es": "## Resumen",
-    "ja": "## 概要"
+    "ja": "## 概要",
+    "de": "## Überblick"
   },
   topics: {
     "en": "## Topics",
@@ -24,7 +26,8 @@ export const REPORT_SECTIONS = {
     "zh-CN": "## 主题",
     "fr": "## Sujets",
     "es": "## Temas",
-    "ja": "## トピック"
+    "ja": "## トピック",
+    "de": "## Themen"
   },
   topSubtopics: {
     "en": "## Top {count} Most Discussed Subtopics",
@@ -32,7 +35,8 @@ export const REPORT_SECTIONS = {
     "zh-CN": "## 前 {count} 个最常讨论的子主题",
     "fr": "## Top {count} des sous-sujets les plus discutés",
     "es": "## Top {count} de subtemas más discutidos",
-    "ja": "## 最も議論された上位 {count} のサブトピック"
+    "ja": "## 最も議論された上位 {count} のサブトピック",
+    "de": "## Die {count} am häufigsten diskutierten Unterthemen"
   },
   opinionGroups: {
     "en": "## Opinion Groups",
@@ -40,7 +44,8 @@ export const REPORT_SECTIONS = {
     "zh-CN": "## 意见群组",
     "fr": "## Groupes d'opinion",
     "es": "## Grupos de opinión",
-    "ja": "## 意見グループ"
+    "ja": "## 意見グループ",
+    "de": "## Meinungsgruppen"
   }
 };
 

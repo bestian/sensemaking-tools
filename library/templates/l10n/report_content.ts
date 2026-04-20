@@ -61,6 +61,14 @@ export const REPORT_CONTENT: ContentStructure = {
       topics: "トピック",
       subtopics: "サブトピック",
       anonymous: "すべての投票者は匿名でした。"
+    },
+    "de": {
+      text: "Dieser Bericht fasst die Ergebnisse der öffentlichen Beteiligung zusammen und umfasst:",
+      statements: "Aussagen",
+      votes: "Abstimmungen",
+      topics: "Themen",
+      subtopics: "Unterthemen",
+      anonymous: "Alle Abstimmenden waren anonym."
     }
   },
   overview: {
@@ -81,6 +89,9 @@ export const REPORT_CONTENT: ContentStructure = {
     },
     "ja": {
       preamble: "以下は、会話で議論されたトピックの高レベルな概要と、各トピックの下に分類された声明の割合です。声明が複数のトピックに該当する場合、割合の合計が100%を超える可能性があることにご注意ください。\n\n"
+    },
+    "de": {
+      preamble: "Nachfolgend findet sich ein übergeordneter Überblick über die in der Konversation diskutierten Themen sowie der Anteil der Aussagen, die unter jedes Thema fallen. Beachte, dass die Prozentsätze in Summe mehr als 100 % ergeben können, wenn Aussagen mehr als einem Thema zugeordnet werden.\n\n"
     }
   },
   topics: {
@@ -101,6 +112,9 @@ export const REPORT_CONTENT: ContentStructure = {
     },
     "ja": {
       overview: "提出された声明から、{topicCount}の高レベルトピック{subtopicsText}が特定されました。投票パターンに基づいて{groupsText}、共通点と意見の相違点の両方{groupsBetweenText}が特定され、以下に説明されています。\n\n"
+    },
+    "de": {
+      overview: "Aus den eingereichten Aussagen wurden {topicCount} übergeordnete Themen identifiziert{subtopicsText}. Auf Basis der Abstimmungsmuster{groupsText} wurden sowohl Punkte des gemeinsamen Verständnisses als auch Meinungsverschiedenheiten {groupsBetweenText}identifiziert und werden unten beschrieben.\n\n"
     }
   },
   subtopics: {
@@ -121,6 +135,9 @@ export const REPORT_CONTENT: ContentStructure = {
     },
     "ja": {
       text: "、および {count} のサブトピック"
+    },
+    "de": {
+      text: " sowie {count} Unterthemen"
     }
   },
   topSubtopics: {
@@ -141,6 +158,9 @@ export const REPORT_CONTENT: ContentStructure = {
     },
     "ja": {
       text: "議論から{totalCount}のサブトピックが生まれました。これらの{topCount}のサブトピックには、最も多くの声明が提出されました。"
+    },
+    "de": {
+      text: "Es entstanden {totalCount} Unterthemen in der Diskussion. Zu diesen {topCount} Unterthemen wurden die meisten Aussagen eingereicht."
     }
   },
   opinionGroups: {
@@ -161,6 +181,9 @@ export const REPORT_CONTENT: ContentStructure = {
     },
     "ja": {
       text: "{groupCount}の異なるグループ（ここでは{groupNames}として命名）が、提出された声明に関連して異なる視点で出現しました。これらのグループは、グループ外の人よりも互いに似た投票をする傾向がある人々に基づいています。しかし、グループが同様に投票した共通点が存在します。\n\n"
+    },
+    "de": {
+      text: "{groupCount} unterschiedliche Gruppen (hier als {groupNames} benannt) sind mit abweichenden Sichtweisen zu den eingereichten Aussagen hervorgetreten. Die Gruppen basieren auf Personen, die tendenziell untereinander ähnlicher abstimmen als mit Personen außerhalb der Gruppe. Dennoch gibt es Punkte des gemeinsamen Verständnisses, an denen die Gruppen ähnlich abgestimmt haben.\n\n"
     }
   }
 };

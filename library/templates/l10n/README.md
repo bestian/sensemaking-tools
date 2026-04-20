@@ -1,6 +1,6 @@
 # Localization (l10n) System
 
-This directory contains the localization system for the Sensemaker reports, supporting multiple languages including English, Traditional Chinese, and French.
+This directory contains the localization system for the Sensemaker reports, supporting multiple languages including English, Traditional Chinese, Simplified Chinese, French, Spanish, Japanese, and German.
 
 ## Structure
 
@@ -15,7 +15,11 @@ This directory contains the localization system for the Sensemaker reports, supp
 
 - `en` - English (default)
 - `zh-TW` - Traditional Chinese
+- `zh-CN` - Simplified Chinese
 - `fr` - French
+- `es` - Spanish
+- `ja` - Japanese
+- `de` - German
 
 ## Usage
 

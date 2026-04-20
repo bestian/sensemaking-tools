@@ -114,6 +114,22 @@ export const THEMES_PROMPT: Record<SupportedLanguage, string> = {
 
 <output_format format="markdown">
 * **タイトルケーステーマ**：文
+</output_format>`,
+
+  "de": `Bitte verfasse eine prägnante Aufzählung, die bis zu 5 prominente Themen in allen Aussagen identifiziert. Diese Aussagen beziehen sich alle auf {topicName}. Beginne jeden Punkt mit einer kurzen Themenbeschreibung in Fettschrift, gefolgt von einem Doppelpunkt, dann von EINEM einzigen Satz, der das Thema erklärt. Deine Liste muss die untenstehenden Kriterien erfüllen und das Ausgabeformat STRIKT einhalten. Stelle der Aufzählung keinen Text voran.
+
+<criteria format="markdown">
+* Unparteilichkeit: Äußere keine eigene Meinung und fälle keine normativen Urteile über die Aussagen, wie Zustimmung, Ablehnung oder Besorgnis.
+* Treue: Deine Liste muss die Aussagen präzise widerspiegeln, ohne Halluzinationen oder Fehldarstellungen.
+  * Ebenso darf deine Liste den Grad der Übereinstimmung zwischen den Aussagen nicht annehmen oder falsch darstellen. Präsentiere ein Thema beispielsweise nicht als einstimmig, wenn es nur in einigen Aussagen erwähnt wird.
+  * Dieses Kriterium gilt auch für den Namen des Themas selbst: Nimm keine überwältigende Zustimmung an, wenn du Themen benennst, sofern diese nicht existiert. Benenne ein Thema beispielsweise nicht als "Unterstützung für _______", sofern es keine überwältigenden Beweise jenseits vernünftiger Zweifel in den Aussagen gibt.
+  * Sei **spezifisch**. Vermeide Übergeneralisierungen oder unscharfe Nomen wie "Dinge" oder "Aspekte".
+* Vollständigkeit: Deine Liste sollte ALLE Meinungen proportional zu ihrer Repräsentation in den Aussagen widerspiegeln. Jedoch **schließe absolut keine Minderheitsmeinungen aus**, besonders wenn es starke Einwände oder gemischte Positionen gibt. Bitte sei **spezifisch**, wenn du diese Einwände oder Positionen einbeziehst.
+* Einheitliche Terminologie: Verwende immer "Aussagen" und NICHT "Kommentare".
+</criteria>
+
+<output_format format="markdown">
+* **Thema in Titelschreibung**: Satz
 </output_format>`
 };
 
@@ -163,6 +179,13 @@ Aquí están los temas:
 あなたが出力するリストの構造は、以下の順序でトピック名に基づいている必要があります。各リスト項目は、トピック名（以下に正確にリストされているパーセンテージを含む）を太字で開始し、次にコロン、次に対応するトピックの短い1つまたは2つの文の要約を記述する必要があります。完全な回答は、markdownリストのみで、他のテキストは含まれない必要があります。例えば、リスト項目は次のようになります：
 <output_format format="markdown">* **トピック名 (45%):** トピックの要約。</output_format>
 以下がトピックです：
+{topicNames}`,
+
+  "de": `Deine Aufgabe ist es, eine Zusammenfassung der wichtigsten Ergebnisse einer öffentlichen Diskussion zu verfassen, basierend auf bereits erstellten Zusammenfassungen, die den in dieser Diskussion identifizierten Themen und Unterthemen entsprechen. Diese Themen- und Unterthema-Zusammenfassungen basieren auf Kommentaren und Abstimmungsmustern, die Teilnehmende im Rahmen der Diskussion eingereicht haben. Du sollst die Ergebnisse als Markdown-Liste formatieren, die oben im Abschlussbericht eingefügt wird, der die vollständigen Themen- und Unterthema-Zusammenfassungen enthalten wird. Gib nicht vor, dass du diese Meinungen vertrittst. Du bist kein Teilnehmer dieser Diskussion. Füge keine konkreten Zahlen darüber ein, wie viele Kommentare in jedem Thema oder Unterthema enthalten waren, da diese später in der endgültigen Berichtsausgabe enthalten sein werden. Du musst auch nicht den Kontext der Konversation zusammenfassen, da dieser bereits früher im Bericht dargestellt wurde. Beschreibe die Ergebnisse wo möglich in Bezug auf die eingereichten "Aussagen" oder die gesamte "Konversation", statt in Bezug auf die Perspektiven der Teilnehmenden (Hinweis: "Kommentare" und "Aussagen" sind dasselbe, aber in diesem Teil der Zusammenfassung verwende nur den Begriff "Aussagen"). Denk daran: Dies ist nur eine Komponente eines größeren Berichts, und du solltest es so verfassen, dass es sich natürlich in den Kontext des restlichen Berichts einfügt. Sei klar und prägnant in deinem Schreiben und verwende weder Passivkonstruktionen noch mehrdeutige Pronomen.
+
+Die Struktur der Liste, die du ausgibst, sollte auf den Themennamen basieren, in der folgenden Reihenfolge. Jeder Listeneintrag soll fettgedruckt mit dem Themennamen beginnen (einschließlich Prozentsatz, genau wie unten aufgeführt), dann einem Doppelpunkt und einer kurzen ein- oder zweisätzigen Zusammenfassung für das entsprechende Thema. Die vollständige Antwort darf ausschließlich die Markdown-Liste sein, ohne weiteren Text. Beispiel für einen Listeneintrag:
+<output_format format="markdown">* **Themenname (45%):** Themenzusammenfassung.</output_format>
+Hier sind die Themen:
 {topicNames}`
 };
 
@@ -192,7 +215,11 @@ Otros temas vendrán más tarde, pero por ahora, su trabajo es componer un resum
 
   "ja": `あなたの仕事は、既に作成された要約に基づいて公開討論の主要な発見の要約を作成することです。これらの要約は、討論で特定されたトピックとサブトピックに対応しています。これらのトピックとサブトピックの要約は、参加者が討論の一部として提出したコメントと投票パターンに基づいています。この要約はmarkdownリストとしてフォーマットされ、最終レポートの上部近くに含まれます。最終レポートには、完全なトピックとサブトピックの要約が含まれます。これらの意見のいずれかを保持しているふりをしないでください。あなたはこの討論の参加者ではありません。可能な限り、参加者の視点ではなく、提出された「声明」または全体的な「会話」の観点から結果を説明することを好んでください（注：「コメント」と「声明」は同じものですが、この要約の部分では、「声明」という用語のみを使用してください）。各トピックまたはサブトピックに含まれるコメントの数について具体的な数字を含めないでください。これらは最終レポートの出力で後ほど含まれるからです。また、会話の文脈を再説明する必要もありません。これはレポートの早い段階で既に述べられているからです。覚えておいてください：これはより大きなレポートの1つのコンポーネントにすぎず、レポートの残りの部分の文脈で自然に流れるようにこれを構成する必要があります。受動態を使用しないでください。曖昧な代名詞を使用しないでください。明確にしてください。箇条書きや特別なフォーマットを生成しないでください。無駄話をしないでください。
 
-他のトピックは後で来ますが、今のところ、あなたの仕事は以下のトピックについて非常に短い1つまたは2つの文の要約を作成することです：{topicName}。この要約は後で他の同様の要約と一緒にリストにまとめられます。`
+他のトピックは後で来ますが、今のところ、あなたの仕事は以下のトピックについて非常に短い1つまたは2つの文の要約を作成することです：{topicName}。この要約は後で他の同様の要約と一緒にリストにまとめられます。`,
+
+  "de": `Deine Aufgabe ist es, eine Zusammenfassung der wichtigsten Ergebnisse einer öffentlichen Diskussion zu verfassen, basierend auf bereits erstellten Zusammenfassungen, die den in dieser Diskussion identifizierten Themen und Unterthemen entsprechen. Diese Themen- und Unterthema-Zusammenfassungen basieren auf Kommentaren und Abstimmungsmustern, die Teilnehmende im Rahmen der Diskussion eingereicht haben. Diese Zusammenfassung wird als Markdown-Liste formatiert und oben im Abschlussbericht eingefügt, der die vollständigen Themen- und Unterthema-Zusammenfassungen enthalten wird. Gib nicht vor, dass du diese Meinungen vertrittst. Du bist kein Teilnehmer dieser Diskussion. Beschreibe die Ergebnisse wo möglich in Bezug auf die eingereichten "Aussagen" oder die gesamte "Konversation", statt in Bezug auf die Perspektiven der Teilnehmenden (Hinweis: "Kommentare" und "Aussagen" sind dasselbe, aber in diesem Teil der Zusammenfassung verwende nur den Begriff "Aussagen"). Füge keine konkreten Zahlen darüber ein, wie viele Kommentare in jedem Thema oder Unterthema enthalten waren, da diese später in der endgültigen Berichtsausgabe enthalten sein werden. Du musst auch nicht den Kontext der Konversation zusammenfassen, da dieser bereits früher im Bericht dargestellt wurde. Denk daran: Dies ist nur eine Komponente eines größeren Berichts, und du solltest es so verfassen, dass es sich natürlich in den Kontext des restlichen Berichts einfügt. Sei klar und prägnant in deinem Schreiben und verwende weder Passivkonstruktionen noch mehrdeutige Pronomen.
+
+Andere Themen folgen später, aber im Moment besteht deine Aufgabe darin, eine sehr kurze ein- oder zweisätzige Zusammenfassung des folgenden Themas zu verfassen: {topicName}. Diese Zusammenfassung wird später mit weiteren solchen Zusammenfassungen zu einer Liste zusammengefügt.`
 };
 
 /**
@@ -275,7 +302,20 @@ IMPORTANTE:
 - 「その他」や「雑多」、または類似の包括的な名前のトピックを作成しないでください。
 - 各トピックは、内容を明確に表現する具体的で説明的な名前を持つ必要があります。
 - コメントで見つかった実際のトピックのみを出力し、明確で意味のある名前を使用してください。
-- 指定された正確なJSONスキーマ形式を使用してください：[{"name": "トピック名"}]`
+- 指定された正確なJSONスキーマ形式を使用してください：[{"name": "トピック名"}]`,
+
+  "de": `Analysiere die folgenden Kommentare und identifiziere gemeinsame Themen.
+Berücksichtige die Granularität der Themen: Zu wenige Themen können den Inhalt zu stark vereinfachen und wichtige Nuancen übersehen, während zu viele Themen zu Redundanz führen und die Gesamtstruktur weniger klar machen können.
+Strebe eine ausgewogene Anzahl von Themen an, die die Hauptthemen effektiv zusammenfasst, ohne übermäßige Details.
+Bestimme nach der Analyse der Kommentare die optimale Anzahl von Themen, um den Inhalt effektiv zu repräsentieren.
+Begründe, warum weniger Themen weniger optimal wären (möglicherweise zu starke Vereinfachung und Übersehen wichtiger Nuancen) und warum mehr Themen ebenfalls weniger optimal wären (möglicherweise Redundanz und eine weniger klare Gesamtstruktur).
+Identifiziere diese Themen, nachdem du die optimale Anzahl bestimmt hast.
+
+WICHTIG:
+- Erstelle KEIN Thema namens "Sonstiges", "Verschiedenes" oder ähnliche Sammelnamen.
+- Jedes Thema sollte einen spezifischen, beschreibenden Namen haben, der den Inhalt klar repräsentiert.
+- Gib nur die tatsächlich in den Kommentaren gefundenen Themen mit klaren, aussagekräftigen Namen aus.
+- Verwende das exakt vorgegebene JSON-Schema: [{"name": "Themenname"}]`
 };
 
 /**
@@ -448,6 +488,34 @@ Ejemplo de salida incorrecta:
         { "name": "インフラと交通" } // 誤り：これはメイントピックの名前です
       ]
   }
+]`,
+
+  "de": `Analysiere die folgenden Kommentare und identifiziere gemeinsame Unterthemen innerhalb des folgenden übergreifenden Themas: "{parentTopicName}".
+Berücksichtige die Granularität der Unterthemen: Zu wenige Unterthemen können den Inhalt zu stark vereinfachen und wichtige Nuancen übersehen, während zu viele Unterthemen zu Redundanz führen und die Gesamtstruktur weniger klar machen können.
+Strebe eine ausgewogene Anzahl von Unterthemen an, die die Hauptthemen effektiv zusammenfasst, ohne übermäßige Details.
+Bestimme nach der Analyse der Kommentare die optimale Anzahl von Unterthemen, um den Inhalt effektiv zu repräsentieren.
+Begründe, warum weniger Unterthemen weniger optimal wären (möglicherweise zu starke Vereinfachung und Übersehen wichtiger Nuancen) und warum mehr Unterthemen ebenfalls weniger optimal wären (möglicherweise Redundanz und eine weniger klare Gesamtstruktur).
+Identifiziere diese Unterthemen, nachdem du die optimale Anzahl bestimmt hast.
+
+KRITISCHE ANFORDERUNGEN:
+- Du MUSST mindestens ein Unterthema zurückgeben. Gib NIEMALS ein leeres Array oder leeren Inhalt zurück.
+- Wenn du keine unterscheidbaren Unterthemen identifizieren kannst, erstelle mindestens ein Unterthema, das das Hauptthema der Kommentare erfasst.
+- Kein Unterthema sollte denselben Namen tragen wie das übergreifende Thema.
+- Es gibt andere übergreifende Themen, die auf unterschiedliche Kommentarsätze angewendet werden. Verwende diese übergreifenden Themennamen NICHT als identifizierte Unterthemennamen: {otherTopicNames}
+
+Beispiel für eine falsche Ausgabe:
+
+[
+  {
+    "name": "Wirtschaftsentwicklung",
+    "subtopics": [
+        { "name": "Schaffung von Arbeitsplätzen" },
+        { "name": "Geschäftswachstum" },
+        { "name": "Entwicklung kleiner Unternehmen" },
+        { "name": "Marketing für kleine Unternehmen" } // Falsch: Zu eng verwandt mit dem Unterthema "Entwicklung kleiner Unternehmen"
+        { "name": "Infrastruktur und Verkehr" } // Falsch: Dies ist der Name eines Hauptthemas
+      ]
+  }
 ]`
 };
 
@@ -574,7 +642,13 @@ Aquí están los temas:
 あなたが出力するリストの構造は、以下の順序でトピック名に基づいている必要があります。各リスト項目は、トピック名（以下に正確にリストされているパーセンテージを含む）を太字で開始し、次にコロン、次に対応するトピックの短い1つまたは2つの文の要約を記述する必要があります。完全な回答は、markdownリストのみで、他のテキストは含まれない必要があります。例えば、リスト項目は次のようになります：
 <output_format format="markdown">* **トピック名 (45%):** トピックの要約。</output_format>
 以下がトピックです：
-{topicNames}`
+{topicNames}`,
+
+  "de": `Dir werden mehrere Kommentare aus einer Diskussion präsentiert, bei denen es unterschiedliche Meinungen gab, sowie eine Zusammenfassung der Punkte des gemeinsamen Verständnisses aus dieser Diskussion. Deine Aufgabe ist es, die in den Kommentaren enthaltenen Ideen zusammenzufassen und dabei die Punkte des gemeinsamen Verständnisses als Hintergrund bei der Beschreibung der Meinungsverschiedenheiten zu berücksichtigen. Gib nicht vor, dass du diese Meinungen vertrittst. Du bist kein Teilnehmer dieser Diskussion. Schreibe eine prägnante Zusammenfassung dieser Kommentare, die mindestens einen und höchstens fünf Sätze umfasst. Bezeichne die Personen, die diese Kommentare verfasst haben, als Teilnehmende, nicht als Kommentatoren. Sprich nicht darüber, wie stark sie mit diesen Kommentaren nicht einverstanden sind. Verwende vollständige Sätze. Verwende keine Passivkonstruktionen. Verwende keine mehrdeutigen Pronomen. Sei klar. Erstelle keine Aufzählungspunkte oder Sonderformatierungen. Rede nicht drum herum.
+
+Gehe nicht davon aus, dass diese Kommentare von verschiedenen Teilnehmenden verfasst wurden. Diese Kommentare könnten von derselben Person stammen, sage also nicht, einige Teilnehmende hätten das eine vorgeschlagen, während andere etwas anderes vorschlugen. Sage nicht "Einige Teilnehmende schlugen X vor, während andere Y vorschlugen." Sage stattdessen "Eine Aussage schlug X vor, während eine andere Y vorschlug."
+
+Wenn sich die Kommentare zu Meinungsverschiedenheiten auf Themen beziehen, die auch in der Zusammenfassung des gemeinsamen Verständnisses enthalten sind, sollte deine Ausgabe in einer Variante der Form "Während es breite Unterstützung für ... gab, unterschieden sich die Meinungen hinsichtlich ..." beginnen. Wenn dies nicht der Fall ist, kannst du einfach mit "Es gab Uneinigkeit ..." oder etwas Ähnlichem beginnen, um zu kontextualisieren, dass die von dir zusammengefassten Kommentare gemischte Unterstützung hatten.`
 };
 
 /**
@@ -639,7 +713,23 @@ Donde los comentarios de diferencia de opinión se refieren a temas que también
 
   "ja": `意見の相違があった議論からの単一のコメントと、その議論の共通点の要約が提示されます。あなたの仕事は、このコメントを書き直して、それが伝えようとしている主要なポイントやアイデアを要約することです。明確で、飾り気なく、参加者がこのコメントに関して持っていた意見の相違を説明する際は、共通点を背景として心に留めておいてください。意見を保持しているふりをしないでください。あなたはこの議論の参加者ではありません。あなたの要約を単一の完全な文として書いてください。これらのコメントをした人々を「コメンター」ではなく「参加者」として言及してください。これらのコメントにどの程度反対しているかについて話さないでください。受動態を使用しないでください。曖昧な代名詞を使用しないでください。明確にしてください。箇条書きや特別なフォーマットを生成しないでください。無駄話をしないでください。
 
-意見の相違のコメントが共通点の要約でもカバーされているトピックを参照する場合、あなたの出力は「...に対して広範な支持があった一方で、...に関して意見が分かれた」の形式のバリエーションで始まる必要があります。これが当てはまらない場合、あなたが要約しているコメントが混合した支持を持っていたことを文脈化するために、「意見の相違があった...」または同様の何かで簡単に始めることができます。`
+意見の相違のコメントが共通点の要約でもカバーされているトピックを参照する場合、あなたの出力は「...に対して広範な支持があった一方で、...に関して意見が分かれた」の形式のバリエーションで始まる必要があります。これが当てはまらない場合、あなたが要約しているコメントが混合した支持を持っていたことを文脈化するために、「意見の相違があった...」または同様の何かで簡単に始めることができます。`,
+
+  "de": `Dir wird ein einzelner Kommentar aus einer Diskussion präsentiert, bei der es unterschiedliche Meinungen gab, ` +
+  `sowie eine Zusammenfassung der Punkte des gemeinsamen Verständnisses aus dieser Diskussion. ` +
+  `Deine Aufgabe ist es, diesen Kommentar umzuschreiben, um die Hauptpunkte oder Ideen, die er vermitteln möchte, klar und ohne Ausschmückung zusammenzufassen, ` +
+  `wobei du die Punkte des gemeinsamen Verständnisses als Hintergrund bei der Beschreibung der Meinungsunterschiede der Teilnehmenden in Bezug auf diesen Kommentar im Blick behältst. ` +
+  `Gib nicht vor, dass du Meinungen vertrittst. Du bist kein Teilnehmer dieser Diskussion. ` +
+  `Schreibe deine Zusammenfassung als einen einzigen vollständigen Satz. ` +
+  `Bezeichne die Personen, die diese Kommentare verfasst haben, als Teilnehmende, nicht als Kommentatoren. ` +
+  `Sprich nicht darüber, wie stark sie mit diesen Kommentaren nicht einverstanden sind. Verwende keine Passivkonstruktionen. Verwende keine mehrdeutigen Pronomen. Sei klar. ` +
+  `Erstelle keine Aufzählungspunkte oder Sonderformatierungen. Rede nicht drum herum.
+
+Wenn sich die Kommentare zu Meinungsverschiedenheiten auf Themen beziehen, die auch in der Zusammenfassung des gemeinsamen Verständnisses enthalten sind, ` +
+  `sollte deine Ausgabe in einer Variante der Form "Während es breite Unterstützung für ... gab, ` +
+  `unterschieden sich die Meinungen hinsichtlich ..." beginnen. Wenn dies nicht der Fall ist, kannst du einfach mit ` +
+  `"Es gab Uneinigkeit ..." oder etwas Ähnlichem beginnen, um zu kontextualisieren, dass die von dir ` +
+  `zusammengefassten Kommentare gemischte Unterstützung hatten.`
 };
 
 /**
@@ -668,7 +758,7 @@ export function getDifferencesOfOpinionSingleCommentInstructions(
   
   // Add group-specific instructions if needed
   if (containsGroups) {
-    const groupSpecificText = language === "zh-TW" || language === "zh-CN" 
+    const groupSpecificText = language === "zh-TW" || language === "zh-CN"
       ? "此對話的參與者已被聚類為意見群組。兩個意見群組對此評論的同意程度非常不同。"
       : language === "fr"
       ? "Les participants à cette conversation ont été regroupés en groupes d'opinion. Il y avait des niveaux très différents d'accord entre les deux groupes d'opinion concernant ce commentaire. "
@@ -676,6 +766,8 @@ export function getDifferencesOfOpinionSingleCommentInstructions(
       ? "Los participantes en esta conversación han sido agrupados en grupos de opinión. Había niveles muy diferentes de acuerdo entre los dos grupos de opinión con respecto a este comentario. "
       : language === "ja"
       ? "この会話の参加者は意見グループにクラスター化されています。2つの意見グループがこのコメントに関して非常に異なるレベルの同意を持っていました。"
+      : language === "de"
+      ? "Die Teilnehmenden dieser Konversation wurden in Meinungsgruppen geclustert. Es gab sehr unterschiedliche Zustimmungsniveaus zwischen den beiden Meinungsgruppen bezüglich dieses Kommentars. "
       : "Participants in this conversation have been clustered into opinion groups. There were very different levels of agreement between the two opinion groups regarding this comment. ";
     
     // Insert group-specific text after the first sentence
@@ -724,7 +816,17 @@ export const COMMON_GROUND_INSTRUCTIONS: Record<SupportedLanguage, string> = {
   `estos comentarios. Use oraciones completas. No use la voz pasiva. No use pronombres ambiguos. Sea claro. ` +
   `No genere viñetas o formato especial. No divague.`,
 
-  "ja": `ここには異なる意見を共有している複数のコメントがあります。あなたの仕事はこれらのコメントを要約することです。これらの意見のいずれかを保持しているふりをしないでください。あなたはこの議論の参加者ではありません。これらのコメントの簡潔な要約を書いてください。少なくとも1つの文で、最大5つの文にしてください。要約は根拠があり、詳細で情報に富んでいる必要があります：具体的な発見、要求、提案、行動項目、例を含めてください。これらはコメントに基づいています。これらのコメントをした人々を「コメンター」ではなく「参加者」として言及してください。彼らがこれらのコメントをどの程度承認しているかについて話さないでください。完全な文を使用してください。受動態を使用しないでください。曖昧な代名詞を使用しないでください。明確にしてください。箇条書きや特別なフォーマットを生成しないでください。無駄話をしないでください。`
+  "ja": `ここには異なる意見を共有している複数のコメントがあります。あなたの仕事はこれらのコメントを要約することです。これらの意見のいずれかを保持しているふりをしないでください。あなたはこの議論の参加者ではありません。これらのコメントの簡潔な要約を書いてください。少なくとも1つの文で、最大5つの文にしてください。要約は根拠があり、詳細で情報に富んでいる必要があります：具体的な発見、要求、提案、行動項目、例を含めてください。これらはコメントに基づいています。これらのコメントをした人々を「コメンター」ではなく「参加者」として言及してください。彼らがこれらのコメントをどの程度承認しているかについて話さないでください。完全な文を使用してください。受動態を使用しないでください。曖昧な代名詞を使用しないでください。明確にしてください。箇条書きや特別なフォーマットを生成しないでください。無駄話をしないでください。`,
+
+  "de": `Hier sind mehrere Kommentare, die verschiedene Meinungen teilen. Deine Aufgabe ist es, diese ` +
+  `Kommentare zusammenzufassen. Gib nicht vor, dass du diese Meinungen vertrittst. Du bist kein Teilnehmer ` +
+  `dieser Diskussion. Schreibe eine prägnante Zusammenfassung dieser ` +
+  `Kommentare mit mindestens einem und höchstens fünf Sätzen. Die Zusammenfassung sollte ` +
+  `fundiert, detailliert und informativ sein: Schließe spezifische Ergebnisse, Anfragen, Vorschläge, ` +
+  `Maßnahmen und Beispiele ein, die auf den Kommentaren basieren. Bezeichne die Personen, die diese ` +
+  `Kommentare verfasst haben, als Teilnehmende, nicht als Kommentatoren. Sprich nicht darüber, wie stark sie ` +
+  `diesen Kommentaren zustimmen. Verwende vollständige Sätze. Verwende keine Passivkonstruktionen. Verwende keine mehrdeutigen Pronomen. Sei klar. ` +
+  `Erstelle keine Aufzählungspunkte oder Sonderformatierungen. Rede nicht drum herum.`
 };
 
 /**
@@ -756,7 +858,14 @@ export const COMMON_GROUND_SINGLE_COMMENT_INSTRUCTIONS: Record<SupportedLanguage
   `aprueban estos comentarios. Escriba una oración completa. No use la voz pasiva. No use pronombres ambiguos. Sea claro. ` +
   `No genere viñetas o formato especial. No divague.`,
 
-  "ja": `ここには議論からの意見を提示するコメントがあります。あなたの仕事は、このコメントを飾り気なく明確に書き直すことです。この意見を保持しているふりをしないでください。あなたはこの議論の参加者ではありません。これらのコメントをした人々を「コメンター」ではなく「参加者」として言及してください。彼らがこれらのコメントをどの程度承認しているかについて話さないでください。完全な文を書いてください。受動態を使用しないでください。曖昧な代名詞を使用しないでください。明確にしてください。箇条書きや特別なフォーマットを生成しないでください。無駄話をしないでください。`
+  "ja": `ここには議論からの意見を提示するコメントがあります。あなたの仕事は、このコメントを飾り気なく明確に書き直すことです。この意見を保持しているふりをしないでください。あなたはこの議論の参加者ではありません。これらのコメントをした人々を「コメンター」ではなく「参加者」として言及してください。彼らがこれらのコメントをどの程度承認しているかについて話さないでください。完全な文を書いてください。受動態を使用しないでください。曖昧な代名詞を使用しないでください。明確にしてください。箇条書きや特別なフォーマットを生成しないでください。無駄話をしないでください。`,
+
+  "de": `Hier ist ein Kommentar, der eine Meinung aus einer Diskussion darstellt. Deine Aufgabe ist es, diesen ` +
+  `Kommentar klar und ohne Ausschmückung umzuschreiben. Gib nicht vor, dass du diese Meinung vertrittst. Du bist ` +
+  `kein Teilnehmer dieser Diskussion. Bezeichne die Personen, die ` +
+  `diese Kommentare verfasst haben, als Teilnehmende, nicht als Kommentatoren. Sprich nicht darüber, wie stark sie ` +
+  `diesen Kommentaren zustimmen. Schreibe einen vollständigen Satz. Verwende keine Passivkonstruktionen. Verwende keine mehrdeutigen Pronomen. Sei klar. ` +
+  `Erstelle keine Aufzählungspunkte oder Sonderformatierungen. Rede nicht drum herum.`
 };
 
 /**
@@ -775,7 +884,7 @@ export function getCommonGroundInstructions(
   
   // Add group-specific instructions if needed
   if (containsGroups) {
-    const groupSpecificText = language === "zh-TW" || language === "zh-CN" 
+    const groupSpecificText = language === "zh-TW" || language === "zh-CN"
       ? "此對話的參與者已被聚類為意見群組。這些意見群組大多贊同這些評論。"
       : language === "fr"
       ? "Les participants à cette conversation ont été regroupés en groupes d'opinion. Ces groupes d'opinion approuvent principalement ces commentaires. "
@@ -783,6 +892,8 @@ export function getCommonGroundInstructions(
       ? "Los participantes en esta conversación han sido agrupados en grupos de opinión. Estos grupos de opinión aprueban principalmente estos comentarios. "
       : language === "ja"
       ? "この会話の参加者は意見グループにクラスター化されています。これらの意見グループは主にこれらのコメントを承認しています。"
+      : language === "de"
+      ? "Die Teilnehmenden dieser Konversation wurden in Meinungsgruppen geclustert. Diese Meinungsgruppen stimmen diesen Kommentaren mehrheitlich zu. "
       : "Participants in this conversation have been clustered into opinion groups. These opinion groups mostly approve of these comments. ";
     
     // Insert group-specific text after the first sentence
@@ -809,7 +920,7 @@ export function getCommonGroundSingleCommentInstructions(
   
   // Add group-specific instructions if needed
   if (containsGroups) {
-    const groupSpecificText = language === "zh-TW" || language === "zh-CN" 
+    const groupSpecificText = language === "zh-TW" || language === "zh-CN"
       ? "此對話的參與者已被聚類為意見群組。這些意見群組大多贊同這些評論。"
       : language === "fr"
       ? "Les participants à cette conversation ont été regroupés en groupes d'opinion. Ces groupes d'opinion approuvent principalement ces commentaires. "
@@ -817,6 +928,8 @@ export function getCommonGroundSingleCommentInstructions(
       ? "Los participantes en esta conversación han sido agrupados en grupos de opinión. Estos grupos de opinión aprueban principalmente estos comentarios. "
       : language === "ja"
       ? "この会話の参加者は意見グループにクラスター化されています。これらの意見グループは主にこれらのコメントを承認しています。"
+      : language === "de"
+      ? "Die Teilnehmenden dieser Konversation wurden in Meinungsgruppen geclustert. Diese Meinungsgruppen stimmen diesen Kommentaren mehrheitlich zu. "
       : "Participants in this conversation have been clustered into opinion groups. These opinion groups mostly approve of these comments. ";
     
     // Insert group-specific text after the first sentence
@@ -895,7 +1008,27 @@ export const RECURSIVE_TOPIC_SUMMARY_INSTRUCTIONS: Record<SupportedLanguage, str
   `No use la voz pasiva. No use pronombres ambiguos. Sea claro. ` +
   `No genere viñetas o formato especial. No divague.`,
 
-  "ja": `あなたの仕事は、参加者間の議論の結果に関する報告書に含める要約段落を作成することです。あなたは特に以下の議論トピックについて段落を作成する任務を負っています：{topicName}。あなたは、そのトピックのサブトピックに対応する既に作成された要約の数に基づいてこの要約を作成します。これらの要約は、参加者が議論の一部として提出したコメントに基づいています。これらの意見のいずれかを保持しているふりをしないでください。あなたはこの議論の参加者ではありません。これらの要約の簡潔な要約を書いてください。少なくとも1つの文で、最大3つから5つの文にしてください。要約は根拠があり、詳細で情報に富んでいる必要があります。ただし、あなたのタスクについて、またはあなたの要約が他の要約に基づいているという事実について、メタコメンタリーを提供しないでください。また、各サブトピックに含まれるコメントの数について具体的な数字を含めないでください。これらは最終報告書の出力で後ほど含まれるからです。また、具体的な同意または不同意の領域を説明することを避け、代わりに議論されたテーマに焦点を当ててください。また、会話の文脈を再説明する必要もありません。これは報告書の早い段階で既に述べられているからです。覚えておいてください：これはより大きな要約の1つの段落にすぎず、あなたはこの段落を、報告書の残りの部分の文脈で自然に流れるように構成する必要があります。受動態を使用しないでください。曖昧な代名詞を使用しないでください。明確にしてください。箇条書きや特別なフォーマットを生成しないでください。無駄話をしないでください。`
+  "ja": `あなたの仕事は、参加者間の議論の結果に関する報告書に含める要約段落を作成することです。あなたは特に以下の議論トピックについて段落を作成する任務を負っています：{topicName}。あなたは、そのトピックのサブトピックに対応する既に作成された要約の数に基づいてこの要約を作成します。これらの要約は、参加者が議論の一部として提出したコメントに基づいています。これらの意見のいずれかを保持しているふりをしないでください。あなたはこの議論の参加者ではありません。これらの要約の簡潔な要約を書いてください。少なくとも1つの文で、最大3つから5つの文にしてください。要約は根拠があり、詳細で情報に富んでいる必要があります。ただし、あなたのタスクについて、またはあなたの要約が他の要約に基づいているという事実について、メタコメンタリーを提供しないでください。また、各サブトピックに含まれるコメントの数について具体的な数字を含めないでください。これらは最終報告書の出力で後ほど含まれるからです。また、具体的な同意または不同意の領域を説明することを避け、代わりに議論されたテーマに焦点を当ててください。また、会話の文脈を再説明する必要もありません。これは報告書の早い段階で既に述べられているからです。覚えておいてください：これはより大きな要約の1つの段落にすぎず、あなたはこの段落を、報告書の残りの部分の文脈で自然に流れるように構成する必要があります。受動態を使用しないでください。曖昧な代名詞を使用しないでください。明確にしてください。箇条書きや特別なフォーマットを生成しないでください。無駄話をしないでください。`,
+
+  "de": `Deine Aufgabe ist es, einen zusammenfassenden Absatz zu verfassen, der in einen Bericht über die Ergebnisse ` +
+  `einer Diskussion zwischen mehreren Teilnehmenden aufgenommen werden soll. Du bist speziell damit beauftragt, ` +
+  `einen Absatz zu folgendem Diskussionsthema zu erstellen: {topicName}. ` +
+  `Du wirst diese Zusammenfassung auf der Grundlage einer Reihe bereits erstellter Zusammenfassungen erstellen, die den ` +
+  `Unterthemen dieses Themas entsprechen. Diese Zusammenfassungen basieren auf Kommentaren, die Teilnehmende ` +
+  `im Rahmen der Diskussion eingereicht haben. ` +
+  `Gib nicht vor, dass du eine dieser Meinungen vertrittst. Du bist kein Teilnehmer dieser ` +
+  `Diskussion. Verfasse eine prägnante Zusammenfassung dieser Zusammenfassungen, die mindestens einen Satz ` +
+  `und höchstens drei bis fünf Sätze umfasst. Die Zusammenfassung sollte fundiert, detailliert und ` +
+  `informativ sein. Gib jedoch keine Metakommentare ` +
+  `über deine Aufgabe oder die Tatsache ab, dass deine Zusammenfassung auf anderen Zusammenfassungen basiert. Schließe auch keine ` +
+  `konkreten Zahlen darüber ein, wie viele Kommentare in jedem Unterthema enthalten waren, da diese später ` +
+  `in der endgültigen Berichtsausgabe enthalten sein werden. ` +
+  `Unterlasse es auch, spezifische Bereiche der Zustimmung oder Ablehnung zu beschreiben, und konzentriere dich stattdessen auf die diskutierten Themen. ` +
+  `Du musst auch nicht den Kontext der Konversation zusammenfassen, ` +
+  `da dieser bereits früher im Bericht dargestellt wurde. Denk daran: Dies ist nur ein Absatz in einer größeren ` +
+  `Zusammenfassung, und du solltest diesen Absatz so verfassen, dass er sich natürlich in den Kontext des restlichen Berichts einfügt. ` +
+  `Verwende keine Passivkonstruktionen. Verwende keine mehrdeutigen Pronomen. Sei klar. ` +
+  `Erstelle keine Aufzählungspunkte oder Sonderformatierungen. Rede nicht drum herum.`
 };
 
 /**
@@ -930,7 +1063,9 @@ export const TOP_SUBTOPICS_THEMES_PROMPT: Record<SupportedLanguage, string> = {
 
   "es": `Por favor, genere una lista concisa con viñetas que identifique hasta 5 temas prominentes en todas las declaraciones. Cada tema debe tener menos de 10 palabras. No use texto en negrita. No introduzca la lista con viñetas con ningún texto. Estas declaraciones son todas sobre {topicName}`,
 
-  "ja": `すべての声明文から最大5つの顕著なテーマを特定する簡潔な箇条書きリストを生成してください。各テーマは10語未満である必要があります。太字を使用しないでください。箇条書きリストの前にテキストを付けないでください。これらの声明文はすべて{topicName}に関するものです`
+  "ja": `すべての声明文から最大5つの顕著なテーマを特定する簡潔な箇条書きリストを生成してください。各テーマは10語未満である必要があります。太字を使用しないでください。箇条書きリストの前にテキストを付けないでください。これらの声明文はすべて{topicName}に関するものです`,
+
+  "de": `Bitte erstelle eine prägnante Aufzählung, die bis zu 5 prominente Themen in allen Aussagen identifiziert. Jedes Thema sollte weniger als 10 Wörter umfassen. Verwende keine Fettschrift. Stelle der Aufzählung keinen Text voran. Diese Aussagen beziehen sich alle auf {topicName}`
 };
 
 /**
@@ -959,7 +1094,9 @@ export const TOP_SUBTOPICS_TITLE_TEMPLATE: Record<SupportedLanguage, string> = {
   
   "es": "### {index}. {topicName} ({commentCount} declaraciones)",
   
-  "ja": "### {index}. {topicName} ({commentCount} 個の声明文)"
+  "ja": "### {index}. {topicName} ({commentCount} 個の声明文)",
+
+  "de": "### {index}. {topicName} ({commentCount} Aussagen)"
 };
 
 /**
@@ -1023,6 +1160,12 @@ export const RELATIVE_AGREEMENT_LABELS: Record<SupportedLanguage, Record<string,
     "moderatelyLowAlignment": "中程度に低い一致",
     "moderatelyHighAlignment": "中程度に高い一致",
     "highAlignment": "高い一致"
+  },
+  "de": {
+    "lowAlignment": "geringe Übereinstimmung",
+    "moderatelyLowAlignment": "mäßig geringe Übereinstimmung",
+    "moderatelyHighAlignment": "mäßig hohe Übereinstimmung",
+    "highAlignment": "hohe Übereinstimmung"
   }
 };
 
@@ -1065,6 +1208,12 @@ export const RELATIVE_ENGAGEMENT_LABELS: Record<SupportedLanguage, Record<string
     "moderatelyLowEngagement": "中程度に低い関与",
     "moderatelyHighEngagement": "中程度に高い関与",
     "highEngagement": "高い関与"
+  },
+  "de": {
+    "lowEngagement": "geringe Beteiligung",
+    "moderatelyLowEngagement": "mäßig geringe Beteiligung",
+    "moderatelyHighEngagement": "mäßig hohe Beteiligung",
+    "highEngagement": "hohe Beteiligung"
   }
 };
 

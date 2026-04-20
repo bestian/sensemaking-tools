@@ -19,7 +19,7 @@ import { SupportedLanguage } from "./languages";
 describe("Multi-language Prompts", () => {
   describe("THEMES_PROMPT", () => {
     it("should have prompts for all supported languages", () => {
-      const supportedLanguages: SupportedLanguage[] = ["en", "zh-TW", "zh-CN", "fr", "es", "ja"];
+      const supportedLanguages: SupportedLanguage[] = ["en", "zh-TW", "zh-CN", "fr", "es", "ja", "de"];
       
       supportedLanguages.forEach(lang => {
         expect(THEMES_PROMPT[lang]).toBeDefined();
@@ -29,7 +29,7 @@ describe("Multi-language Prompts", () => {
     });
 
     it("should contain placeholder for topic name", () => {
-      const supportedLanguages: SupportedLanguage[] = ["en", "zh-TW", "zh-CN", "fr", "es", "ja"];
+      const supportedLanguages: SupportedLanguage[] = ["en", "zh-TW", "zh-CN", "fr", "es", "ja", "de"];
       
       supportedLanguages.forEach(lang => {
         expect(THEMES_PROMPT[lang]).toContain("{topicName}");
@@ -37,7 +37,7 @@ describe("Multi-language Prompts", () => {
     });
 
     it("should contain criteria section", () => {
-      const supportedLanguages: SupportedLanguage[] = ["en", "zh-TW", "zh-CN", "fr", "es", "ja"];
+      const supportedLanguages: SupportedLanguage[] = ["en", "zh-TW", "zh-CN", "fr", "es", "ja", "de"];
       
       supportedLanguages.forEach(lang => {
         expect(THEMES_PROMPT[lang]).toContain("<criteria");
@@ -46,7 +46,7 @@ describe("Multi-language Prompts", () => {
     });
 
     it("should contain output format section", () => {
-      const supportedLanguages: SupportedLanguage[] = ["en", "zh-TW", "zh-CN", "fr", "es", "ja"];
+      const supportedLanguages: SupportedLanguage[] = ["en", "zh-TW", "zh-CN", "fr", "es", "ja", "de"];
       
       supportedLanguages.forEach(lang => {
         expect(THEMES_PROMPT[lang]).toContain("<output_format");
@@ -147,6 +147,13 @@ describe("Multi-language Prompts", () => {
       expect(prompt).toContain("作成してください");
       expect(prompt).toContain("声明文");
       expect(prompt).toContain("公平性");
+    });
+
+    it("should have German content in de prompt", () => {
+      const prompt = THEMES_PROMPT["de"];
+      expect(prompt).toContain("Bitte verfasse");
+      expect(prompt).toContain("Aussagen");
+      expect(prompt).toContain("Unparteilichkeit");
     });
   });
 });
