@@ -15,7 +15,8 @@
 #   --model <model>         The model to use for the report (default: nvidia/nemotron-3-nano-4b)
 #   --lmstudio-base-url <url> The base URL of the LM Studio instance (default: http://127.0.0.1:1234/v1)
 #   --batch-size <count>    Categorization batch size for local model calls (default: 20)
-#   --outputLang <language> Output language for generated report data and UI labels (default: en)
+#   --outputLang <language> Output language for generated report data and UI labels (default: en).
+#                           Supported: en (English), zh-TW (繁體中文), zh-CN (简体中文), fr (Français), es (Español), ja (日本語), de (Deutsch)
 #   --python-bin <path>     Python interpreter path (default: ${ROOT_DIR}/.venv/bin/python if present, otherwise python3)
 
 # Exit on error, unset variables, and pipefail.
