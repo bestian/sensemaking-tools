@@ -14,7 +14,3 @@ todo.md
 .vscode
 *.pkl
 *.tgz
-
-# Ignore local report and generated files.
-/tmp/local-report/
-/web-ui/data/*.json

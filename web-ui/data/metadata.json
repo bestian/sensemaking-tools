@@ -1,0 +1,8 @@
+{
+  "title": "Bloom Civic AI Report",
+  "subtitle": "Structured public-input analysis generated locally with LM Studio.",
+  "question": "How should AI care for our communities, and who gets to decide?",
+  "sourceUrl": "https://polis.comhairle.scot/5ccwfj3hbe",
+  "modelName": "nvidia/nemotron-3-nano-4b",
+  "generatedAt": "2026-03-25 05:22 UTC"
+}

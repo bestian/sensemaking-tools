@@ -1,0 +1,115 @@
+[
+  {
+    "name": "Human-centered AI in care",
+    "commentCount": 8,
+    "voteCount": 25,
+    "relativeAlignment": "high alignment",
+    "relativeEngagement": "high engagement",
+    "subtopicStats": [
+      {
+        "name": "Preserving human interaction",
+        "commentCount": 4,
+        "voteCount": 11,
+        "relativeAlignment": "high alignment",
+        "relativeEngagement": "high engagement"
+      },
+      {
+        "name": "Supporting caregivers and families",
+        "commentCount": 2,
+        "voteCount": 9,
+        "relativeAlignment": "high alignment",
+        "relativeEngagement": "moderately high engagement"
+      },
+      {
+        "name": "Balancing technology with community values",
+        "commentCount": 2,
+        "voteCount": 5,
+        "relativeAlignment": "high alignment",
+        "relativeEngagement": "moderately low engagement"
+      }
+    ]
+  },
+  {
+    "name": "Transparency and accountability in AI decisions",
+    "commentCount": 5,
+    "voteCount": 13,
+    "relativeAlignment": "high alignment",
+    "relativeEngagement": "high engagement",
+    "subtopicStats": [
+      {
+        "name": "Disclosure requirements for automated decisions",
+        "commentCount": 1,
+        "voteCount": 2,
+        "relativeAlignment": "high alignment",
+        "relativeEngagement": "low engagement"
+      },
+      {
+        "name": "Responsibility attribution in biased outcomes",
+        "commentCount": 1,
+        "voteCount": 4,
+        "relativeAlignment": "high alignment",
+        "relativeEngagement": "moderately low engagement"
+      },
+      {
+        "name": "Other",
+        "commentCount": 3,
+        "voteCount": 7,
+        "relativeAlignment": "high alignment",
+        "relativeEngagement": "moderately high engagement"
+      }
+    ]
+  },
+  {
+    "name": "Workforce impact of AI automation",
+    "commentCount": 4,
+    "voteCount": 13,
+    "relativeAlignment": "high alignment",
+    "relativeEngagement": "high engagement",
+    "subtopicStats": [
+      {
+        "name": "Job loss due to automation",
+        "commentCount": 2,
+        "voteCount": 5,
+        "relativeAlignment": "high alignment",
+        "relativeEngagement": "moderately low engagement"
+      },
+      {
+        "name": "Support for displaced workers",
+        "commentCount": 1,
+        "voteCount": 5,
+        "relativeAlignment": "high alignment",
+        "relativeEngagement": "moderately low engagement"
+      },
+      {
+        "name": "Other",
+        "commentCount": 1,
+        "voteCount": 3,
+        "relativeAlignment": "high alignment",
+        "relativeEngagement": "moderately low engagement"
+      }
+    ]
+  },
+  {
+    "name": "Community involvement in AI governance",
+    "commentCount": 3,
+    "voteCount": 13,
+    "relativeAlignment": "high alignment",
+    "relativeEngagement": "high engagement",
+    "subtopicStats": [
+      {
+        "name": "Participatory Decision-Making",
+        "commentCount": 2,
+        "voteCount": 9,
+        "relativeAlignment": "high alignment",
+        "relativeEngagement": "moderately high engagement"
+      },
+      {
+        "name": "Local Impact Assessment",
+        "commentCount": 1,
+        "voteCount": 4,
+        "relativeAlignment": "high alignment",
+        "relativeEngagement": "moderately low engagement"
+      }
+    ]
+  }
+]
