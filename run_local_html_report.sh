@@ -211,7 +211,7 @@ else
     set +e
     LMS_LOAD_OUTPUT="$(
       lms load "${MODEL_NAME}" \
-        --context-length 16384 \
+        --context-length 131072 \
         --parallel 1 \
         --gpu max \
         --identifier "${MODEL_NAME}" \
