@@ -14,7 +14,7 @@
 
 // Simple utils.
 
-import { Comment, CommentRecord, SummaryContent, Topic } from "./types";
+import { Comment, CommentRecord, OverviewSummaryItem, Summary, SummaryContent, Topic } from "./types";
 import { RETRY_DELAY_MS } from "./models/model_util";
 import { voteInfoToString } from "./tasks/utils/citation_utils";
 import { SupportedLanguage, getLanguagePrefix } from "../templates/l10n";
@@ -366,4 +366,79 @@ export function filterSummaryContent(
       .map((s: SummaryContent) => filterSummaryContent(s, filterFn)),
   };
   return filteredTopicSummary;
+}
+
+function normalizeOverviewTopicName(topicName: string): string {
+  return topicName
+    .toLowerCase()
+    .replace(/["""]/g, "")
+    .replace(/['']/g, "")
+    .replace(/[()]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Validate overview JSON items against expected topic names and order.
+ */
+export function isOverviewItemsValid(items: OverviewSummaryItem[], topicNames: string[]): boolean {
+  if (!Array.isArray(items)) {
+    return false;
+  }
+  if (items.length !== topicNames.length) {
+    return false;
+  }
+  for (const [index, item] of items.entries()) {
+    if (!item || typeof item.topicName !== "string" || typeof item.summary !== "string") {
+      return false;
+    }
+    const expectedTopicName = topicNames[index];
+    if (!expectedTopicName || !item.summary?.trim()) {
+      return false;
+    }
+    if (normalizeOverviewTopicName(item.topicName) !== normalizeOverviewTopicName(expectedTopicName)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Convert overview JSON items into the legacy markdown bullet-list format.
+ */
+export function formatOverviewItemsAsMarkdown(
+  items: OverviewSummaryItem[],
+  topicNames: string[]
+): string {
+  const normalizedLookup = new Map(
+    items.map((item) => [normalizeOverviewTopicName(item.topicName), item.summary.trim()] as const)
+  );
+
+  const lines = topicNames.map((topicName) => {
+    const summary = normalizedLookup.get(normalizeOverviewTopicName(topicName)) || "";
+    return `* **${topicName}**: ${summary}`;
+  });
+
+  return lines.join("\n").trim();
+}
+
+/**
+ * Final guard to ensure overview section still renders as markdown list in summary outputs.
+ */
+export function alignOverviewSectionMarkdown(summary: Summary): Summary {
+  if (summary.contents.length < 2) {
+    return summary;
+  }
+
+  const overviewSection = summary.contents[1];
+  if (!overviewSection || !overviewSection.text.includes("* **")) {
+    return summary;
+  }
+
+  overviewSection.text = overviewSection.text
+    .split("\n")
+    .map((line) => line.trimRight())
+    .join("\n")
+    .trim();
+  return summary;
 }

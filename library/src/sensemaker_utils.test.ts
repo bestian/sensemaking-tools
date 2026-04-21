@@ -13,12 +13,14 @@
 // limitations under the License.
 
 import {
+  formatOverviewItemsAsMarkdown,
   getPrompt,
   groupCommentsBySubtopic,
   formatCommentsWithVotes,
   decimalToPercent,
   executeConcurrently,
   getUniqueTopics,
+  isOverviewItemsValid,
 } from "./sensemaker_utils";
 import { Comment, VoteTally } from "./types";
 
@@ -198,5 +200,45 @@ describe("executeConcurrently", () => {
     ];
     const results = await executeConcurrently(callbacks);
     expect(results).toEqual([1, 2, 3]);
+  });
+});
+
+describe("overview JSON formatting", () => {
+  const topicNames = ["Topic 1 (45%)", "Topic 2 (55%)"];
+
+  it("should validate overview items when topics and order match", () => {
+    expect(
+      isOverviewItemsValid(
+        [
+          { topicName: "Topic 1 (45%)", summary: "Summary one." },
+          { topicName: "Topic 2 (55%)", summary: "Summary two." },
+        ],
+        topicNames
+      )
+    ).toBeTruthy();
+  });
+
+  it("should reject overview items when topic order mismatches", () => {
+    expect(
+      isOverviewItemsValid(
+        [
+          { topicName: "Topic 2 (55%)", summary: "Summary two." },
+          { topicName: "Topic 1 (45%)", summary: "Summary one." },
+        ],
+        topicNames
+      )
+    ).toBeFalsy();
+  });
+
+  it("should format overview items back to legacy markdown list", () => {
+    expect(
+      formatOverviewItemsAsMarkdown(
+        [
+          { topicName: "Topic 2 (55%)", summary: "Summary two." },
+          { topicName: "Topic 1 (45%)", summary: "Summary one." },
+        ],
+        topicNames
+      )
+    ).toEqual("* **Topic 1 (45%)**: Summary one.\n* **Topic 2 (55%)**: Summary two.");
   });
 });

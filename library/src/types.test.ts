@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import {
+  OverviewSummaryResponse,
   VoteTally,
   isTopicType,
   isVoteTallyType,
@@ -21,6 +22,7 @@ import {
   Summary,
   SummaryContent,
   CitationFormat,
+  checkDataSchema,
 } from "./types";
 
 describe("Types Test", () => {
@@ -89,6 +91,17 @@ describe("Types Test", () => {
     expect(isTopicType({ name: "Test Topic" })).toBeTruthy();
     expect(
       isTopicType({ name: "Test Topic", subtopics: [{ name: "Test Subtopic" }] })
+    ).toBeTruthy();
+  });
+
+  it("Valid overview summary response should pass schema check", () => {
+    expect(
+      checkDataSchema(OverviewSummaryResponse, {
+        items: [
+          { topicName: "Topic A (45%)", summary: "Summary A." },
+          { topicName: "Topic B (55%)", summary: "Summary B." },
+        ],
+      })
     ).toBeTruthy();
   });
 

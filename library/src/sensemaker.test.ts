@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { Sensemaker } from "./sensemaker";
-import { Comment } from "./types";
+import { Comment, SummarizationType, VoteTally } from "./types";
 import { VertexModel } from "./models/vertex_model";
 import { ModelSettings } from "./models/model";
 
@@ -32,14 +32,17 @@ const TEST_MODEL_SETTINGS: ModelSettings = {
 };
 // Mock the model response. This mock needs to be set up to return response specific for each test.
 let mockGenerateData: jest.SpyInstance;
+let mockGenerateText: jest.SpyInstance;
 
 describe("SensemakerTest", () => {
   beforeEach(() => {
     mockGenerateData = jest.spyOn(VertexModel.prototype, "generateData");
+    mockGenerateText = jest.spyOn(VertexModel.prototype, "generateText");
   });
 
   afterEach(() => {
     mockGenerateData.mockRestore();
+    mockGenerateText.mockRestore();
   });
 
   describe("CategorizeTest", () => {
@@ -233,6 +236,70 @@ describe("SensemakerTest", () => {
 
       expect(mockGenerateData).toHaveBeenCalledTimes(4);
       expect(commentRecords).toEqual(validResponse);
+    });
+  });
+
+  describe("SummarizationIntegrationTest", () => {
+    it("should render overview markdown from structured overview JSON", async () => {
+      const comments: Comment[] = [
+        {
+          id: "1",
+          text: "Build safer bike lanes.",
+          voteInfo: new VoteTally(8, 2, 0),
+          topics: [{ name: "Transportation", subtopics: [{ name: "Bike Infrastructure" }] }],
+        },
+        {
+          id: "2",
+          text: "Expand sidewalk maintenance.",
+          voteInfo: new VoteTally(7, 3, 0),
+          topics: [{ name: "Transportation", subtopics: [{ name: "Pedestrian Safety" }] }],
+        },
+        {
+          id: "3",
+          text: "Increase neighborhood tree cover.",
+          voteInfo: new VoteTally(9, 1, 0),
+          topics: [{ name: "Environment", subtopics: [{ name: "Urban Forestry" }] }],
+        },
+        {
+          id: "4",
+          text: "Protect local wetlands.",
+          voteInfo: new VoteTally(8, 2, 0),
+          topics: [{ name: "Environment", subtopics: [{ name: "Conservation" }] }],
+        },
+      ];
+
+      mockGenerateData.mockResolvedValueOnce({
+        items: [
+          {
+            topicName: "Transportation (50%)",
+            summary: "Statements prioritize safer and more reliable street access.",
+          },
+          {
+            topicName: "Environment (50%)",
+            summary: "Statements emphasize local ecosystem protection and restoration.",
+          },
+        ],
+      });
+
+      mockGenerateText.mockResolvedValue("Stub model text.");
+
+      const summary = await new Sensemaker(TEST_MODEL_SETTINGS).summarize(
+        comments,
+        SummarizationType.AGGREGATE_VOTE,
+        undefined,
+        undefined,
+        "en"
+      );
+
+      const markdown = summary.getText("MARKDOWN");
+      const expectedOverviewFragment =
+        `## Overview\n` +
+        `Below is a high level overview of the topics discussed in the conversation, as well as the percentage of statements categorized under each topic. Note that the percentages may add up to greater than 100% when statements fall under more than one topic.\n\n` +
+        `* **Transportation (50%)**: Statements prioritize safer and more reliable street access.\n` +
+        `* **Environment (50%)**: Statements emphasize local ecosystem protection and restoration.`;
+
+      expect(markdown).toContain(expectedOverviewFragment);
+      expect(mockGenerateData).toHaveBeenCalledTimes(1);
     });
   });
 });

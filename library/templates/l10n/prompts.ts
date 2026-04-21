@@ -569,7 +569,23 @@ export function getThemesPrompt(language: SupportedLanguage, topicName: string):
 export function getOverviewOneShotPrompt(language: SupportedLanguage, topicNames: string[]): string {
   console.log(`[DEBUG] getOverviewOneShotPrompt() language: ${language}`);
   const prompt = OVERVIEW_ONE_SHOT_PROMPT[language] || OVERVIEW_ONE_SHOT_PROMPT["en"];
-  return prompt.replace("{topicNames}", topicNames.map((s) => "* " + s).join("\n"));
+  const basePrompt = prompt.replace("{topicNames}", topicNames.map((s) => "* " + s).join("\n"));
+  return `${basePrompt}
+
+CRITICAL OUTPUT REQUIREMENTS:
+- Return ONLY valid JSON. Do not return markdown, prose, analysis, or code fences.
+- Use this exact schema:
+{
+  "items": [
+    {
+      "topicName": "Topic Name (45%)",
+      "summary": "One or two concise sentences."
+    }
+  ]
+}
+- "items" must include exactly ${topicNames.length} entries, in the exact order listed above.
+- Every "topicName" must exactly match one listed topic string, including percentage punctuation/spaces.
+- Keep each "summary" concise and faithful to the provided data.`;
 }
 
 /**
@@ -581,7 +597,16 @@ export function getOverviewOneShotPrompt(language: SupportedLanguage, topicNames
 export function getOverviewPerTopicPrompt(language: SupportedLanguage, topicName: string): string {
   console.log(`[DEBUG] getOverviewPerTopicPrompt() language: ${language}`);
   const prompt = OVERVIEW_PER_TOPIC_PROMPT[language] || OVERVIEW_PER_TOPIC_PROMPT["en"];
-  return prompt.replace("{topicName}", topicName);
+  const basePrompt = prompt.replace("{topicName}", topicName);
+  return `${basePrompt}
+
+CRITICAL OUTPUT REQUIREMENTS:
+- Return ONLY valid JSON. Do not return markdown, prose, analysis, or code fences.
+- Use this exact schema:
+{
+  "summary": "One or two concise sentences."
+}
+- The summary must describe only this topic: "${topicName}".`;
 }
 
 /**

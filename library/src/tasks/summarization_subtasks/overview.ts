@@ -16,19 +16,58 @@
 // based on the results of the more detailed topic and subtopic summaries
 
 import { SummaryStats, TopicStats } from "../../stats/summary_stats";
-import { SummaryContent, Summary } from "../../types";
+import { OverviewSummaryItem, OverviewSummaryResponse, SummaryContent, Summary } from "../../types";
 import { RecursiveSummary } from "./recursive_summarization";
 import {
+  formatOverviewItemsAsMarkdown,
   getAbstractPrompt,
   decimalToPercent,
   filterSummaryContent,
+  isOverviewItemsValid,
   retryCall,
 } from "../../sensemaker_utils";
+import { Type } from "@sinclair/typebox";
 
 // Import localization system
 import { getReportSectionTitle, getReportContent } from "../../../templates/l10n";
 import { getOverviewOneShotPrompt, getOverviewPerTopicPrompt } from "../../../templates/l10n/prompts";
 import { SupportedLanguage } from "../../../templates/l10n/languages";
+
+const OverviewPerTopicResponse = Type.Object({
+  summary: Type.String(),
+});
+
+function describeResponseShape(response: unknown): string {
+  if (Array.isArray(response)) {
+    return `array(len=${response.length})`;
+  }
+  if (response === null) {
+    return "null";
+  }
+  if (response === undefined) {
+    return "undefined";
+  }
+  if (typeof response === "object") {
+    const keys = Object.keys(response as Record<string, unknown>);
+    return `object(keys=${keys.join(",") || "<none>"})`;
+  }
+  return typeof response;
+}
+
+function extractOverviewItems(response: unknown): OverviewSummaryItem[] {
+  if (Array.isArray(response)) {
+    return response as OverviewSummaryItem[];
+  }
+  if (
+    response &&
+    typeof response === "object" &&
+    "items" in response &&
+    Array.isArray((response as { items?: unknown }).items)
+  ) {
+    return (response as { items: OverviewSummaryItem[] }).items;
+  }
+  return [];
+}
 
 function oneShotInstructions(topicNames: string[], output_lang: string) {
   return getOverviewOneShotPrompt(output_lang as SupportedLanguage, topicNames);
@@ -100,28 +139,30 @@ export class OverviewSummary extends RecursiveSummary<OverviewInput> {
     console.log(`[DEBUG] OverviewSummary.oneShotSummary() calling getAbstractPrompt with: output_lang="${this.output_lang}"`);
     
     return await retryCall(
-      async function (model, prompt, output_lang, topicNames) {
+      async function (model, prompt, output_lang, topicNames): Promise<OverviewSummaryItem[]> {
         console.log(`Generating OVERVIEW SUMMARY in one shot`);
         console.log(`[DEBUG] retryCall function received output_lang: ${output_lang}`);
-        const rawResult = await model.generateText(prompt, output_lang);
-        let result = extractOverviewList(rawResult, topicNames);
-        if (!result) {
-          result = rawResult;
+        const response = await model.generateData(
+          prompt,
+          OverviewSummaryResponse,
+          output_lang
+        );
+        const items = extractOverviewItems(response);
+        if (!isOverviewItemsValid(items, topicNames)) {
+          console.warn(
+            `[WARN] Invalid one-shot overview response shape: ${describeResponseShape(response)}`
+          );
+          throw new Error("Overview summary failed to conform to structured JSON format.");
         }
-        result = removeEmptyLines(result);
-        if (!result) {
-          throw new Error(`Overview summary failed to conform to markdown list format.`);
-        } else {
-          return result;
-        }
+        return items;
       },
-      (result) => isMdListValid(result, topicNames),
+      (result) => isOverviewItemsValid(result, topicNames),
       6, // 6 retries
-      "Overview summary failed to conform to markdown list format, or did not include all topic descriptions exactly as intended.",
+      "Overview summary failed to conform to structured JSON format, or did not include all topic descriptions exactly as intended.",
       undefined,
       [this.model, prompt, output_lang, topicNames],  // ← 加入 output_lang
       []
-    );
+    ).then((items) => formatOverviewItemsAsMarkdown(items, topicNames));
   }
 
   /**
@@ -132,11 +173,11 @@ export class OverviewSummary extends RecursiveSummary<OverviewInput> {
     // Debug: 檢查 perTopicSummary 中的 output_lang 值
     console.log(`[DEBUG] OverviewSummary.perTopicSummary() output_lang: ${this.output_lang}`);
     
-    let text = "";
+    const items: OverviewSummaryItem[] = [];
     for (const topicStats of this.input.summaryStats.getStatsByTopic()) {
-      text += `* __${this.getTopicNameAndCommentPercentage(topicStats)}__: `;
+      const topicName = this.getTopicNameAndCommentPercentage(topicStats);
       const prompt = getAbstractPrompt(
-        perTopicInstructions(topicStats.name, this.output_lang),
+        perTopicInstructions(topicName, this.output_lang),
         [filterSectionsForOverview(this.input.topicsSummary)],
         (summary: SummaryContent) =>
           `<topicsSummary>\n` +
@@ -150,10 +191,30 @@ export class OverviewSummary extends RecursiveSummary<OverviewInput> {
       console.log(`[DEBUG] OverviewSummary.perTopicSummary() calling getAbstractPrompt with: output_lang="${this.output_lang}"`);
       
       console.log(`Generating OVERVIEW SUMMARY for topic: "${topicStats.name}"`);
-      console.log(`[DEBUG] Calling model.generateText with output_lang: ${this.output_lang}`);
-      text += (await this.model.generateText(prompt, this.output_lang)).trim() + "\n";
+      console.log(`[DEBUG] Calling model.generateData with output_lang: ${this.output_lang}`);
+      const response = (await this.model.generateData(
+        prompt,
+        OverviewPerTopicResponse,
+        this.output_lang
+      )) as { summary: string };
+      if (!response || typeof response.summary !== "string" || !response.summary.trim()) {
+        console.warn(
+          `[WARN] Invalid per-topic overview response shape: ${describeResponseShape(response)}`
+        );
+        throw new Error("Per-topic overview summary failed to return a valid summary string.");
+      }
+      items.push({
+        topicName,
+        summary: response.summary.trim(),
+      });
     }
-    return text;
+    const topicNames = this.topicNames();
+    if (!isOverviewItemsValid(items, topicNames)) {
+      throw new Error(
+        "Per-topic overview summary failed to conform to structured JSON format, or topic ordering."
+      );
+    }
+    return formatOverviewItemsAsMarkdown(items, topicNames);
   }
 
   /**
@@ -186,171 +247,4 @@ function filterSectionsForOverview(topicSummary: SummaryContent): SummaryContent
       !subtopicSummary.title?.includes("Common ground") &&
       !subtopicSummary.title?.includes("Differences of opinion")
   );
-}
-
-/**
- * Remove all empty lines from the input string, useful when a model response formats
- * list items with empty lines between them (as though they are paragraphs, each containing
- * a single list item).
- * @param mdList A string, presumably representing a markdown list
- * @returns The input string, with all empty lines removed
- */
-export function removeEmptyLines(mdList: string): string {
-  return mdList.replace(/\s*[\r\n]+\s*/g, "\n").trim();
-}
-
-/**
- * This function processes the input markdown list string, ensuring that it matches
- * the expected format, normalizing it with `removeEmptyLines`, and ensuring that each
- * lines matches the expected format (* **bold topic**: summary...)
- */
-export function isMdListValid(mdList: string, topicNames: string[]): boolean {
-  const lines = removeEmptyLines(mdList).split("\n").filter(Boolean);
-  if (lines.length !== topicNames.length) {
-    console.log(
-      `Overview markdown list line count mismatch. Expected ${topicNames.length}, got ${lines.length}.`
-    );
-    return false;
-  }
-
-  for (const [index, line] of lines.entries()) {
-    // Check to make sure that every line matches the expected format
-    // Valid examples:
-    // * **Topic Name:** A summary.
-    // *   **Topic Name with extra spaces in front:** A summary.
-    // * __Topic Name:__ A summary.
-    // - **Topic Name**:  A summary.
-    // - __Topic Name__:  A summary.
-    if (!line.match(/^[\*\-]\s+\*\*.*:?\*\*:?\s/) && !line.match(/^[\*\-]\s+\_\_.*:?\_\_:?\s/)) {
-      console.log("Line does not match expected format:", line);
-      return false;
-    }
-    
-    // Check to make sure that every single topicName in topicNames is in the list, and in the right order
-    // 使用更寬鬆的檢查，處理可能的格式變化
-    const expectedTopicName = topicNames[index];
-    if (!expectedTopicName) {
-      console.log(`Unexpected extra line in overview list:\n`, line);
-      return false;
-    }
-    const normalizedExpected = normalizeTopicName(expectedTopicName);
-    const topicLabel = getMdListTopicLabel(line);
-    const normalizedLineTopic = normalizeTopicName(topicLabel || line);
-
-    if (normalizedLineTopic !== normalizedExpected) {
-      console.log(`Topic "${expectedTopicName}" not found at line:\n`, line);
-      console.log(`Normalized expected: "${normalizedExpected}"`);
-      console.log(`Normalized line topic: "${normalizedLineTopic}"`);
-      return false;
-    }
-  }
-  return true;
-}
-
-/**
- * Extract a valid overview markdown list from verbose model output.
- * This is a safety net for responses that include analysis or other
- * non-list preamble before the actual final answer.
- */
-function extractOverviewList(modelOutput: string, topicNames: string[]): string {
-  const lines = modelOutput
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter((line) => line && !shouldDropAnalysisLine(line));
-  const extractedLines: string[] = [];
-  let searchStartIndex = 0;
-
-  for (const topicName of topicNames) {
-    const normalizedTopicName = normalizeTopicName(topicName);
-    let foundLineIndex = -1;
-
-    for (let i = searchStartIndex; i < lines.length; i++) {
-      const line = lines[i];
-      if (!isMdListLine(line)) {
-        continue;
-      }
-      const topicLabel = getMdListTopicLabel(line);
-      if (!topicLabel) {
-        continue;
-      }
-      if (normalizeTopicName(topicLabel) === normalizedTopicName) {
-        foundLineIndex = i;
-        break;
-      }
-    }
-
-    if (foundLineIndex === -1) {
-      return "";
-    }
-
-    extractedLines.push(lines[foundLineIndex]);
-    searchStartIndex = foundLineIndex + 1;
-  }
-
-  return removeEmptyLines(extractedLines.join("\n"));
-}
-
-function isMdListLine(line: string): boolean {
-  return Boolean(
-    line.match(/^[\*\-]\s+\*\*.*:?\*\*:?\s/) || line.match(/^[\*\-]\s+\_\_.*:?\_\_:?\s/)
-  );
-}
-
-function getMdListTopicLabel(line: string): string {
-  const match = line.match(/^[\*\-]\s+(?:\*\*([^*]+?)\*\*|__([^_]+?)__)\s*:?\s+/);
-  if (!match) {
-    return "";
-  }
-  return (match[1] || match[2] || "").replace(/:\s*$/, "").trim();
-}
-
-function shouldDropAnalysisLine(line: string): boolean {
-  const normalized = line.toLowerCase().replace(/\s+/g, " ").trim();
-  const analysisPrefixes = [
-    "analyze user input",
-    "deconstruct constraints",
-    "constraint check",
-    "check against constraints",
-    "self-correction",
-    "output generation",
-    "role/constraint",
-    "input data",
-    "instructions/constraints",
-    "data says",
-    "draft:",
-    "draft generation",
-    "constraints:",
-  ];
-
-  if (analysisPrefixes.some((prefix) => normalized.startsWith(prefix))) {
-    return true;
-  }
-
-  if (normalized.startsWith("- **role/constraint:**")) {
-    return true;
-  }
-  if (normalized.startsWith("- data says:") || normalized.startsWith("- draft:")) {
-    return true;
-  }
-  if (normalized.match(/^\d+\.\s+\*\*analyze user input:\*\*/)) {
-    return true;
-  }
-  if (normalized.startsWith("[output generation]")) {
-    return true;
-  }
-
-  return false;
-}
-
-/**
- * 標準化主題名稱，移除可能影響匹配的字符
- */
-function normalizeTopicName(topicName: string): string {
-  return topicName
-    .toLowerCase()
-    .replace(/["""]/g, '')           // 移除各種引號
-    .replace(/['']/g, '')            // 移除各種單引號
-    .replace(/[()]/g, '')            // 移除括號
-    .replace(/\s+/g, ' ')            // 標準化空白字符
-    .trim();
 }

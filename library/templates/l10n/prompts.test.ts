@@ -13,7 +13,12 @@
 // limitations under the License.
 
 import { describe, it, expect } from "@jest/globals";
-import { getThemesPrompt, THEMES_PROMPT } from "./prompts";
+import {
+  getOverviewOneShotPrompt,
+  getOverviewPerTopicPrompt,
+  getThemesPrompt,
+  THEMES_PROMPT,
+} from "./prompts";
 import { SupportedLanguage } from "./languages";
 
 describe("Multi-language Prompts", () => {
@@ -52,6 +57,22 @@ describe("Multi-language Prompts", () => {
         expect(THEMES_PROMPT[lang]).toContain("<output_format");
         expect(THEMES_PROMPT[lang]).toContain("</output_format>");
       });
+    });
+  });
+
+  describe("Overview prompts JSON output", () => {
+    it("one-shot prompt should enforce JSON output format", () => {
+      const result = getOverviewOneShotPrompt("en", ["Topic A (40%)", "Topic B (60%)"]);
+      expect(result).toContain("Return ONLY valid JSON");
+      expect(result).toContain('"items"');
+      expect(result).toContain("exactly 2 entries");
+    });
+
+    it("per-topic prompt should enforce JSON output format", () => {
+      const result = getOverviewPerTopicPrompt("en", "Topic A (40%)");
+      expect(result).toContain("Return ONLY valid JSON");
+      expect(result).toContain('"summary"');
+      expect(result).toContain('only this topic: "Topic A (40%)"');
     });
   });
 

@@ -18,7 +18,7 @@ import { Comment, SummarizationType, Summary, Topic } from "./types";
 import { categorizeCommentsRecursive } from "./tasks/categorization";
 import { summarizeByType } from "./tasks/summarization";
 import { ModelSettings, Model } from "./models/model";
-import { getUniqueTopics } from "./sensemaker_utils";
+import { alignOverviewSectionMarkdown, getUniqueTopics } from "./sensemaker_utils";
 import { SupportedLanguage, translateSummary } from "../templates/l10n";
 
 // Class to make sense of conversation data. Uses LLMs to learn what topics were discussed and
@@ -97,11 +97,12 @@ export class Sensemaker {
       additionalContext,
       output_lang
     );
+    const markdownAlignedSummary = alignOverviewSectionMarkdown(summary);
 
-    console.log(`[DEBUG] summary: ${JSON.stringify(summary)}`);
+    console.log(`[DEBUG] summary: ${JSON.stringify(markdownAlignedSummary)}`);
 
     // TODO: translate the summary's "Other" to the output language
-    const translatedSummary = translateSummary(summary, output_lang);
+    const translatedSummary = translateSummary(markdownAlignedSummary, output_lang);
     
     console.log(`Summarization took ${(performance.now() - startTime) / (1000 * 60)} minutes.`);
     return translatedSummary;

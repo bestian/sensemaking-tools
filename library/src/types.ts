@@ -161,6 +161,23 @@ export interface SummaryContent {
 export type CitationFormat = "XML" | "MARKDOWN";
 
 /**
+ * Structured payload for Overview summary generation.
+ * This is used for constrained JSON decoding and then rendered to markdown.
+ */
+export const OverviewSummaryItem = Type.Object({
+  topicName: Type.String(),
+  summary: Type.String(),
+});
+
+export type OverviewSummaryItem = Static<typeof OverviewSummaryItem>;
+
+export const OverviewSummaryResponse = Type.Object({
+  items: Type.Array(OverviewSummaryItem),
+});
+
+export type OverviewSummaryResponse = Static<typeof OverviewSummaryResponse>;
+
+/**
  * Represents a summary composed of multiple SummaryContents.
  * If a SummaryContent contains a claim, it should be grounded by representative comments.
  */
