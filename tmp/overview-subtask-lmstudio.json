@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-04-21T12:13:49.496Z",
+  "elapsedMs": 60634,
+  "config": {
+    "model": "qwen/qwen3.6-35b-a3b",
+    "baseUrl": "http://127.0.0.1:1234/v1",
+    "outputLang": "en",
+    "maxTokens": 4096,
+    "topicCount": 10,
+    "subtopicsPerTopic": 5,
+    "commentsPerSubtopic": 12,
+    "totalComments": 600
+  },
+  "outputs": [
+    {
+      "method": "one-shot",
+      "topicCount": 10,
+      "bulletCount": 10,
+      "title": "## Overview",
+      "markdown": "\n\n## Overview\nBelow is a high level overview of the topics discussed in the conversation, as well as the percentage of statements categorized under each topic. Note that the percentages may add up to greater than 100% when statements fall under more than one topic.\n\n* **Topic 1 (10%)**: Statements emphasize the need for clear feasibility timelines and address budget constraints while prioritizing equitable access across neighborhoods.\n* **Topic 2 (10%)**: The conversation highlights operational details and concerns about side effects, with a strong focus on staffing limitations and implementation trade-offs.\n* **Topic 3 (10%)**: Participants stress the importance of timeline clarity and equitable resource distribution, noting significant budget constraints that impact project viability.\n* **Topic 4 (10%)**: Discussions center on practical concerns regarding operational details and potential side effects, alongside recurring themes of staffing and budget limitations.\n* **Topic 5 (10%)**: Statements reflect a consistent demand for feasible timelines and equitable access, while acknowledging the constraints imposed by current budget and staffing levels.\n* **Topic 6 (10%)**: The conversation reveals ongoing concerns about side effects and operational feasibility, with participants repeatedly citing budget and staffing as critical barriers.\n* **Topic 7 (10%)**: Feedback focuses on the necessity of clear timelines and equitable neighborhood access, tempered by realistic assessments of budget and staffing constraints.\n* **Topic 8 (10%)**: Statements prioritize operational clarity and equitable outcomes, while consistently flagging budget and staffing limitations as key implementation challenges.\n* **Topic 9 (10%)**: The discussion underscores the need for feasible timelines and fair access, with participants noting that budget and staffing constraints complicate proposed solutions.\n* **Topic 10 (10%)**: Participants emphasize practical concerns and side effect mitigation, while repeatedly highlighting the impact of budget and staffing limits on project feasibility."
+    },
+    {
+      "method": "per-topic",
+      "topicCount": 10,
+      "bulletCount": 10,
+      "title": "## Overview",
+      "markdown": "\n\n## Overview\nBelow is a high level overview of the topics discussed in the conversation, as well as the percentage of statements categorized under each topic. Note that the percentages may add up to greater than 100% when statements fall under more than one topic.\n\n* **Topic 1 (10%)**: The conversation highlights recurring practical concerns and proposals, emphasizing the need for feasibility and timeline clarity, budget and staffing constraints, and equitable access across neighborhoods.\n* **Topic 2 (10%)**: Topic 2 reflects common priorities and implementation trade-offs, with statements emphasizing feasibility, timeline clarity, budget constraints, and equitable access across neighborhoods.\n* **Topic 3 (10%)**: Topic 3 reflects common priorities and implementation trade-offs, with statements highlighting feasibility, timeline clarity, budget constraints, and equitable access across neighborhoods.\n* **Topic 4 (10%)**: Topic 4 reflects common priorities and implementation trade-offs, with statements emphasizing feasibility, timeline clarity, budget constraints, and equitable access across neighborhoods.\n* **Topic 5 (10%)**: Topic 5 reflects common priorities and implementation trade-offs, with statements emphasizing feasibility, timeline clarity, budget constraints, and equitable access across neighborhoods.\n* **Topic 6 (10%)**: The conversation highlights recurring practical concerns and proposals, emphasizing feasibility, timeline clarity, budget constraints, and equitable access across neighborhoods.\n* **Topic 7 (10%)**: Topic 7 reflects common priorities and implementation trade-offs, with statements emphasizing feasibility, timeline clarity, budget constraints, and equitable access across neighborhoods.\n* **Topic 8 (10%)**: Statements regarding Topic 8 emphasize practical concerns and implementation constraints, highlighting the need for clear timelines, budget management, and equitable access across neighborhoods.\n* **Topic 9 (10%)**: Topic 9 reflects common priorities and implementation trade-offs, with statements emphasizing feasibility, timeline clarity, budget constraints, and equitable access across neighborhoods.\n* **Topic 10 (10%)**: Statements regarding Topic 10 emphasize practical concerns and implementation constraints, highlighting the need for clear timelines, budget management, and equitable access across neighborhoods."
+    }
+  ]
+}
