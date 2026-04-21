@@ -39,6 +39,36 @@ const DEFAULT_MODEL = "nvidia/nemotron-3-nano-4b";
 const DEFAULT_MAX_TOKENS = 4096;
 const DEFAULT_CATEGORIZATION_BATCH_SIZE = 20;
 const MAX_RETRIES = 3;
+const DEFAULT_CONCURRENCY = 1;
+
+// Global concurrency limiter: caps the number of in-flight fetches to LM Studio
+// so we never exceed the model's `Parallel` setting (which would queue requests
+// server-side and trigger undici HeadersTimeoutError on the client).
+const MAX_CONCURRENCY = (() => {
+  const raw = getEnvVar("LM_STUDIO_CONCURRENCY", String(DEFAULT_CONCURRENCY));
+  const parsed = Number.parseInt(raw ?? "", 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_CONCURRENCY;
+})();
+
+let activeRequests = 0;
+const pendingWaiters: Array<() => void> = [];
+
+async function acquireSlot(): Promise<void> {
+  if (activeRequests < MAX_CONCURRENCY) {
+    activeRequests++;
+    return;
+  }
+  await new Promise<void>((resolve) => pendingWaiters.push(resolve));
+}
+
+function releaseSlot(): void {
+  const next = pendingWaiters.shift();
+  if (next) {
+    next();
+  } else {
+    activeRequests--;
+  }
+}
 
 export class LmStudioModel extends Model {
   private readonly apiKey?: string;
@@ -118,6 +148,7 @@ export class LmStudioModel extends Model {
 
     let lastError: Error | null = null;
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      await acquireSlot();
       try {
         const response = await fetch(`${this.baseUrl}/chat/completions`, {
           method: "POST",
@@ -145,6 +176,8 @@ export class LmStudioModel extends Model {
           break;
         }
         await sleep(attempt * 1000);
+      } finally {
+        releaseSlot();
       }
     }
 
