@@ -62,13 +62,29 @@ export class OpenRouterModel extends Model {
         throw new Error("Empty response from OpenRouter API");
       }
       const parsed = JSON.parse(response);
-      
-      // 處理 LLM 可能回傳的包裝格式，如 {"items": [...]}
+
+      // schema 期望的型別（'array' / 'object' / undefined）
+      const schemaType =
+        schema && typeof schema === 'object' && 'type' in schema
+          ? (schema as { type?: string }).type
+          : undefined;
+
+      // 處理 LLM 可能回傳的包裝格式，如 {"items": [...]}。
+      // 注意：只有當 schema 期望「陣列」時才能解開包裝，否則對於像
+      // OverviewSummaryResponse = { items: [...] } 這類本來就是物件的 schema，
+      // 解包會把回應誤判成陣列並觸發後面的型別檢查錯誤。
       let processedData = parsed;
       console.log(`   🔍 Raw parsed response:`, JSON.stringify(parsed, null, 2));
-      
-      if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
-        // 檢查是否有常見的包裝鍵
+
+      const shouldUnwrap =
+        schemaType === 'array' || (schemaType === undefined && Array.isArray(schema));
+
+      if (
+        shouldUnwrap &&
+        typeof parsed === 'object' &&
+        parsed !== null &&
+        !Array.isArray(parsed)
+      ) {
         const wrapperKeys = ['items', 'data', 'result', 'content', 'output'];
         for (const key of wrapperKeys) {
           if (key in parsed && Array.isArray(parsed[key])) {
@@ -78,9 +94,9 @@ export class OpenRouterModel extends Model {
           }
         }
       }
-      
+
       console.log(`   🔍 Final processed data:`, JSON.stringify(processedData, null, 2));
-      
+
       // 在 Cloudflare Workers 環境中，避免使用 TypeBox 編譯器
       // 改用簡單的 JSON 驗證
       if (schema && Array.isArray(schema)) {
@@ -90,17 +106,21 @@ export class OpenRouterModel extends Model {
           throw new Error('Response format error: expected array but got ' + typeof processedData);
         }
       }
-      
+
       // 基本類型檢查（避免使用 TypeBox 編譯器）
-      if (schema && typeof schema === 'object' && 'type' in schema) {
-        if (schema.type === 'array' && !Array.isArray(processedData)) {
-          throw new Error('Response format error: expected array but got ' + typeof processedData);
-        }
-        if (schema.type === 'object' && (typeof processedData !== 'object' || Array.isArray(processedData))) {
-          throw new Error('Response format error: expected object but got ' + typeof processedData);
-        }
+      if (schemaType === 'array' && !Array.isArray(processedData)) {
+        throw new Error('Response format error: expected array but got ' + typeof processedData);
       }
-      
+      if (
+        schemaType === 'object' &&
+        (typeof processedData !== 'object' ||
+          processedData === null ||
+          Array.isArray(processedData))
+      ) {
+        const actual = Array.isArray(processedData) ? 'array' : typeof processedData;
+        throw new Error('Response format error: expected object but got ' + actual);
+      }
+
       return processedData;
     } catch (error) {
       console.error('Error in generateData:', error);
